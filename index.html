@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<meta name="ext-resource-dependency" content="./images/logo-mark.webp" data-resource-id="a0" />
+<meta name="ext-resource-dependency" content="./images/bar.webp" data-resource-id="a3" />
+<meta name="ext-resource-dependency" content="./images/oven-wide.webp" data-resource-id="a4" />
+<meta name="ext-resource-dependency" content="./images/pz-margherita.webp" data-resource-id="a9" />
+<meta name="ext-resource-dependency" content="./images/pz-mozzarella-basil.webp" data-resource-id="a10" />
+<meta name="ext-resource-dependency" content="./images/pizza-garden.webp" data-resource-id="a11" />
+<meta name="ext-resource-dependency" content="./images/pz-paneer-tikka.webp" data-resource-id="a12" />
+<meta name="ext-resource-dependency" content="./images/pz-spinach-feta.webp" data-resource-id="a13" />
+<meta name="ext-resource-dependency" content="./images/pz-mediterranean.webp" data-resource-id="a14" />
+<meta name="ext-resource-dependency" content="./images/pz-braganza-bonanza-veg.webp" data-resource-id="a15" />
+<meta name="ext-resource-dependency" content="./images/pz-pepperoni.webp" data-resource-id="a16" />
+<meta name="ext-resource-dependency" content="./images/pizza-chicken-bbq.webp" data-resource-id="a17" />
+<meta name="ext-resource-dependency" content="./images/pizza-chicken-tikka.webp" data-resource-id="a18" />
+<meta name="ext-resource-dependency" content="./images/pz-chicken-keema.webp" data-resource-id="a19" />
+<meta name="ext-resource-dependency" content="./images/pz-chicken-sausages.webp" data-resource-id="a20" />
+<meta name="ext-resource-dependency" content="./images/pz-smoked-paprika.webp" data-resource-id="a21" />
+<meta name="ext-resource-dependency" content="./images/pz-bacon-onion.webp" data-resource-id="a22" />
+<meta name="ext-resource-dependency" content="./images/pz-flaming-salami.webp" data-resource-id="a23" />
+<meta name="ext-resource-dependency" content="./images/pz-goan-chorizo.webp" data-resource-id="a24" />
+<meta name="ext-resource-dependency" content="./images/pz-hawaiian.webp" data-resource-id="a25" />
+<meta name="ext-resource-dependency" content="./images/pz-braganza-bonanza.webp" data-resource-id="a26" />
+<template id="__bundler_thumbnail" data-bg-color="#FBF3E6">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#FBF3E6"/>
+    <circle cx="600" cy="400" r="215" fill="#1B7A3E"/>
+    <circle cx="600" cy="400" r="196" fill="#FBF3E6"/>
+    <circle cx="600" cy="400" r="180" fill="#C9341F"/>
+    <text x="600" y="380" text-anchor="middle" font-family="Georgia,serif" font-size="96" fill="#F2EFDD">Pizza</text>
+    <text x="600" y="478" text-anchor="middle" font-family="Georgia,serif" font-size="96" fill="#F2EFDD">Mia</text>
+  </svg>
+</template>
+<meta name="ext-resource-dependency" content="./images/banner1.jpg" data-resource-id="n1" />
+<meta name="ext-resource-dependency" content="./images/banner2.jpg" data-resource-id="n2" />
+<meta name="ext-resource-dependency" content="./images/banner3.jpg" data-resource-id="n3" />
+<meta name="ext-resource-dependency" content="./images/location-banner.jpg" data-resource-id="n4" />
+<meta name="ext-resource-dependency" content="./images/fairytale1.png" data-resource-id="n5" />
+<meta name="ext-resource-dependency" content="./images/fairytale2.png" data-resource-id="n6" />
+<meta name="ext-resource-dependency" content="./images/fairytale3.png" data-resource-id="n7" />
+<meta name="ext-resource-dependency" content="./images/doughityourself1.png" data-resource-id="n8" />
+<meta name="ext-resource-dependency" content="./images/doughityourself2.png" data-resource-id="n9" />
+<meta name="ext-resource-dependency" content="./images/doughityourself3.jpg" data-resource-id="n10" />
+<meta name="ext-resource-dependency" content="./images/doughityourself4.webp" data-resource-id="n11" />
+<meta name="ext-resource-dependency" content="./images/kareoke1.webp" data-resource-id="n12" />
+<meta name="ext-resource-dependency" content="./images/kareoke2.webp" data-resource-id="n13" />
+<meta name="ext-resource-dependency" content="./images/kareoke3.png" data-resource-id="n14" />
+<meta name="ext-resource-dependency" content="./images/rakhi1.jpg" data-resource-id="n15" />
+<meta name="ext-resource-dependency" content="./images/rakhi2.jpg" data-resource-id="n16" />
+<meta name="ext-resource-dependency" content="./images/rakhi3.jpg" data-resource-id="n17" />
+<meta name="ext-resource-dependency" content="./images/rakhi4.jpg" data-resource-id="n18" />
+<meta name="ext-resource-dependency" content="./images/valentine1.jpg" data-resource-id="n19" />
+<meta name="ext-resource-dependency" content="./images/valentine2.jpeg" data-resource-id="n20" />
+<meta name="ext-resource-dependency" content="./images/valentine3.jpeg" data-resource-id="n21" />
+<meta name="ext-resource-dependency" content="./images/valentine4.jpg" data-resource-id="n22" />
+<meta name="ext-resource-dependency" content="./images/pizzamaking1.png" data-resource-id="n23" />
+<meta name="ext-resource-dependency" content="./images/pizzamaking2.png" data-resource-id="n24" />
+<meta name="ext-resource-dependency" content="./images/pizzamaking3.webp" data-resource-id="n25" />
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #FBF3E6; }
+  a { color: #C9341F; text-decoration: none; }
+  a:hover { color: #1B3A2A; }
+  ::selection { background: #C6DBBB; }
+  .rail::-webkit-scrollbar { height: 6px; }
+  .rail::-webkit-scrollbar-thumb { background: #DCCFBA; border-radius: 99px; }
+  .rail::-webkit-scrollbar-track { background: transparent; }
+</style>
+</helmet>
+
+<div style="font-family:'Karla',sans-serif;color:#22271F;background:#FBF3E6;width:100%;overflow-x:hidden;">
+
+  <header style="{{ headerStyle }}">
+    <div style="max-width:1240px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+      <a href="#home" style="display:flex;align-items:center;gap:12px;">
+        <img src="./images/logo-mark.webp" alt="Pizza Mia" style="height:56px;width:56px;object-fit:contain;display:block;"/>
+        <div style="line-height:1;">
+          <div style="font-family:'Pacifico',cursive;font-size:23px;color:#1B3A2A;">Pizza Mia</div>
+          <div style="font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;color:#7A7767;margin-top:5px;">Your Neighbourhood Pizzeria</div>
+        </div>
+      </a>
+
+      <nav style="display:flex;gap:26px;align-items:center;flex-wrap:wrap;">
+        <a href="#menu" style="color:#22271F;font-weight:600;font-size:14.5px;letter-spacing:0.01em;">Menu</a>
+        <a href="#events" style="color:#22271F;font-weight:600;font-size:14.5px;">Events</a>
+        <a href="#about" style="color:#22271F;font-weight:600;font-size:14.5px;">Our Place</a>
+        <a href="#visit" style="color:#22271F;font-weight:600;font-size:14.5px;">Visit</a>
+        <a href="#visit" style="color:#22271F;font-weight:700;font-size:14.5px;white-space:nowrap;">Contact us</a>
+        <a href="#order" style="background:#C9341F;color:#FBF3E6;padding:11px 20px;border-radius:100px;font-weight:700;font-size:14px;white-space:nowrap;box-shadow:0 2px 0 #8E2314;">Order online</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="home" style="max-width:1240px;margin:0 auto;padding:60px 28px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:52px;align-items:center;">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:#C6DBBB;color:#1B3A2A;padding:7px 15px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:22px;">Miramar · Panaji · Goa</div>
+      <h1 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(38px,5vw,62px);line-height:1.04;letter-spacing:-0.01em;margin:0 0 20px;color:#1B3A2A;">Pizzas, cocktails<br/>and a <span style="font-family:'Pacifico',cursive;font-size:0.82em;color:#C9341F;">family friendly</span><br/>community</h1>
+      <p style="font-size:17.5px;line-height:1.6;color:#4E5347;margin:0 0 30px;max-width:470px;">A cozy corner pizzeria in Miramar. We organise community get-togethers, birthday parties and events for your loved ones along with our fresh thin crust pizzas from the oven, Garlic Knots and signature cocktails.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="#menu" style="background:#C9341F;color:#FBF3E6;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;box-shadow:0 3px 0 #8E2314;">See the pizzas</a>
+        <a href="#events" style="background:transparent;border:1.5px solid #1B3A2A;color:#1B3A2A;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;">Host an event</a>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto auto;gap:14px;min-width:0;">
+      <img src="./images/banner1.jpg" alt="Pizza Mia" style="width:100%;height:100%;min-height:354px;object-fit:cover;border-radius:18px;display:block;grid-row:span 2;"/>
+      <img src="./images/banner2.jpg" alt="Pizza Mia" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
+      <img src="./images/banner3.jpg" alt="Pizza Mia" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF STRIP -->
+  <section style="max-width:1240px;margin:0 auto;padding:16px 28px 72px;">
+    <div style="border:1px solid #E4D8C2;background:#FFFCF6;border-radius:18px;padding:22px 28px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:34px;line-height:1;color:#1B3A2A;">4.2</div>
+        <div>
+          <div style="color:#E8A33D;font-size:14px;letter-spacing:3px;line-height:1;">★★★★☆</div>
+          <div style="font-size:13px;color:#7A7767;margin-top:6px;letter-spacing:0.04em;">200+ Google reviews</div>
+        </div>
+      </div>
+      <div style="height:38px;width:1px;background:#E4D8C2;"></div>
+      <div style="font-family:'DM Serif Display',serif;font-style:italic;font-size:19px;line-height:1.4;color:#4E5347;max-width:420px;">“A tiny, cosy place near Miramar Beach, some of the best pizza in Goa.”</div>
+      <div style="height:38px;width:1px;background:#E4D8C2;"></div>
+      <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="display:flex;align-items:center;gap:11px;">
+        <span style="width:38px;height:38px;border-radius:11px;background:#1B3A2A;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FBF3E6" stroke-width="1.9" stroke-linecap="round"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#FBF3E6" stroke="none"></circle></svg></span>
+        <span>
+          <span style="display:block;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#7A7767;">Follow along</span>
+          <span style="display:block;font-size:16px;font-weight:700;letter-spacing:-0.01em;color:#1B3A2A;margin-top:3px;">@pizzamiagoa</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- MENU RAIL -->
+  <section id="menu" style="background:#FFFCF6;border-top:1px solid #EFE4D0;border-bottom:1px solid #EFE4D0;padding:76px 0;">
+    <div style="max-width:1240px;margin:0 auto;padding:0 28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:34px;">
+      <div style="max-width:560px;">
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#C9341F;font-weight:700;margin-bottom:12px;">The Menu</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(30px,3.6vw,44px);line-height:1.1;margin:0 0 12px;color:#1B3A2A;">Thin crust, big table</h2>
+        <p style="font-size:16.5px;line-height:1.6;color:#4E5347;margin:0;">Hand-stretched bases, baked to order. Scroll through the pizzas.</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onClick="{{ scrollPizzaLeft }}" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #D9CBB3;background:#FBF3E6;color:#1B3A2A;font-size:17px;cursor:pointer;" style-hover="background:#C6DBBB;border-color:#1B3A2A;">←</button>
+        <button onClick="{{ scrollPizzaRight }}" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #D9CBB3;background:#FBF3E6;color:#1B3A2A;font-size:17px;cursor:pointer;" style-hover="background:#C6DBBB;border-color:#1B3A2A;">→</button>
+      </div>
+    </div>
+
+    <div ref="{{ pizzaRail }}" class="rail" style="display:flex;gap:20px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x mandatory;padding:6px 28px 24px;max-width:1240px;margin:0 auto;">
+      <sc-for list="{{ pizzas }}" as="pizza" hint-placeholder-count="0">
+        <div style="flex:0 0 288px;min-width:0;overflow:hidden;scroll-snap-align:start;background:#FBF3E6;border:1px solid #EFE4D0;border-radius:20px;padding:18px;" style-hover="border-color:#C6DBBB;">
+          <div style="background:#FFFFFF;border-radius:14px;padding:10px;margin-bottom:16px;">
+            <sc-if value="{{ pizza.hasImg }}" hint-placeholder-val="{{ true }}">
+              <img ref="{{ pizza.imgRef }}" alt="{{ pizza.name }}" style="width:100%;height:210px;object-fit:contain;display:block;"/>
+            </sc-if>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#1B3A2A;line-height:1.15;">{{ pizza.name }}</div>
+            <span style="{{ pizza.tagStyle }}"><span style="{{ pizza.dotStyle }}"></span>{{ pizza.tag }}</span>
+          </div>
+          <div style="font-size:14.5px;line-height:1.5;color:#7A7767;margin-top:8px;">{{ pizza.toppings }}</div>
+        </div>
+      </sc-for>
+      <div style="flex:0 0 288px;scroll-snap-align:start;background:#1B3A2A;border-radius:20px;padding:28px;display:flex;flex-direction:column;justify-content:flex-end;">
+        <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#FBF3E6;line-height:1.15;margin-bottom:10px;">Plus pastas, starters &amp; desserts</div>
+        <p style="font-size:14.5px;line-height:1.55;color:#B9C7B0;margin:0 0 20px;">Garlic knots, aglio e olio, brownies. The full list is on the delivery apps.</p>
+        <a href="#order" style="color:#FBF3E6;font-weight:700;font-size:14.5px;border-bottom:1.5px solid #E8A33D;padding-bottom:3px;align-self:flex-start;">See the full menu →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section id="events" style="background:#1B3A2A;padding:80px 0;">
+    <div style="max-width:1240px;margin:0 auto;padding:0 28px;">
+      <div style="max-width:620px;margin-bottom:30px;">
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#E8A33D;font-weight:700;margin-bottom:12px;">What's On</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(30px,3.6vw,44px);line-height:1.1;margin:0 0 14px;color:#FBF3E6;">A room built for<span style="font-family:'Pacifico',cursive;color:#C6DBBB;"> get-togethers</span></h2>
+        <p style="font-size:16.5px;line-height:1.6;color:#B9C7B0;margin:0;">Pizza making parties, craft afternoons, karaoke nights and festive specials. A few examples of what we've hosted. Its always a messy affair but so much fun. Tell us the occasion and we'll help you plan a custom event around it.</p>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;">
+        <sc-for list="{{ eventTabs }}" as="tab" hint-placeholder-count="5">
+          <button onClick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:18px;">
+        <p style="font-size:16px;line-height:1.6;color:#B9C7B0;margin:0;max-width:520px;">{{ activeEventBlurb }}</p>
+        <div style="display:flex;gap:10px;">
+          <button onClick="{{ scrollEventLeft }}" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #3A5B47;background:transparent;color:#FBF3E6;font-size:17px;cursor:pointer;" style-hover="background:#3A5B47;">←</button>
+          <button onClick="{{ scrollEventRight }}" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #3A5B47;background:transparent;color:#FBF3E6;font-size:17px;cursor:pointer;" style-hover="background:#3A5B47;">→</button>
+        </div>
+      </div>
+    </div>
+
+    <div ref="{{ eventRail }}" class="rail" style="display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x mandatory;padding:4px 28px 20px;max-width:1240px;margin:0 auto;">
+      <sc-for list="{{ activeEventPhotos }}" as="photo" hint-placeholder-count="4">
+        <div style="flex:0 0 {{ photo.width }};scroll-snap-align:start;border-radius:18px;overflow:hidden;background:#24452F;height:{{ photo.height }};color:#DCE8D6;">
+          <img ref="{{ photo.imgRef }}" alt="{{ photo.alt }}" style="{{ photo.slotStyle }}"/>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="max-width:1240px;margin:0 auto;padding:22px 28px 0;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+      <a href="tel:+919284499027" style="background:#E8A33D;color:#22271F;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;">Enquire about hosting →</a>
+      <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="color:#FBF3E6;border:1.5px solid #3A5B47;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;display:flex;align-items:center;gap:9px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FBF3E6" stroke-width="1.9" stroke-linecap="round"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#FBF3E6" stroke="none"></circle></svg>See what's coming up</a>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" style="max-width:1240px;margin:0 auto;padding:84px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:center;">
+    <div style="position:relative;">
+      <img src="./images/bar.webp" alt="Inside Pizza Mia" style="width:100%;height:480px;object-fit:cover;border-radius:20px;display:block;"/>
+      <div style="position:absolute;bottom:20px;left:20px;background:#FBF3E6;border-radius:14px;padding:14px 18px;">
+        <div style="font-family:'Pacifico',cursive;font-size:17px;color:#C9341F;line-height:1;">Happy hours</div>
+        <div style="font-size:13px;color:#4E5347;margin-top:6px;letter-spacing:0.02em;">Cocktails 1+1 · 7–9 PM</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#C9341F;font-weight:700;margin-bottom:12px;">Our Place</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(30px,3.6vw,44px);line-height:1.1;margin:0 0 18px;color:#1B3A2A;">Small room, long tables, no rush</h2>
+      <p style="font-size:16.5px;line-height:1.65;color:#4E5347;margin:0 0 30px;">Green walls, wooden floors, lanterns out front. Board Games stocked up. Bring the kids, bring the grandparents, bring ten friends and push the tables together.</p>
+      <div style="display:grid;gap:18px;">
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <span style="width:42px;height:42px;border-radius:12px;background:#C6DBBB;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🍕</span>
+          <div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Pizza worth the wait</div>
+            <div style="font-size:15px;color:#7A7767;line-height:1.55;">Hand-stretched thin crust, loaded properly, straight from the deck oven.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <span style="width:42px;height:42px;border-radius:12px;background:#C6DBBB;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🍸</span>
+          <div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">A proper little bar</div>
+            <div style="font-size:15px;color:#7A7767;line-height:1.55;">Cocktails, cold beer and wine, with happy hours to start the evening right.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <span style="width:42px;height:42px;border-radius:12px;background:#C6DBBB;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎈</span>
+          <div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Yours for the evening</div>
+            <div style="font-size:15px;color:#7A7767;line-height:1.55;">Birthdays, family dinners and community nights. We'll help you set it up.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section style="background:#FFFCF6;border-top:1px solid #EFE4D0;border-bottom:1px solid #EFE4D0;padding:76px 28px;">
+    <div style="max-width:1240px;margin:0 auto;">
+      <div style="text-align:center;max-width:540px;margin:0 auto 42px;">
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#C9341F;font-weight:700;margin-bottom:12px;">Word of Mouth</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(30px,3.6vw,44px);line-height:1.1;margin:0;color:#1B3A2A;">What the neighbours say</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;">
+        <div style="background:#FBF3E6;border:1px solid #EFE4D0;border-radius:20px;padding:30px;">
+          <div style="color:#E8A33D;font-size:14px;letter-spacing:3px;margin-bottom:18px;">★★★★★</div>
+          <p style="font-family:'DM Serif Display',serif;font-size:19.5px;line-height:1.45;color:#22271F;margin:0 0 20px;">“Best pizzas I've had in Goa, properly thin and crisp, and the chicken pizza is unmissable.”</p>
+          <div style="font-size:12.5px;letter-spacing:0.1em;text-transform:uppercase;color:#7A7767;font-weight:700;">Google Reviews</div>
+        </div>
+        <div style="background:#FBF3E6;border:1px solid #EFE4D0;border-radius:20px;padding:30px;">
+          <div style="color:#E8A33D;font-size:14px;letter-spacing:3px;margin-bottom:18px;">★★★★★</div>
+          <p style="font-family:'DM Serif Display',serif;font-size:19.5px;line-height:1.45;color:#22271F;margin:0 0 20px;">“A tiny, cosy place tucked away near Miramar Beach. The garlic knots alone are worth the trip.”</p>
+          <div style="font-size:12.5px;letter-spacing:0.1em;text-transform:uppercase;color:#7A7767;font-weight:700;">Tripadvisor</div>
+        </div>
+        <div style="background:#FBF3E6;border:1px solid #EFE4D0;border-radius:20px;padding:30px;">
+          <div style="color:#E8A33D;font-size:14px;letter-spacing:3px;margin-bottom:18px;">★★★★★</div>
+          <p style="font-family:'DM Serif Display',serif;font-size:19.5px;line-height:1.45;color:#22271F;margin:0 0 20px;">“Great for families, the kids loved it, and the whole evening felt warm and unhurried.”</p>
+          <div style="font-size:12.5px;letter-spacing:0.1em;text-transform:uppercase;color:#7A7767;font-weight:700;">Google Reviews</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISIT -->
+  <section id="visit" style="max-width:1240px;margin:0 auto;padding:76px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;align-items:stretch;">
+    <div style="display:flex;flex-direction:column;min-width:0;">
+      <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#C9341F;font-weight:700;margin-bottom:12px;">Come Say Hello</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(30px,3.6vw,42px);line-height:1.1;margin:0 0 14px;color:#1B3A2A;">Find us in Miramar</h2>
+      <p style="font-size:16px;line-height:1.55;color:#4E5347;margin:0 0 22px;max-width:430px;">Next to London Hotel, a five-minute walk from Miramar Beach. Dine in, take away, or call for free delivery.</p>
+      <div style="display:grid;gap:13px;margin-bottom:22px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span style="font-size:17px;line-height:1.4;">📍</span>
+          <div style="font-size:15.5px;line-height:1.6;color:#22271F;">Shop No. 1, Ground Floor, Romirs Apartment,<br/>St. Mary's Colony, Plot No. 13/759/1,<br/>next to London Hotel, Miramar, Panaji, Goa 403001</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <span style="font-size:17px;">📞</span>
+          <a href="tel:+919284499027" style="font-size:15.5px;font-weight:700;color:#22271F;">+91 92844 99027 · free delivery</a>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <span style="font-size:16px;">✉️</span>
+          <a href="mailto:pizzamiamiramar@gmail.com" style="font-size:15.5px;font-weight:700;color:#22271F;">pizzamiamiramar@gmail.com</a>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22271F" stroke-width="1.9" stroke-linecap="round" style="flex-shrink:0;"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#22271F" stroke="none"></circle></svg>
+          <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="font-size:15.5px;font-weight:700;color:#22271F;">@pizzamiagoa</a>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+        <a href="https://maps.google.com/?q=Pizza+Mia+Miramar+Panaji+Goa" target="_blank" style="background:#1B3A2A;color:#FBF3E6;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;">Get directions →</a>
+        <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="border:1.5px solid #D9CBB3;color:#1B3A2A;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;display:flex;align-items:center;gap:9px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1B3A2A" stroke-width="1.9" stroke-linecap="round"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#1B3A2A" stroke="none"></circle></svg>Instagram</a>
+      </div>
+      <img src="./images/oven-wide.webp" alt="Pizza Mia" style="width:100%;flex:1 1 auto;min-height:230px;object-fit:cover;border-radius:20px;display:block;"/>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:20px;min-width:0;align-content:start;">
+    <img src="./images/location-banner.jpg" alt="Pizza Mia" style="width:100%;height:392px;object-fit:cover;border-radius:20px;display:block;"/>
+    <div style="background:#FFFCF6;border:1px solid #E4D8C2;border-radius:20px;padding:26px 28px;">
+      <div style="font-family:'DM Serif Display',serif;font-size:21px;color:#1B3A2A;margin-bottom:14px;">Opening hours</div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EFE4D0;font-size:14.5px;"><span style="font-weight:700;">Monday</span><span style="color:#7A7767;">12–3 PM · 6–11:45 PM</span></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EFE4D0;font-size:14.5px;"><span style="font-weight:700;">Tuesday</span><span style="color:#7A7767;">3–11:45 PM</span></div>
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;font-size:14.5px;"><span style="font-weight:700;">Wed – Sunday</span><span style="color:#7A7767;">12–11:45 PM</span></div>
+      <div style="margin-top:16px;padding-top:15px;border-top:1px dashed #DCCFBA;font-size:14px;line-height:1.5;color:#4E5347;">Happy hours every evening, 7–9 PM. Cocktails 1+1.</div>
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:flex-start;background:#F6EFE0;border-radius:12px;padding:12px 14px;">
+        <span style="font-size:14px;line-height:1.4;">🌙</span>
+        <div style="font-size:14px;line-height:1.5;color:#22271F;"><strong style="font-weight:700;">Late night, Wed–Sunday:</strong> open 12 AM–3 AM for takeaway, Swiggy and Zomato.</div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ORDER -->
+  <section id="order" style="padding:0 28px 84px;">
+    <div style="max-width:1240px;margin:0 auto;background:#C9341F;border-radius:26px;padding:64px 40px;text-align:center;">
+      <h2 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(28px,3.6vw,42px);line-height:1.12;color:#FBF3E6;margin:0 0 14px;">Hungry now? We deliver.</h2>
+      <p style="font-size:16.5px;color:#F6D3CB;margin:0 auto 34px;max-width:480px;line-height:1.6;">Order on your usual app, or call us directly. Delivery is free.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://www.zomato.com/goa/pizza-mia-panaji" target="_blank" style="background:#FBF3E6;color:#22271F;padding:16px 30px;border-radius:100px;font-weight:700;font-size:15.5px;display:flex;align-items:center;gap:10px;"><span style="width:8px;height:8px;border-radius:50%;background:#C9341F;"></span>Order on Zomato</a>
+        <a href="https://www.swiggy.com/city/central-goa/pizza-mia-panjim-miramar-rest79041" target="_blank" style="background:#FBF3E6;color:#22271F;padding:16px 30px;border-radius:100px;font-weight:700;font-size:15.5px;display:flex;align-items:center;gap:10px;"><span style="width:8px;height:8px;border-radius:50%;background:#E8A33D;"></span>Order on Swiggy</a>
+        <a href="tel:+919284499027" style="border:1.5px solid #F0A79B;color:#FBF3E6;padding:16px 30px;border-radius:100px;font-weight:700;font-size:15.5px;">Call 92844 99027</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="background:#1B3A2A;padding:60px 28px 30px;">
+    <div style="max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
+      <div>
+        <img src="./images/logo-mark.webp" alt="Pizza Mia" style="height:104px;width:104px;object-fit:contain;display:block;margin-bottom:18px;background:#FBF3E6;border-radius:50%;padding:9px;box-sizing:border-box;"/>
+        <p style="font-size:15px;line-height:1.6;color:#B9C7B0;margin:0;max-width:260px;">Your neighbourhood pizzeria in Miramar, Panaji. Pizza, cocktails and good company.</p>
+      </div>
+      <div>
+        <div style="font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:#E8A33D;font-weight:700;margin-bottom:16px;">Explore</div>
+        <div style="display:grid;gap:11px;font-size:15px;">
+          <a href="#menu" style="color:#DCE8D6;">Menu</a>
+          <a href="#events" style="color:#DCE8D6;">Events</a>
+          <a href="#about" style="color:#DCE8D6;">Our Place</a>
+          <a href="#visit" style="color:#DCE8D6;">Visit</a>
+          <a href="#order" style="color:#DCE8D6;">Order online</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:#E8A33D;font-weight:700;margin-bottom:16px;">Find Us</div>
+        <div style="font-size:14.5px;line-height:1.65;color:#B9C7B0;">Shop No. 1, Ground Floor, Romirs Apartment, St. Mary's Colony, Plot No. 13/759/1, next to London Hotel, Miramar, Panaji, Goa 403001</div>
+      </div>
+      <div>
+        <div style="font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:#E8A33D;font-weight:700;margin-bottom:16px;">Say Hello</div>
+        <div style="display:grid;gap:11px;font-size:15px;">
+          <a href="tel:+919284499027" style="color:#DCE8D6;">+91 92844 99027</a>
+          <a href="mailto:pizzamiamiramar@gmail.com" style="color:#DCE8D6;">pizzamiamiramar@gmail.com</a>
+          <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;color:#FBF3E6;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBF3E6" stroke-width="1.9" stroke-linecap="round" style="flex-shrink:0;"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#FBF3E6" stroke="none"></circle></svg>@pizzamiagoa</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1240px;margin:44px auto 0;padding-top:22px;border-top:1px solid #2E4F3B;font-size:13px;color:#8FA487;">© 2026 Pizza Mia, Goa.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;stickyHeader&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+const RMAP = {"./images/logo-mark.webp":"a0","./images/bar.webp":"a3","./images/oven-wide.webp":"a4","./images/pz-margherita.webp":"a9","./images/pz-mozzarella-basil.webp":"a10","./images/pizza-garden.webp":"a11","./images/pz-paneer-tikka.webp":"a12","./images/pz-spinach-feta.webp":"a13","./images/pz-mediterranean.webp":"a14","./images/pz-braganza-bonanza-veg.webp":"a15","./images/pz-pepperoni.webp":"a16","./images/pizza-chicken-bbq.webp":"a17","./images/pizza-chicken-tikka.webp":"a18","./images/pz-chicken-keema.webp":"a19","./images/pz-chicken-sausages.webp":"a20","./images/pz-smoked-paprika.webp":"a21","./images/pz-bacon-onion.webp":"a22","./images/pz-flaming-salami.webp":"a23","./images/pz-goan-chorizo.webp":"a24","./images/pz-hawaiian.webp":"a25","./images/pz-braganza-bonanza.webp":"a26","./images/banner1.jpg":"n1","./images/banner2.jpg":"n2","./images/banner3.jpg":"n3","./images/location-banner.jpg":"n4","./images/fairytale1.png":"n5","./images/fairytale2.png":"n6","./images/fairytale3.png":"n7","./images/doughityourself1.png":"n8","./images/doughityourself2.png":"n9","./images/doughityourself3.jpg":"n10","./images/doughityourself4.webp":"n11","./images/kareoke1.webp":"n12","./images/kareoke2.webp":"n13","./images/kareoke3.png":"n14","./images/rakhi1.jpg":"n15","./images/rakhi2.jpg":"n16","./images/rakhi3.jpg":"n17","./images/rakhi4.jpg":"n18","./images/valentine1.jpg":"n19","./images/valentine2.jpeg":"n20","./images/valentine3.jpeg":"n21","./images/valentine4.jpg":"n22","./images/pizzamaking1.png":"n23","./images/pizzamaking2.png":"n24","./images/pizzamaking3.webp":"n25"};
+const R = (p) => { if (!p) return p; if (/^data:/.test(p)) return p; const id = RMAP[p]; return (window.__resources && window.__resources[id]) || p; };
+
+const EVENTS = [
+  {
+    id: "fairytale",
+    label: "Fairytale Party",
+    blurb: "Costumes encouraged. The room gets dressed up and so does everyone in it.",
+    photos: [
+      { src: "./images/fairytale1.png", alt: "Fairytale Party photo 1", width: "560px" },
+      { src: "./images/fairytale2.png", alt: "Fairytale Party photo 2", width: "380px" },
+      { src: "./images/fairytale3.png", alt: "Fairytale Party photo 3", width: "380px" },
+    ],
+  },
+  {
+    id: "street",
+    label: "Dough-It-Yourself Ornaments",
+    blurb: "Kids shape and paint their own dough ornaments at the tables out front, then take one home to hang up.",
+    photos: [
+      { src: "./images/doughityourself1.png", alt: "Dough-It-Yourself Ornaments photo 1", width: "380px" },
+      { src: "./images/doughityourself2.png", alt: "Dough-It-Yourself Ornaments photo 2", width: "380px" },
+      { src: "./images/doughityourself3.jpg", alt: "Dough-It-Yourself Ornaments photo 3", width: "560px" },
+      { src: "./images/doughityourself4.webp", alt: "Dough-It-Yourself Ornaments photo 4", width: "380px" },
+    ],
+  },
+  {
+    id: "valentines",
+    label: "Karaoke",
+    blurb: "The mic goes round and everyone gets a turn. Happy hours run right through it.",
+    photoHeight: "500px",
+    photos: [
+      { src: "./images/kareoke1.webp", alt: "Karaoke photo 1", width: "355px" },
+      { src: "./images/kareoke2.webp", alt: "Karaoke photo 2", width: "355px" },
+      { src: "./images/kareoke3.png", alt: "Karaoke photo 3", width: "355px" },
+    ],
+  },
+  {
+    id: "rakhi",
+    label: "Rakhi",
+    blurb: "Brothers, sisters, cousins and a lot of pizza. A Rakhi afternoon for the whole family.",
+    photos: [
+      { src: "./images/rakhi1.jpg", alt: "Rakhi photo 1", width: "560px" },
+      { src: "./images/rakhi2.jpg", alt: "Rakhi photo 2", width: "380px" },
+      { src: "./images/rakhi3.jpg", alt: "Rakhi photo 3", width: "380px" },
+      { src: "./images/rakhi4.jpg", alt: "Rakhi photo 4", width: "380px" },
+    ],
+  },
+  {
+    id: "karaoke",
+    label: "Valentine's Day Special",
+    blurb: "Celebrating the 'I' in Valentine. Long conversations, hearty laughter and a table you're in no hurry to leave.",
+    photoFilter: "saturate(0.62) contrast(1.1) brightness(0.97) sepia(0.28) hue-rotate(-8deg)",
+    photos: [
+      { src: "./images/valentine1.jpg", alt: "Valentine's Day Special photo 1", width: "560px" },
+      { src: "./images/valentine2.jpeg", alt: "Valentine's Day Special photo 2", width: "380px" },
+      { src: "./images/valentine3.jpeg", alt: "Valentine's Day Special photo 3", width: "380px" },
+      { src: "./images/valentine4.jpg", alt: "Valentine's Day Special photo 4", width: "380px" },
+    ],
+  },
+  {
+    id: "pizza-making",
+    label: "Pizza Making Party",
+    blurb: "Aprons on, dough in hand. Kids stretch their own bases, top them however they like, and we bake them right there.",
+    photos: [
+      { src: "./images/pizzamaking1.png", alt: "Pizza Making Party photo 1", width: "560px" },
+      { src: "./images/pizzamaking2.png", alt: "Pizza Making Party photo 2", width: "380px" },
+      { src: "./images/pizzamaking3.webp", alt: "Pizza Making Party photo 3", width: "380px" },
+    ],
+  },
+];
+
+const PIZZAS = [
+  { name: "Margherita", toppings: "Cheese", img: "./images/pz-margherita.webp", veg: true },
+  { name: "Mozzarella and Basil", toppings: "Buffalo Mozzarella & Basil Leaves", img: "./images/pz-mozzarella-basil.webp", veg: true },
+  { name: "Garden", toppings: "Mushroom, Capsicum, Onion & Tomato", img: "./images/pizza-garden.webp", veg: true },
+  { name: "Paneer Tikka", toppings: "Paneer & Coriander", img: "./images/pz-paneer-tikka.webp", veg: true },
+  { name: "Spinach and Feta", toppings: "Sauté Spinach, Feta & Olive", img: "./images/pz-spinach-feta.webp", veg: true },
+  { name: "Mediterranean", toppings: "Feta, Sun-dried Tomato & Olive", img: "./images/pz-mediterranean.webp", veg: true },
+  { name: "Braganza Bonanza Veg", toppings: "Pineapple, Spinach, Feta, Jalapeños & Corn", img: "./images/pz-braganza-bonanza-veg.webp", veg: true },
+  { name: "Pepperoni", toppings: "Pepperoni", img: "./images/pz-pepperoni.webp", veg: false },
+  { name: "Chicken BBQ", toppings: "BBQ Chicken & Capsicum", img: "./images/pizza-chicken-bbq.webp", veg: false },
+  { name: "Chicken Tikka", toppings: "Chicken Tikka & Onion", img: "./images/pizza-chicken-tikka.webp", veg: false },
+  { name: "Chicken Keema", toppings: "Chicken Keema & Spring Onion", img: "./images/pz-chicken-keema.webp", veg: false },
+  { name: "Chicken Sausages", toppings: "Chicken Sausage, Mushroom & Green Olives", img: "./images/pz-chicken-sausages.webp", veg: false },
+  { name: "Smoked Paprika", toppings: "Chicken Paprika, Yellow Capsicum & Onion", img: "./images/pz-smoked-paprika.webp", veg: false },
+  { name: "Bacon & Onion", toppings: "Bacon & Caramelised onion", img: "./images/pz-bacon-onion.webp", veg: false },
+  { name: "Flaming Salami", toppings: "Salami, Red Pepper, Chilli Flakes & Mushroom", img: "./images/pz-flaming-salami.webp", veg: false },
+  { name: "Goan Chorizo", toppings: "Chorizo", img: "./images/pz-goan-chorizo.webp", veg: false },
+  { name: "Hawaiian", toppings: "Pineapple, Ham & Sweet Corn", img: "./images/pz-hawaiian.webp", veg: false },
+  { name: "Braganza Bonanza", toppings: "Chicken Tikka, Chicken Keema, Chicken Paprika, BBQ Chicken, Pineapple & Jalapeños", img: "./images/pz-braganza-bonanza.webp", veg: false },
+].map(p => ({
+  ...p,
+  tag: p.veg ? "Veg" : "Non-veg",
+  tagStyle: `display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-size:10.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;padding:5px 10px;border-radius:100px;border:1.5px solid ${p.veg ? "#1B7A3E" : "#C9341F"};color:${p.veg ? "#1B7A3E" : "#C9341F"};`,
+  dotStyle: `width:7px;height:7px;border-radius:2px;background:${p.veg ? "#1B7A3E" : "#C9341F"};`,
+  hasImg: !!p.img,
+  needsSlot: !p.img,
+  slotId: p.slotId || "",
+  imgRef: (el) => { const u = R(p.img); if (el && u && el.getAttribute("src") !== u) el.setAttribute("src", u); },
+}));
+
+class Component extends DCLogic {
+  state = { activeEvent: "fairytale" };
+  pizzaRail = React.createRef();
+  eventRail = React.createRef();
+
+  scroll(ref, dir) {
+    const el = ref.current;
+    if (el) el.scrollBy({ left: dir * Math.max(300, el.clientWidth * 0.8), behavior: "smooth" });
+  }
+
+  renderVals() {
+    const active = EVENTS.find(e => e.id === this.state.activeEvent) || EVENTS[0];
+    return {
+      headerStyle: (this.props.stickyHeader ?? true)
+        ? "position:sticky;top:0;z-index:50;background:rgba(251,243,230,0.94);backdrop-filter:blur(10px);border-bottom:1px solid #EFE4D0;"
+        : "background:#FBF3E6;border-bottom:1px solid #EFE4D0;",
+      pizzas: PIZZAS,
+      pizzaRail: this.pizzaRail,
+      eventRail: this.eventRail,
+      scrollPizzaLeft: () => this.scroll(this.pizzaRail, -1),
+      scrollPizzaRight: () => this.scroll(this.pizzaRail, 1),
+      scrollEventLeft: () => this.scroll(this.eventRail, -1),
+      scrollEventRight: () => this.scroll(this.eventRail, 1),
+      activeEventBlurb: active.blurb,
+      activeEventPhotos: active.photos.map(p => {
+        const height = p.height || active.photoHeight || "340px";
+        const resolved = R(p.src) || "";
+        return {
+          ...p,
+          src: resolved,
+          imgRef: (el) => { if (el && resolved && el.getAttribute("src") !== resolved) el.setAttribute("src", resolved); },
+          height,
+          slotStyle: `width:100%;height:${height};object-fit:cover;display:block;filter:${active.photoFilter || "saturate(0.82) contrast(1.06) brightness(1.02) sepia(0.16)"};`,
+        };
+      }),
+      eventTabs: EVENTS.map(e => {
+        const on = e.id === active.id;
+        return {
+          label: e.label,
+          onClick: () => this.setState({ activeEvent: e.id }),
+          style: `padding:11px 20px;border-radius:100px;font-family:'Karla',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer;border:1.5px solid ${on ? "#C6DBBB" : "#3A5B47"};background:${on ? "#C6DBBB" : "transparent"};color:${on ? "#1B3A2A" : "#DCE8D6"};`,
+        };
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
