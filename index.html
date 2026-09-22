@@ -39,16 +39,16 @@
 <meta name="ext-resource-dependency" content="./images/banner2.jpg" data-resource-id="n2" />
 <meta name="ext-resource-dependency" content="./images/banner3.jpg" data-resource-id="n3" />
 <meta name="ext-resource-dependency" content="./images/location-banner.jpg" data-resource-id="n4" />
-<meta name="ext-resource-dependency" content="./images/fairytale1.png" data-resource-id="n5" />
-<meta name="ext-resource-dependency" content="./images/fairytale2.png" data-resource-id="n6" />
-<meta name="ext-resource-dependency" content="./images/fairytale3.png" data-resource-id="n7" />
-<meta name="ext-resource-dependency" content="./images/doughityourself1.png" data-resource-id="n8" />
-<meta name="ext-resource-dependency" content="./images/doughityourself2.png" data-resource-id="n9" />
+<meta name="ext-resource-dependency" content="./images/fairytale1.jpg" data-resource-id="n5" />
+<meta name="ext-resource-dependency" content="./images/fairytale2.jpg" data-resource-id="n6" />
+<meta name="ext-resource-dependency" content="./images/fairytale3.jpg" data-resource-id="n7" />
+<meta name="ext-resource-dependency" content="./images/doughityourself1.jpg" data-resource-id="n8" />
+<meta name="ext-resource-dependency" content="./images/doughityourself2.jpg" data-resource-id="n9" />
 <meta name="ext-resource-dependency" content="./images/doughityourself3.jpg" data-resource-id="n10" />
 <meta name="ext-resource-dependency" content="./images/doughityourself4.webp" data-resource-id="n11" />
 <meta name="ext-resource-dependency" content="./images/kareoke1.webp" data-resource-id="n12" />
 <meta name="ext-resource-dependency" content="./images/kareoke2.webp" data-resource-id="n13" />
-<meta name="ext-resource-dependency" content="./images/kareoke3.png" data-resource-id="n14" />
+<meta name="ext-resource-dependency" content="./images/kareoke3.jpg" data-resource-id="n14" />
 <meta name="ext-resource-dependency" content="./images/rakhi1.jpg" data-resource-id="n15" />
 <meta name="ext-resource-dependency" content="./images/rakhi2.jpg" data-resource-id="n16" />
 <meta name="ext-resource-dependency" content="./images/rakhi3.jpg" data-resource-id="n17" />
@@ -57,8 +57,8 @@
 <meta name="ext-resource-dependency" content="./images/valentine2.jpeg" data-resource-id="n20" />
 <meta name="ext-resource-dependency" content="./images/valentine3.jpeg" data-resource-id="n21" />
 <meta name="ext-resource-dependency" content="./images/valentine4.jpg" data-resource-id="n22" />
-<meta name="ext-resource-dependency" content="./images/pizzamaking1.png" data-resource-id="n23" />
-<meta name="ext-resource-dependency" content="./images/pizzamaking2.png" data-resource-id="n24" />
+<meta name="ext-resource-dependency" content="./images/pizzamaking1.jpg" data-resource-id="n23" />
+<meta name="ext-resource-dependency" content="./images/pizzamaking2.jpg" data-resource-id="n24" />
 <meta name="ext-resource-dependency" content="./images/pizzamaking3.webp" data-resource-id="n25" />
 </head>
 <body>
@@ -112,9 +112,9 @@
       </div>
     </div>
     <div style="display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto auto;gap:14px;min-width:0;">
-      <img src="./images/banner1.jpg" alt="Pizza Mia" style="width:100%;height:100%;min-height:354px;object-fit:cover;border-radius:18px;display:block;grid-row:span 2;"/>
-      <img src="./images/banner2.jpg" alt="Pizza Mia" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
-      <img src="./images/banner3.jpg" alt="Pizza Mia" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
+      <img src="./images/banner1.jpg" alt="Pizza Mia" fetchpriority="high" decoding="async" style="width:100%;height:100%;min-height:354px;object-fit:cover;border-radius:18px;display:block;grid-row:span 2;"/>
+      <img src="./images/banner2.jpg" alt="Pizza Mia" decoding="async" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
+      <img src="./images/banner3.jpg" alt="Pizza Mia" decoding="async" style="width:100%;height:170px;object-fit:cover;border-radius:18px;display:block;"/>
     </div>
   </section>
 
@@ -160,7 +160,7 @@
         <div style="flex:0 0 288px;min-width:0;overflow:hidden;scroll-snap-align:start;background:#FBF3E6;border:1px solid #EFE4D0;border-radius:20px;padding:18px;" style-hover="border-color:#C6DBBB;">
           <div style="background:#FFFFFF;border-radius:14px;padding:10px;margin-bottom:16px;">
             <sc-if value="{{ pizza.hasImg }}" hint-placeholder-val="{{ true }}">
-              <img ref="{{ pizza.imgRef }}" alt="{{ pizza.name }}" style="width:100%;height:210px;object-fit:contain;display:block;"/>
+              <img ref="{{ pizza.imgRef }}" alt="{{ pizza.name }}" loading="lazy" decoding="async" style="width:100%;height:210px;object-fit:contain;display:block;"/>
             </sc-if>
           </div>
           <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
@@ -205,7 +205,7 @@
     <div ref="{{ eventRail }}" class="rail" style="display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x mandatory;padding:4px 28px 20px;max-width:1240px;margin:0 auto;">
       <sc-for list="{{ activeEventPhotos }}" as="photo" hint-placeholder-count="4">
         <div style="flex:0 0 {{ photo.width }};scroll-snap-align:start;border-radius:18px;overflow:hidden;background:#24452F;height:{{ photo.height }};color:#DCE8D6;">
-          <img ref="{{ photo.imgRef }}" alt="{{ photo.alt }}" style="{{ photo.slotStyle }}"/>
+          <img ref="{{ photo.imgRef }}" alt="{{ photo.alt }}" loading="lazy" decoding="async" style="{{ photo.slotStyle }}"/>
         </div>
       </sc-for>
     </div>
@@ -219,7 +219,7 @@
   <!-- ABOUT -->
   <section id="about" style="max-width:1240px;margin:0 auto;padding:84px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:center;">
     <div style="position:relative;">
-      <img src="./images/bar.webp" alt="Inside Pizza Mia" style="width:100%;height:480px;object-fit:cover;border-radius:20px;display:block;"/>
+      <img src="./images/bar.webp" alt="Inside Pizza Mia" loading="lazy" decoding="async" style="width:100%;height:480px;object-fit:cover;border-radius:20px;display:block;"/>
       <div style="position:absolute;bottom:20px;left:20px;background:#FBF3E6;border-radius:14px;padding:14px 18px;">
         <div style="font-family:'Pacifico',cursive;font-size:17px;color:#C9341F;line-height:1;">Happy hours</div>
         <div style="font-size:13px;color:#4E5347;margin-top:6px;letter-spacing:0.02em;">Cocktails 1+1 · 7–9 PM</div>
@@ -310,11 +310,11 @@
         <a href="https://maps.google.com/?q=Pizza+Mia+Miramar+Panaji+Goa" target="_blank" style="background:#1B3A2A;color:#FBF3E6;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;">Get directions →</a>
         <a href="https://www.instagram.com/pizzamiagoa/" target="_blank" style="border:1.5px solid #D9CBB3;color:#1B3A2A;padding:14px 26px;border-radius:100px;font-weight:700;font-size:15px;display:flex;align-items:center;gap:9px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1B3A2A" stroke-width="1.9" stroke-linecap="round"><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="5.4"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.3" cy="6.7" r="1.15" fill="#1B3A2A" stroke="none"></circle></svg>Instagram</a>
       </div>
-      <img src="./images/oven-wide.webp" alt="Pizza Mia" style="width:100%;flex:1 1 auto;min-height:230px;object-fit:cover;border-radius:20px;display:block;"/>
+      <img src="./images/oven-wide.webp" alt="Pizza Mia" loading="lazy" decoding="async" style="width:100%;flex:1 1 auto;min-height:230px;object-fit:cover;border-radius:20px;display:block;"/>
     </div>
 
     <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:20px;min-width:0;align-content:start;">
-    <img src="./images/location-banner.jpg" alt="Pizza Mia" style="width:100%;height:392px;object-fit:cover;border-radius:20px;display:block;"/>
+    <img src="./images/location-banner.jpg" alt="Pizza Mia" loading="lazy" decoding="async" style="width:100%;height:392px;object-fit:cover;border-radius:20px;display:block;"/>
     <div style="background:#FFFCF6;border:1px solid #E4D8C2;border-radius:20px;padding:26px 28px;">
       <div style="font-family:'DM Serif Display',serif;font-size:21px;color:#1B3A2A;margin-bottom:14px;">Opening hours</div>
       <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EFE4D0;font-size:14.5px;"><span style="font-weight:700;">Monday</span><span style="color:#7A7767;">12–3 PM · 6–11:45 PM</span></div>
@@ -345,7 +345,7 @@
   <footer style="background:#1B3A2A;padding:60px 28px 30px;">
     <div style="max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;">
       <div>
-        <img src="./images/logo-mark.webp" alt="Pizza Mia" style="height:104px;width:104px;object-fit:contain;display:block;margin-bottom:18px;background:#FBF3E6;border-radius:50%;padding:9px;box-sizing:border-box;"/>
+        <img src="./images/logo-mark.webp" alt="Pizza Mia" loading="lazy" decoding="async" style="height:104px;width:104px;object-fit:contain;display:block;margin-bottom:18px;background:#FBF3E6;border-radius:50%;padding:9px;box-sizing:border-box;"/>
         <p style="font-size:15px;line-height:1.6;color:#B9C7B0;margin:0;max-width:260px;">Your neighbourhood pizzeria in Miramar, Panaji. Pizza, cocktails and good company.</p>
       </div>
       <div>
@@ -378,7 +378,7 @@
 
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;stickyHeader&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
-const RMAP = {"./images/logo-mark.webp":"a0","./images/bar.webp":"a3","./images/oven-wide.webp":"a4","./images/pz-margherita.webp":"a9","./images/pz-mozzarella-basil.webp":"a10","./images/pizza-garden.webp":"a11","./images/pz-paneer-tikka.webp":"a12","./images/pz-spinach-feta.webp":"a13","./images/pz-mediterranean.webp":"a14","./images/pz-braganza-bonanza-veg.webp":"a15","./images/pz-pepperoni.webp":"a16","./images/pizza-chicken-bbq.webp":"a17","./images/pizza-chicken-tikka.webp":"a18","./images/pz-chicken-keema.webp":"a19","./images/pz-chicken-sausages.webp":"a20","./images/pz-smoked-paprika.webp":"a21","./images/pz-bacon-onion.webp":"a22","./images/pz-flaming-salami.webp":"a23","./images/pz-goan-chorizo.webp":"a24","./images/pz-hawaiian.webp":"a25","./images/pz-braganza-bonanza.webp":"a26","./images/banner1.jpg":"n1","./images/banner2.jpg":"n2","./images/banner3.jpg":"n3","./images/location-banner.jpg":"n4","./images/fairytale1.png":"n5","./images/fairytale2.png":"n6","./images/fairytale3.png":"n7","./images/doughityourself1.png":"n8","./images/doughityourself2.png":"n9","./images/doughityourself3.jpg":"n10","./images/doughityourself4.webp":"n11","./images/kareoke1.webp":"n12","./images/kareoke2.webp":"n13","./images/kareoke3.png":"n14","./images/rakhi1.jpg":"n15","./images/rakhi2.jpg":"n16","./images/rakhi3.jpg":"n17","./images/rakhi4.jpg":"n18","./images/valentine1.jpg":"n19","./images/valentine2.jpeg":"n20","./images/valentine3.jpeg":"n21","./images/valentine4.jpg":"n22","./images/pizzamaking1.png":"n23","./images/pizzamaking2.png":"n24","./images/pizzamaking3.webp":"n25"};
+const RMAP = {"./images/logo-mark.webp":"a0","./images/bar.webp":"a3","./images/oven-wide.webp":"a4","./images/pz-margherita.webp":"a9","./images/pz-mozzarella-basil.webp":"a10","./images/pizza-garden.webp":"a11","./images/pz-paneer-tikka.webp":"a12","./images/pz-spinach-feta.webp":"a13","./images/pz-mediterranean.webp":"a14","./images/pz-braganza-bonanza-veg.webp":"a15","./images/pz-pepperoni.webp":"a16","./images/pizza-chicken-bbq.webp":"a17","./images/pizza-chicken-tikka.webp":"a18","./images/pz-chicken-keema.webp":"a19","./images/pz-chicken-sausages.webp":"a20","./images/pz-smoked-paprika.webp":"a21","./images/pz-bacon-onion.webp":"a22","./images/pz-flaming-salami.webp":"a23","./images/pz-goan-chorizo.webp":"a24","./images/pz-hawaiian.webp":"a25","./images/pz-braganza-bonanza.webp":"a26","./images/banner1.jpg":"n1","./images/banner2.jpg":"n2","./images/banner3.jpg":"n3","./images/location-banner.jpg":"n4","./images/fairytale1.jpg":"n5","./images/fairytale2.jpg":"n6","./images/fairytale3.jpg":"n7","./images/doughityourself1.jpg":"n8","./images/doughityourself2.jpg":"n9","./images/doughityourself3.jpg":"n10","./images/doughityourself4.webp":"n11","./images/kareoke1.webp":"n12","./images/kareoke2.webp":"n13","./images/kareoke3.jpg":"n14","./images/rakhi1.jpg":"n15","./images/rakhi2.jpg":"n16","./images/rakhi3.jpg":"n17","./images/rakhi4.jpg":"n18","./images/valentine1.jpg":"n19","./images/valentine2.jpeg":"n20","./images/valentine3.jpeg":"n21","./images/valentine4.jpg":"n22","./images/pizzamaking1.jpg":"n23","./images/pizzamaking2.jpg":"n24","./images/pizzamaking3.webp":"n25"};
 const R = (p) => { if (!p) return p; if (/^data:/.test(p)) return p; const id = RMAP[p]; return (window.__resources && window.__resources[id]) || p; };
 
 const EVENTS = [
@@ -387,9 +387,9 @@ const EVENTS = [
     label: "Fairytale Party",
     blurb: "Costumes encouraged. The room gets dressed up and so does everyone in it.",
     photos: [
-      { src: "./images/fairytale1.png", alt: "Fairytale Party photo 1", width: "560px" },
-      { src: "./images/fairytale2.png", alt: "Fairytale Party photo 2", width: "380px" },
-      { src: "./images/fairytale3.png", alt: "Fairytale Party photo 3", width: "380px" },
+      { src: "./images/fairytale1.jpg", alt: "Fairytale Party photo 1", width: "560px" },
+      { src: "./images/fairytale2.jpg", alt: "Fairytale Party photo 2", width: "380px" },
+      { src: "./images/fairytale3.jpg", alt: "Fairytale Party photo 3", width: "380px" },
     ],
   },
   {
@@ -397,8 +397,8 @@ const EVENTS = [
     label: "Dough-It-Yourself Ornaments",
     blurb: "Kids shape and paint their own dough ornaments at the tables out front, then take one home to hang up.",
     photos: [
-      { src: "./images/doughityourself1.png", alt: "Dough-It-Yourself Ornaments photo 1", width: "380px" },
-      { src: "./images/doughityourself2.png", alt: "Dough-It-Yourself Ornaments photo 2", width: "380px" },
+      { src: "./images/doughityourself1.jpg", alt: "Dough-It-Yourself Ornaments photo 1", width: "380px" },
+      { src: "./images/doughityourself2.jpg", alt: "Dough-It-Yourself Ornaments photo 2", width: "380px" },
       { src: "./images/doughityourself3.jpg", alt: "Dough-It-Yourself Ornaments photo 3", width: "560px" },
       { src: "./images/doughityourself4.webp", alt: "Dough-It-Yourself Ornaments photo 4", width: "380px" },
     ],
@@ -411,7 +411,7 @@ const EVENTS = [
     photos: [
       { src: "./images/kareoke1.webp", alt: "Karaoke photo 1", width: "355px" },
       { src: "./images/kareoke2.webp", alt: "Karaoke photo 2", width: "355px" },
-      { src: "./images/kareoke3.png", alt: "Karaoke photo 3", width: "355px" },
+      { src: "./images/kareoke3.jpg", alt: "Karaoke photo 3", width: "355px" },
     ],
   },
   {
@@ -442,8 +442,8 @@ const EVENTS = [
     label: "Pizza Making Party",
     blurb: "Aprons on, dough in hand. Kids stretch their own bases, top them however they like, and we bake them right there.",
     photos: [
-      { src: "./images/pizzamaking1.png", alt: "Pizza Making Party photo 1", width: "560px" },
-      { src: "./images/pizzamaking2.png", alt: "Pizza Making Party photo 2", width: "380px" },
+      { src: "./images/pizzamaking1.jpg", alt: "Pizza Making Party photo 1", width: "560px" },
+      { src: "./images/pizzamaking2.jpg", alt: "Pizza Making Party photo 2", width: "380px" },
       { src: "./images/pizzamaking3.webp", alt: "Pizza Making Party photo 3", width: "380px" },
     ],
   },
