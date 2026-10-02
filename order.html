@@ -149,6 +149,60 @@
     .item .nm { font-size:17px; }
     .grid { grid-template-columns:1fr; }
   }
+
+  /* Play & Win banner + reward */
+  .winbar { max-width:1180px; margin:14px auto 0; padding:0 20px; }
+  .winbar .inner { background:linear-gradient(100deg,#1B3A2A,#2E5B41); color:var(--cream); border-radius:18px; padding:14px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .winbar b { color:#FBE9C8; }
+  .winbar .txt { flex:1; min-width:180px; font-size:14.5px; line-height:1.4; }
+  .winbar button { background:var(--gold); color:var(--ink); border:none; font-weight:700; font-size:14.5px; padding:11px 22px; border-radius:100px; white-space:nowrap; }
+  .rewardbar { max-width:1180px; margin:12px auto 0; padding:0 20px; display:none; }
+  .rewardbar .inner { background:#EAF4E4; border:1.5px solid var(--veg); color:var(--green); border-radius:14px; padding:11px 16px; display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; }
+  .rewardbar .inner button { margin-left:auto; background:none; border:none; color:var(--muted); font-weight:700; text-decoration:underline; font-size:12.5px; }
+  .bill .disc { color:var(--veg); font-weight:700; }
+  .cart-reward { background:#EAF4E4; border:1.5px solid var(--veg); color:var(--green); border-radius:12px; padding:11px 14px; font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:10px; margin:10px 0; }
+  .cart-reward button { margin-left:auto; background:none; border:none; color:var(--muted); text-decoration:underline; font-weight:700; font-size:12px; }
+  .playcart { width:100%; background:#1B3A2A; color:var(--cream); border:none; font-weight:700; font-size:14.5px; padding:13px; border-radius:12px; margin:10px 0; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+  /* Games overlay */
+  .gamewrap { position:fixed; z-index:80; left:50%; top:50%; transform:translate(-50%,-50%) scale(.98); width:min(460px,calc(100% - 24px)); max-height:92vh; background:var(--cream); border-radius:22px; display:flex; flex-direction:column; opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; overflow:hidden; }
+  .gamewrap.show { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+  .ghead { padding:16px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; }
+  .ghead h2 { margin:0; font-size:21px; color:var(--green); flex:1; }
+  .gbody { flex:1; overflow-y:auto; padding:18px; }
+  .gcard { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:22px 20px; text-align:center; margin-bottom:14px; cursor:pointer; transition:border-color .15s, transform .1s; }
+  .gcard:hover { border-color:var(--green); }
+  .gcard:active { transform:scale(.99); }
+  .gcard .ico { font-size:46px; line-height:1; }
+  .gcard .t { font-family:'DM Serif Display',serif; font-size:21px; color:var(--green); margin-top:10px; }
+  .gcard .d { font-size:13px; color:var(--muted); margin-top:6px; line-height:1.45; }
+  .gbtn { background:var(--red); color:var(--cream); border:none; font-weight:700; font-size:16px; padding:14px 22px; border-radius:100px; box-shadow:0 3px 0 #8E2314; }
+  .gbtn:disabled { opacity:.55; box-shadow:none; }
+  .gbtn.wide { width:100%; }
+  .gbtn.ghost { background:transparent; color:var(--green); border:1.5px solid #D9CBB3; box-shadow:none; }
+  .ghint { font-size:13px; color:var(--muted); text-align:center; line-height:1.5; margin:12px 0; }
+
+  /* Spin wheel */
+  .wheelbox { position:relative; width:min(300px,78vw); margin:8px auto 18px; }
+  .wheelbox canvas { display:block; width:100%; height:auto; transition:transform 4.2s cubic-bezier(.16,.86,.28,1); }
+  .wheelptr { position:absolute; top:-4px; left:50%; transform:translateX(-50%); z-index:2; width:0; height:0; border-left:13px solid transparent; border-right:13px solid transparent; border-top:24px solid #C9341F; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
+  .wheelhub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2; width:48px; height:48px; border-radius:50%; background:var(--cream); border:3px solid #1B3A2A; display:flex; align-items:center; justify-content:center; font-size:23px; }
+
+  /* Catch game */
+  .catchwrap { position:relative; width:100%; max-width:340px; margin:0 auto; }
+  .catchwrap canvas { display:block; width:100%; height:auto; border-radius:16px; touch-action:none; background:#2A1C12; }
+  .chud { position:absolute; top:10px; left:0; right:0; display:flex; justify-content:space-between; padding:0 12px; pointer-events:none; }
+  .chud .tt { background:rgba(0,0,0,.4); color:#fff; font-weight:700; font-size:14px; padding:5px 12px; border-radius:100px; }
+  .catchstart { position:absolute; inset:0; background:rgba(27,58,42,.88); border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; color:var(--cream); padding:24px; }
+  .catchstart p { margin:0; font-size:13.5px; line-height:1.55; color:#DCE8D6; }
+
+  /* Result */
+  .gresult { text-align:center; padding:8px 0; }
+  .gresult .big { font-size:58px; line-height:1; }
+  .gresult .rw { font-family:'DM Serif Display',serif; font-size:32px; color:var(--red); margin:8px 0 2px; }
+  .gresult .sc { font-size:14px; color:var(--muted); margin-bottom:16px; }
+  .growrow { display:flex; gap:10px; margin-top:10px; }
+  .growrow .gbtn { flex:1; }
 </style>
 </head>
 <body>
@@ -177,6 +231,12 @@
     <button class="vegtog" id="vegToggle"><span class="switch" id="vegSwitch"></span>Veg only</button>
   </div>
 </div>
+
+<div class="winbar"><div class="inner">
+  <div class="txt">🎮 <b>Play a game, win a discount!</b> Spin the pizza wheel or catch the toppings — your reward applies at checkout.</div>
+  <button id="playWinBtn">Play &amp; Win</button>
+</div></div>
+<div class="rewardbar" id="rewardBanner"></div>
 
 <main id="menu"></main>
 
@@ -215,6 +275,17 @@
   </div>
 </div>
 
+<!-- Games -->
+<div class="overlay" id="gOverlay"></div>
+<div class="gamewrap" id="gameWrap">
+  <div class="ghead">
+    <button class="xbtn" id="gBack" style="display:none;">←</button>
+    <h2 id="gTitle">Play &amp; Win 🎮</h2>
+    <button class="xbtn" id="gClose">×</button>
+  </div>
+  <div class="gbody" id="gameBody"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -226,6 +297,7 @@
   var GST_RATE = 0.05;               // menu is "not inclusive of taxes"
   var CART_KEY = "pizzamia_cart";
   var CUST_KEY = "pizzamia_customer";
+  var REWARD_KEY = "pizzamia_reward";
   var PIZZA_SIZES = [
     { label: "Medium", sub: '9" · Serves 1' },
     { label: "Large",  sub: '13" · Serves 2' },
@@ -377,6 +449,24 @@
     else renderDrawer();
   }
   function removeLine(idx){ cart.splice(idx,1); saveCart(); refreshCartUI(); renderMenu(); renderDrawer(); }
+
+  /* ---------- REWARD STATE ---------- */
+  var REWARD = null;
+  try { REWARD = JSON.parse(localStorage.getItem(REWARD_KEY) || "null"); } catch(e){ REWARD = null; }
+  function saveReward(){ try { if (REWARD) localStorage.setItem(REWARD_KEY, JSON.stringify(REWARD)); else localStorage.removeItem(REWARD_KEY); } catch(e){} }
+  function rewardText(r){ return !r ? "" : (r.kind==="percent" ? r.percent+"% OFF" : "Free "+r.itemName); }
+  function setReward(r){ REWARD = r; saveReward(); updateRewardUI(); refreshCartUI(); if (drawerOpen) renderDrawer(); }
+  function clearReward(){ setReward(null); }
+  function computeBill(){
+    var it = itemTotal(), discount = 0, freeLabel = null;
+    if (REWARD){
+      if (REWARD.kind==="percent") discount = Math.round(it * REWARD.percent/100);
+      else if (REWARD.kind==="freeitem") freeLabel = REWARD.itemName;
+    }
+    var subtotal = Math.max(0, it - discount);
+    var gst = subtotal*GST_RATE;
+    return { it:it, discount:discount, freeLabel:freeLabel, subtotal:subtotal, gst:gst, total:subtotal+gst };
+  }
 
   /* ---------- MENU RENDER ---------- */
   var vegOnly = false;
@@ -532,13 +622,16 @@
   }
 
   function billHtml(){
-    var it = itemTotal(), gst = it*GST_RATE, total = it+gst;
-    return '<div class="bill">'+
-      '<div class="row"><span>Item total</span><span>'+money(it)+'</span></div>'+
-      '<div class="row"><span>GST ('+(GST_RATE*100)+'%)</span><span>'+money(gst)+'</span></div>'+
+    var b = computeBill();
+    var h = '<div class="bill">'+
+      '<div class="row"><span>Item total</span><span>'+money(b.it)+'</span></div>';
+    if (b.discount>0) h += '<div class="row"><span>Discount'+(REWARD&&REWARD.label?' ('+REWARD.label+')':'')+'</span><span class="disc">− '+money(b.discount)+'</span></div>';
+    if (b.freeLabel) h += '<div class="row"><span>Reward</span><span class="disc">🎁 Free '+b.freeLabel+'</span></div>';
+    h += '<div class="row"><span>GST ('+(GST_RATE*100)+'%)</span><span>'+money(b.gst)+'</span></div>'+
       '<div class="row"><span>Delivery</span><span class="free">FREE</span></div>'+
-      '<div class="row total"><span>To pay</span><span>'+money(total)+'</span></div>'+
+      '<div class="row total"><span>To pay</span><span>'+money(b.total)+'</span></div>'+
     '</div>';
+    return h;
   }
 
   function renderDrawer(){
@@ -564,9 +657,14 @@
           '<div class="ci-price">'+money(lineUnit(l)*l.qty)+'</div>'+
         '</div>';
       }).join("");
-      el("drawerBody").innerHTML = lines + '<div style="padding:16px 0 4px">'+billHtml()+'</div>';
+      var rewardStrip = REWARD
+        ? '<div class="cart-reward">🎁 '+rewardText(REWARD)+' applied <button id="cartRewRemove">Remove</button></div>'
+        : '<button class="playcart" id="cartPlay">🎮 Play a game &amp; win a discount</button>';
+      el("drawerBody").innerHTML = lines + rewardStrip + '<div style="padding:8px 0 4px">'+billHtml()+'</div>';
       el("drawerFoot").innerHTML = '<button class="cta" id="toCheckout">Proceed to Checkout →</button>';
       el("toCheckout").onclick = function(){ checkoutMode=true; renderDrawer(); el("drawerBody").scrollTop=0; };
+      if (el("cartPlay")) el("cartPlay").onclick = function(){ openGames("cart"); };
+      if (el("cartRewRemove")) el("cartRewRemove").onclick = function(){ clearReward(); toast("Reward removed"); };
       bindLineBtns();
     } else {
       var c = {};
@@ -609,7 +707,7 @@
 
     try { localStorage.setItem(CUST_KEY, JSON.stringify({name:name,phone:phone,addr:addr,land:land})); } catch(e){}
 
-    var it = itemTotal(), gst = it*GST_RATE, total = it+gst;
+    var b = computeBill();
     var L = [];
     L.push("*New Order — Pizza Mia* 🍕");
     L.push("");
@@ -622,10 +720,12 @@
     });
     L.push("");
     L.push("*Bill:*");
-    L.push("Item total: "+money(it));
-    L.push("GST ("+(GST_RATE*100)+"%): "+money(gst));
+    L.push("Item total: "+money(b.it));
+    if (b.discount>0) L.push("Discount"+(REWARD&&REWARD.label?" ("+REWARD.label+")":"")+": -"+money(b.discount));
+    if (b.freeLabel) L.push("Reward: FREE "+b.freeLabel+" 🎁");
+    L.push("GST ("+(GST_RATE*100)+"%): "+money(b.gst));
     L.push("Delivery: FREE");
-    L.push("*Total: "+money(total)+"*");
+    L.push("*Total: "+money(b.total)+"*");
     L.push("");
     L.push("*Deliver to:*");
     L.push("Name: "+name);
@@ -637,10 +737,10 @@
     L.push("*Payment: Cash on Delivery*");
 
     var url = "https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(L.join("\n"));
-    if (typeof gtag==="function"){ try { gtag("event","place_order",{value:Math.round(total),items:cartCount()}); } catch(e){} }
+    if (typeof gtag==="function"){ try { gtag("event","place_order",{value:Math.round(b.total),items:cartCount()}); } catch(e){} }
     window.open(url, "_blank");
 
-    cart = []; saveCart(); refreshCartUI(); renderMenu();
+    cart = []; saveCart(); REWARD=null; saveReward(); updateRewardUI(); refreshCartUI(); renderMenu();
     el("drawerBody").innerHTML = '<div class="empty"><div class="big">✅</div><p><b>Order sent!</b><br>We\'ve opened WhatsApp with your order. Hit send and we\'ll confirm &amp; start baking. 🍕</p></div>';
     el("drawerFoot").innerHTML = '<button class="cta" id="doneBtn">Done</button>';
     el("doneBtn").onclick = closeDrawer;
@@ -675,20 +775,232 @@
     });
   }
 
+  /* ---------- REWARD BANNER ---------- */
+  function updateRewardUI(){
+    var b = el("rewardBanner"); if (!b) return;
+    if (REWARD){
+      b.style.display = "block";
+      b.innerHTML = '<div class="inner"><span>🎁 Reward: <b>'+rewardText(REWARD)+'</b> — applied at checkout</span><button id="rewRemove">Remove</button></div>';
+      el("rewRemove").onclick = function(){ clearReward(); toast("Reward removed"); };
+    } else { b.style.display = "none"; b.innerHTML = ""; }
+  }
+
+  /* ---------- GAMES ---------- */
+  var WHEEL = [
+    { kind:"percent", percent:5,  label:"5% OFF",  color:"#E8A33D" },
+    { kind:"percent", percent:10, label:"10% OFF", color:"#C9341F" },
+    { kind:"freeitem", itemName:"Garlic Knots", label:"Garlic Knots", color:"#1B7A3E" },
+    { kind:"percent", percent:15, label:"15% OFF", color:"#E8A33D" },
+    { kind:"freeitem", itemName:"Soft Drink", label:"Free Drink", color:"#1B7A3E" },
+    { kind:"percent", percent:20, label:"20% OFF", color:"#C9341F" }
+  ];
+  var CATCH_ITEMS = [
+    { emoji:"🍅", pts:5 }, { emoji:"🧀", pts:10 }, { emoji:"🍄", pts:10 },
+    { emoji:"🫑", pts:15 }, { emoji:"🫒", pts:15 }, { emoji:"🌶️", pts:20 }, { emoji:"🍍", pts:25 }
+  ];
+  // DUMMY score→discount mapping — tune later
+  function scoreToReward(score){
+    var p = score>=300?20 : score>=200?15 : score>=120?10 : score>=60?5 : 0;
+    return p>0 ? { kind:"percent", percent:p, label:p+"% OFF", source:"catch" } : null;
+  }
+
+  var gamesReturn = "page";
+  var catchState = null;
+
+  function openGames(ctx){
+    gamesReturn = ctx || "page";
+    el("gOverlay").classList.add("show");
+    el("gameWrap").classList.add("show");
+    renderGameMenu();
+  }
+  function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); }
+  function gSetHead(title, back){ el("gTitle").textContent = title; el("gBack").style.display = back ? "block" : "none"; }
+
+  function renderGameMenu(){
+    stopCatch();
+    gSetHead("Play & Win 🎮", false);
+    var have = REWARD ? '<div class="ghint">Current reward: <b style="color:var(--veg)">'+rewardText(REWARD)+'</b>. Playing again replaces it.</div>' : '';
+    el("gameBody").innerHTML =
+      '<div class="gcard" id="gcWheel"><div class="ico">🎡</div><div class="t">Spin the Pizza Wheel</div><div class="d">One spin, instant prize — discounts, free garlic knots or a free drink.</div></div>'+
+      '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Move your pizza to catch falling toppings in 60s. Dodge the burning coal — higher score, bigger discount!</div></div>'+
+      have;
+    el("gcWheel").onclick = startWheel;
+    el("gcCatch").onclick = startCatch;
+  }
+
+  /* --- Spin the Wheel --- */
+  var wheelRot = 0, wheelSpinning = false;
+  function startWheel(){
+    stopCatch();
+    gSetHead("Spin the Pizza Wheel 🎡", true);
+    el("gameBody").innerHTML =
+      '<div class="wheelbox"><div class="wheelptr"></div><canvas id="wheelCanvas" width="300" height="300"></canvas><div class="wheelhub">🍕</div></div>'+
+      '<button class="gbtn wide" id="spinBtn">Spin!</button>'+
+      '<div class="ghint">Each wedge is a prize. Tap Spin and see where it lands.</div>';
+    wheelRot = 0; wheelSpinning = false;
+    var cv = el("wheelCanvas");
+    cv.style.transition = "none"; cv.style.transform = "rotate(0deg)";
+    drawWheel(cv, WHEEL);
+    el("spinBtn").onclick = spinWheel;
+  }
+  function drawWheel(cv, segs){
+    var ctx = cv.getContext("2d"), S = cv.width, R = S/2, n = segs.length, seg = 2*Math.PI/n;
+    ctx.clearRect(0,0,S,S);
+    for (var i=0;i<n;i++){
+      var a0 = -Math.PI/2 + i*seg, a1 = a0+seg;
+      ctx.beginPath(); ctx.moveTo(R,R); ctx.arc(R,R,R-10,a0,a1); ctx.closePath();
+      ctx.fillStyle = segs[i].color; ctx.fill();
+      ctx.strokeStyle = "#5A1E12"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.save(); ctx.translate(R,R); ctx.rotate(a0+seg/2);
+      ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.fillStyle="#fff";
+      ctx.font="bold 14px Karla,Arial,sans-serif"; ctx.fillText(segs[i].label, R-22, 0);
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(R,R,R-5,0,2*Math.PI); ctx.lineWidth=10; ctx.strokeStyle="#D9A441"; ctx.stroke();
+  }
+  function spinWheel(){
+    if (wheelSpinning) return;
+    wheelSpinning = true; el("spinBtn").disabled = true;
+    var n = WHEEL.length, segDeg = 360/n, w = Math.floor(Math.random()*n);
+    var jitter = (Math.random()*2-1) * segDeg * 0.3;
+    var desiredMod = (360 - (w+0.5)*segDeg + jitter + 720) % 360;
+    var currentMod = ((wheelRot % 360) + 360) % 360;
+    wheelRot += (desiredMod - currentMod + 360) % 360 + 360*5;
+    var cv = el("wheelCanvas");
+    cv.style.transition = "transform 4.2s cubic-bezier(.16,.86,.28,1)";
+    void cv.offsetWidth;
+    cv.style.transform = "rotate("+wheelRot+"deg)";
+    var settled = false;
+    var done = function(){ if (settled) return; settled = true; cv.removeEventListener("transitionend", done); wheelSpinning=false; showResult(WHEEL[w], null, null); };
+    cv.addEventListener("transitionend", done);
+    setTimeout(done, 4600);   // fallback if transitionend doesn't fire (reduced-motion, etc.)
+  }
+
+  /* --- Catch the Toppings --- */
+  function startCatch(){
+    gSetHead("Catch the Toppings 🍕", true);
+    el("gameBody").innerHTML =
+      '<div class="catchwrap"><canvas id="catchCanvas" width="340" height="520"></canvas>'+
+      '<div class="chud"><span class="tt" id="cScore">Score 0</span><span class="tt" id="cTime">60s</span></div>'+
+      '<div class="catchstart" id="catchStart"><div style="font-size:40px">🍕</div><p><b>Catch the toppings, dodge the coal.</b><br>Drag (or use ← →) to move your pizza. Each topping shows its points. Catch 🔥 and it\'s game over. 60 seconds — go for the highest score!</p><button class="gbtn" id="catchGo">Start</button></div></div>'+
+      '<div class="ghint">More points = bigger discount.</div>';
+    el("catchGo").onclick = runCatch;
+  }
+  function stopCatch(){ if (catchState){ catchState.running=false; if(catchState.cleanup) catchState.cleanup(); catchState=null; } }
+  function runCatch(){
+    var cv = el("catchCanvas"), dpr = Math.min(window.devicePixelRatio||1, 2), W = 340, H = 520;
+    cv.width = W*dpr; cv.height = H*dpr;
+    var ctx = cv.getContext("2d"); ctx.scale(dpr,dpr);
+    el("catchStart").style.display = "none";
+    var st = { W:W, H:H, px:W/2, tx:W/2, pr:30, py:H-46, objs:[], floats:[], score:0, t:60, spawn:0, running:true, last:null };
+    catchState = st;
+    function toX(cx){ var r=cv.getBoundingClientRect(); return (cx-r.left)/r.width * W; }
+    cv.onpointermove = function(e){ st.tx = Math.max(st.pr, Math.min(W-st.pr, toX(e.clientX))); };
+    cv.ontouchmove = function(e){ if(e.touches[0]){ st.tx = Math.max(st.pr, Math.min(W-st.pr, toX(e.touches[0].clientX))); e.preventDefault(); } };
+    var keyh = function(e){ if(e.key==="ArrowLeft") st.tx=Math.max(st.pr,st.tx-30); else if(e.key==="ArrowRight") st.tx=Math.min(W-st.pr,st.tx+30); };
+    window.addEventListener("keydown", keyh);
+    st.cleanup = function(){ window.removeEventListener("keydown", keyh); };
+    requestAnimationFrame(function loop(ts){
+      if (!st.running) return;
+      if (st.last==null) st.last=ts;
+      var dt = Math.min((ts-st.last)/1000, 0.05); st.last=ts;
+      st.t -= dt; if (st.t<=0){ st.t=0; endCatch(st,false); return; }
+      var elapsed = 60-st.t;
+      st.spawn -= dt;
+      if (st.spawn<=0){ st.spawn = Math.max(0.45, 0.9 - elapsed*0.006); spawnObj(st, elapsed); }
+      st.px += (st.tx - st.px) * Math.min(1, dt*12);
+      for (var i=st.objs.length-1;i>=0;i--){
+        var o = st.objs[i]; o.y += o.vy*dt;
+        if (Math.abs(o.x-st.px) < (st.pr + o.r*0.5) && o.y > st.py-st.pr && o.y < st.py+st.pr){
+          st.objs.splice(i,1);
+          if (o.coal){ endCatch(st, true); return; }
+          st.score += o.pts; st.floats.push({x:o.x,y:st.py-30,txt:"+"+o.pts,life:0.8});
+        } else if (o.y - o.r > H){ st.objs.splice(i,1); }
+      }
+      for (var f=st.floats.length-1;f>=0;f--){ st.floats[f].y -= dt*42; st.floats[f].life -= dt; if(st.floats[f].life<=0) st.floats.splice(f,1); }
+      drawCatch(ctx, st);
+      el("cScore").textContent = "Score "+st.score;
+      el("cTime").textContent = Math.ceil(st.t)+"s";
+      requestAnimationFrame(loop);
+    });
+  }
+  function spawnObj(st, elapsed){
+    var fall = 130 + elapsed*2.4, coalChance = Math.min(0.28, 0.12 + elapsed*0.003);
+    var r = 20, x = r + Math.random()*(st.W-2*r), vy = fall*(0.9+Math.random()*0.35);
+    if (Math.random() < coalChance) st.objs.push({ coal:true, x:x, y:-r, r:r, vy:vy });
+    else { var t = CATCH_ITEMS[Math.floor(Math.random()*CATCH_ITEMS.length)]; st.objs.push({ emoji:t.emoji, pts:t.pts, x:x, y:-r, r:r, vy:vy }); }
+  }
+  function drawCatch(ctx, st){
+    var W=st.W, H=st.H;
+    var g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,"#3A2415"); g.addColorStop(1,"#1C120A");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    for (var i=0;i<st.objs.length;i++){
+      var o = st.objs[i];
+      if (o.coal){
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,2*Math.PI); ctx.fillStyle="#333"; ctx.fill();
+        ctx.font="24px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("🔥",o.x,o.y);
+      } else {
+        ctx.font="28px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(o.emoji,o.x,o.y);
+        ctx.beginPath(); ctx.arc(o.x+13,o.y+12,9,0,2*Math.PI); ctx.fillStyle="#1B3A2A"; ctx.fill();
+        ctx.fillStyle="#fff"; ctx.font="bold 10px Karla,Arial,sans-serif"; ctx.fillText(o.pts,o.x+13,o.y+13);
+      }
+    }
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    for (var f=0;f<st.floats.length;f++){ ctx.globalAlpha=Math.max(0,st.floats[f].life); ctx.fillStyle="#FBE9C8"; ctx.font="bold 15px Karla,Arial,sans-serif"; ctx.fillText(st.floats[f].txt, st.floats[f].x, st.floats[f].y); }
+    ctx.globalAlpha=1;
+    ctx.font="46px serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("🍕", st.px, st.py);
+  }
+  function endCatch(st, hitCoal){
+    st.running=false; if (st.cleanup) st.cleanup(); catchState=null;
+    showResult(scoreToReward(st.score), st.score, hitCoal);
+  }
+
+  /* --- Result --- */
+  function showResult(reward, score, hitCoal){
+    gSetHead("Your Reward 🎉", true);
+    var body;
+    if (reward){
+      var txt = reward.kind==="percent" ? reward.percent+"% OFF" : "Free "+reward.itemName;
+      body = '<div class="gresult"><div class="big">🎉</div><div class="rw">'+txt+'</div>'+
+        (score!=null?'<div class="sc">You scored '+score+' points'+(hitCoal?' — caught the coal!':'')+'</div>':'<div class="sc">Lucky spin!</div>')+
+        '<button class="gbtn wide" id="applyRw">Apply &amp; continue</button>'+
+        '<div class="growrow"><button class="gbtn ghost" id="playAgain">Play again</button></div></div>';
+    } else {
+      body = '<div class="gresult"><div class="big">😅</div><div class="rw" style="color:var(--green)">So close!</div>'+
+        '<div class="sc">'+(hitCoal?'You caught the burning coal! ':'')+'You scored '+(score||0)+' — not enough for a discount yet. Try again!</div>'+
+        '<button class="gbtn wide" id="playAgain">Try again</button></div>';
+    }
+    el("gameBody").innerHTML = body;
+    if (el("applyRw")) el("applyRw").onclick = function(){ applyAndClose(reward); };
+    if (el("playAgain")) el("playAgain").onclick = renderGameMenu;
+  }
+  function applyAndClose(reward){
+    setReward(reward);
+    closeGames();
+    if (gamesReturn==="cart") openDrawer();
+    toast("Reward applied: "+rewardText(reward));
+  }
+
   /* ---------- WIRE UP ---------- */
   el("vegToggle").onclick = function(){ vegOnly=!vegOnly; el("vegSwitch").classList.toggle("on",vegOnly); renderMenu(); };
   el("viewCartBtn").onclick = openDrawer;
   el("drawerClose").onclick = closeDrawer;
   el("drawerBack").onclick = showCart;
   el("overlay").onclick = function(){ if (el("modal").classList.contains("show")) showModal(false); else closeDrawer(); };
+  el("playWinBtn").onclick = function(){ openGames("page"); };
+  el("gClose").onclick = closeGames;
+  el("gBack").onclick = renderGameMenu;
+  el("gOverlay").onclick = closeGames;
 
   renderCats();
   renderMenu();
   refreshCartUI();
+  updateRewardUI();
   window.addEventListener("scroll", onScroll, {passive:true});
 
-  // expose a couple for debugging/testing
-  window.__pm = { cart:function(){return cart;}, itemTotal:itemTotal };
+  // expose a few for debugging/testing
+  window.__pm = { cart:function(){return cart;}, itemTotal:itemTotal, computeBill:computeBill,
+    setReward:setReward, getReward:function(){return REWARD;}, scoreToReward:scoreToReward, openGames:openGames };
 })();
 </script>
 </body>
