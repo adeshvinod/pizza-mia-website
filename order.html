@@ -212,6 +212,46 @@
   .conf { position:absolute; left:0; right:0; top:0; height:0; pointer-events:none; z-index:2; }
   .conf span { position:absolute; top:-12px; font-size:20px; animation: confFall 1.5s ease-in forwards; }
   @keyframes confFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(240px) rotate(360deg);opacity:0} }
+
+  /* AI host chat */
+  .chat-fab { position:fixed; bottom:22px; right:20px; z-index:55; width:60px; height:60px; border-radius:50%; border:none; background:linear-gradient(135deg,#C9341F,#E8A33D); color:#fff; font-size:27px; box-shadow:0 5px 16px rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; transition:bottom .2s, transform .15s; }
+  .chat-fab:hover { transform:scale(1.07); }
+  .chat-fab.raised { bottom:92px; }
+  .chat-fab .dot { position:absolute; top:3px; right:5px; width:12px; height:12px; border-radius:50%; background:#1B7A3E; border:2px solid #fff; }
+  .chat-panel { position:fixed; bottom:22px; right:20px; z-index:56; width:min(380px,calc(100vw - 24px)); height:min(600px,calc(100vh - 110px)); background:var(--cream); border-radius:20px; box-shadow:0 12px 40px rgba(0,0,0,.35); display:flex; flex-direction:column; overflow:hidden; opacity:0; pointer-events:none; transform:translateY(16px) scale(.98); transition:opacity .2s, transform .2s; }
+  .chat-panel.show { opacity:1; pointer-events:auto; transform:none; }
+  .chat-head { background:#1B3A2A; color:var(--cream); padding:12px 14px; display:flex; align-items:center; gap:11px; }
+  .chat-head .av { width:40px; height:40px; border-radius:50%; background:#2E5B41; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+  .chat-head .who { flex:1; min-width:0; }
+  .chat-head .who .nm { font-weight:700; font-size:15px; }
+  .chat-head .who .st { font-size:11.5px; color:#B9C7B0; }
+  .chat-head .hbtn { background:none; border:none; color:#DCE8D6; font-weight:700; font-size:12.5px; cursor:pointer; padding:4px; }
+  .chat-head .xc { font-size:23px; line-height:1; }
+  .chat-body { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:9px; }
+  .c-msg { max-width:86%; padding:10px 13px; border-radius:15px; font-size:14px; line-height:1.5; white-space:pre-wrap; word-wrap:break-word; }
+  .c-msg.bot { align-self:flex-start; background:#FFFCF6; border:1px solid var(--line); border-bottom-left-radius:5px; color:var(--ink); }
+  .c-msg.me { align-self:flex-end; background:#1B3A2A; color:var(--cream); border-bottom-right-radius:5px; }
+  .c-adds { display:flex; flex-wrap:wrap; gap:7px; align-self:flex-start; max-width:90%; }
+  .c-add { background:#C9341F; color:#fff; border:none; font-weight:700; font-size:12.5px; padding:7px 13px; border-radius:100px; cursor:pointer; box-shadow:0 2px 0 #8E2314; }
+  .c-typing { align-self:flex-start; background:#FFFCF6; border:1px solid var(--line); border-radius:15px; border-bottom-left-radius:5px; padding:12px 15px; display:flex; gap:4px; }
+  .c-typing span { width:7px; height:7px; border-radius:50%; background:#B9A98C; animation:ctb 1s infinite; }
+  .c-typing span:nth-child(2){ animation-delay:.15s; } .c-typing span:nth-child(3){ animation-delay:.3s; }
+  @keyframes ctb { 0%,60%,100%{transform:translateY(0);opacity:.5} 30%{transform:translateY(-5px);opacity:1} }
+  .chat-input { border-top:1px solid var(--line); padding:10px; display:flex; gap:8px; align-items:flex-end; background:var(--card); }
+  .chat-input textarea { flex:1; border:1.5px solid #D9CBB3; border-radius:14px; padding:9px 12px; font-family:'Karla',sans-serif; font-size:14px; resize:none; max-height:90px; background:#fff; color:var(--ink); }
+  .chat-input textarea:focus { outline:none; border-color:var(--green); }
+  .chat-input .send { background:#C9341F; color:#fff; border:none; width:42px; height:42px; border-radius:50%; font-size:17px; flex-shrink:0; cursor:pointer; }
+  .chat-input .send:disabled { opacity:.5; }
+  .chat-pick { padding:16px; overflow-y:auto; flex:1; }
+  .chat-pick h3 { font-family:'DM Serif Display',serif; font-size:19px; color:var(--green); margin:2px 0 4px; }
+  .chat-pick .sub { font-size:13px; color:var(--muted); margin:0 0 14px; }
+  .pick-card { display:flex; gap:12px; align-items:center; background:#FFFCF6; border:1px solid var(--line); border-radius:16px; padding:13px; margin-bottom:10px; cursor:pointer; transition:border-color .15s, transform .1s; }
+  .pick-card:hover { border-color:var(--green); }
+  .pick-card:active { transform:scale(.99); }
+  .pick-card .pav { width:48px; height:48px; border-radius:50%; background:#C6DBBB; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+  .pick-card .pnm { font-weight:700; font-size:15.5px; color:var(--green); }
+  .pick-card .pds { font-size:12.5px; color:var(--muted); line-height:1.4; margin-top:2px; }
+  @media (max-width:480px){ .chat-panel { bottom:0; right:0; width:100vw; height:90vh; border-radius:18px 18px 0 0; } }
 </style>
 </head>
 <body>
@@ -293,6 +333,17 @@
     <button class="xbtn" id="gClose">×</button>
   </div>
   <div class="gbody" id="gameBody"></div>
+</div>
+
+<!-- AI host -->
+<button id="chatFab" class="chat-fab" aria-label="Chat with our host">💬<span class="dot"></span></button>
+<div id="chatPanel" class="chat-panel">
+  <div class="chat-head" id="chatHead"></div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input" id="chatInputRow" style="display:none;">
+    <textarea id="chatText" rows="1" placeholder="Ask about the menu…"></textarea>
+    <button class="send" id="chatSend" aria-label="Send">➤</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -759,7 +810,9 @@
   /* ---------- CART BAR / UI SYNC ---------- */
   function refreshCartUI(){
     var n = cartCount();
-    el("cartbar").classList.toggle("show", n>0 && !drawerOpen);
+    var barShown = n>0 && !drawerOpen;
+    el("cartbar").classList.toggle("show", barShown);
+    var fab = el("chatFab"); if (fab) fab.classList.toggle("raised", barShown);
     var it = itemTotal();
     el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(it)+" + taxes</small>";
   }
@@ -1038,6 +1091,122 @@
     toast("Reward applied: "+rewardText(reward));
   }
 
+  /* ---------- AI HOST CHAT ---------- */
+  var CHAT_ENDPOINT = "/.netlify/functions/chat";
+  var CHAT_KEY = "pizzamia_persona";
+  var CHAT_PERSONAS = {
+    doughg: { name:"Dough-G", emoji:"🎤", tag:"Cheeky rapper host",
+      desc:"Big up! Streetwise slang and maximum hype for pizza.",
+      greet:"Yo yo yo! Dough-G in the house, big up yourself! 🎤 What you feelin' today fam — proper cheesy, loaded meaty, or somethin' spicy? Lemme sort you right out, innit." },
+    nonna: { name:"Nonna Mia", emoji:"👵", tag:"Your Italian grandma",
+      desc:"Warm, bossy, and sure you need to eat more.",
+      greet:"Ciao tesoro! 👵 Come, come, sit! You look a little hungry, no? Tell Nonna what you like and I feed you something buonissimo. Veg or non-veg, piccolino?" },
+    cosmo: { name:"Cosmic Dave", emoji:"🌌", tag:"Chilled cosmic dude",
+      desc:"Mega mellow, finds the meaning of life in a slice.",
+      greet:"Heyyy, welcome man. 🌌 Cosmic Dave here, just vibin'. A pizza's basically a lil' edible galaxy, you know? Tell me what your soul's cravin' and we'll find your slice of the universe." }
+  };
+
+  var chatPersona = null; try { chatPersona = localStorage.getItem(CHAT_KEY) || null; } catch(e){}
+  if (chatPersona && !CHAT_PERSONAS[chatPersona]) chatPersona = null;
+  var chatMsgs = [];      // {role:'user'|'assistant', text, local?}
+  var chatOpen = false, chatBusy = false;
+
+  function openChat(){
+    chatOpen = true; el("chatPanel").classList.add("show");
+    if (chatPersona){ if (!chatMsgs.length) chatMsgs.push({role:"assistant", text:CHAT_PERSONAS[chatPersona].greet, local:true}); renderChat(); }
+    else renderPicker();
+  }
+  function closeChat(){ chatOpen = false; el("chatPanel").classList.remove("show"); }
+
+  function renderPicker(){
+    el("chatInputRow").style.display = "none";
+    el("chatHead").innerHTML = '<div class="av">🍕</div><div class="who"><div class="nm">Pizza Mia host</div><div class="st">Pick who you want to chat with</div></div><button class="hbtn xc" id="chatClose1">×</button>';
+    el("chatClose1").onclick = closeChat;
+    var cards = Object.keys(CHAT_PERSONAS).map(function(k){
+      var p = CHAT_PERSONAS[k];
+      return '<div class="pick-card" data-persona="'+k+'"><div class="pav">'+p.emoji+'</div><div><div class="pnm">'+p.name+'</div><div class="pds">'+p.desc+'</div></div></div>';
+    }).join("");
+    el("chatBody").className = "chat-pick";
+    el("chatBody").innerHTML = '<h3>Who\'s taking your order? 🍕</h3><p class="sub">Same menu smarts, totally different vibes. Pick your host:</p>'+cards;
+    [].forEach.call(document.querySelectorAll("[data-persona]"), function(c){
+      c.onclick = function(){ pickPersona(c.getAttribute("data-persona")); };
+    });
+  }
+
+  function pickPersona(k){
+    chatPersona = k; try { localStorage.setItem(CHAT_KEY, k); } catch(e){}
+    chatMsgs = [{ role:"assistant", text:CHAT_PERSONAS[k].greet, local:true }];
+    renderChat();
+    setTimeout(function(){ var t=el("chatText"); if(t) t.focus(); }, 60);
+  }
+
+  function renderChat(){
+    var p = CHAT_PERSONAS[chatPersona];
+    el("chatHead").innerHTML = '<div class="av">'+p.emoji+'</div><div class="who"><div class="nm">'+p.name+'</div><div class="st">'+p.tag+'</div></div>'+
+      '<button class="hbtn" id="chatSwitch">Switch</button><button class="hbtn xc" id="chatClose2">×</button>';
+    el("chatSwitch").onclick = function(){ renderPicker(); };
+    el("chatClose2").onclick = closeChat;
+    el("chatInputRow").style.display = "flex";
+    el("chatBody").className = "chat-body";
+    renderMessages();
+  }
+
+  function parseBot(text){
+    var adds = [];
+    var clean = String(text).replace(/\[\[add:([a-z0-9_]+)\]\]/gi, function(_, id){
+      id = id.toLowerCase(); if (ITEMS[id] && adds.indexOf(id)<0) adds.push(id); return "";
+    }).replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim();
+    return { clean:clean, adds:adds };
+  }
+
+  function renderMessages(){
+    var body = el("chatBody"); var html = "";
+    chatMsgs.forEach(function(m){
+      if (m.role === "user"){ html += '<div class="c-msg me"></div>'; }
+      else {
+        var p = parseBot(m.text);
+        html += '<div class="c-msg bot"></div>';
+        if (p.adds.length){
+          html += '<div class="c-adds">'+p.adds.map(function(id){ return '<button class="c-add" data-addid="'+id+'">+ '+ITEMS[id].name+'</button>'; }).join("")+'</div>';
+        }
+      }
+    });
+    if (chatBusy) html += '<div class="c-typing"><span></span><span></span><span></span></div>';
+    body.innerHTML = html;
+    // set text safely (avoid HTML injection) + strip tags from bot text
+    var nodes = body.querySelectorAll(".c-msg"); var ni = 0;
+    chatMsgs.forEach(function(m){
+      var node = nodes[ni++]; if (!node) return;
+      node.textContent = m.role==="user" ? m.text : parseBot(m.text).clean;
+    });
+    [].forEach.call(body.querySelectorAll("[data-addid]"), function(b){
+      b.onclick = function(){ var id=b.getAttribute("data-addid"); if (ITEMS[id]){ closeChat(); openItem(id); } };
+    });
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function sendChat(){
+    var t = el("chatText"); var text = (t.value||"").trim();
+    if (!text || chatBusy || !chatPersona) return;
+    t.value = ""; t.style.height = "auto";
+    chatMsgs.push({ role:"user", text:text });
+    chatBusy = true; renderMessages();
+    var payload = { persona: chatPersona, messages: chatMsgs.filter(function(m){ return !m.local; }).map(function(m){ return { role:m.role, text:m.text }; }) };
+    fetch(CHAT_ENDPOINT, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        chatBusy = false;
+        if (data && data.reply) chatMsgs.push({ role:"assistant", text:data.reply });
+        else chatMsgs.push({ role:"assistant", text: (data && data.error) ? data.error : "Hmm, I couldn't think of a reply — try asking again?" });
+        renderMessages();
+      })
+      .catch(function(){
+        chatBusy = false;
+        chatMsgs.push({ role:"assistant", text:"I couldn't reach the kitchen brain just now — please try again in a moment." });
+        renderMessages();
+      });
+  }
+
   /* ---------- WIRE UP ---------- */
   el("vegToggle").onclick = function(){ vegOnly=!vegOnly; el("vegSwitch").classList.toggle("on",vegOnly); renderMenu(); };
   el("viewCartBtn").onclick = openDrawer;
@@ -1048,6 +1217,10 @@
   el("gClose").onclick = closeGames;
   el("gBack").onclick = renderGameMenu;
   el("gOverlay").onclick = closeGames;
+  el("chatFab").onclick = function(){ chatOpen ? closeChat() : openChat(); };
+  el("chatSend").onclick = sendChat;
+  el("chatText").addEventListener("keydown", function(e){ if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendChat(); } });
+  el("chatText").addEventListener("input", function(){ this.style.height="auto"; this.style.height=Math.min(this.scrollHeight,90)+"px"; });
 
   renderCats();
   renderMenu();

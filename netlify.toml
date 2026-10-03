@@ -1,0 +1,11 @@
+# Pizza Mia — static site + serverless functions
+# The site itself is plain static files at the repo root (no build step).
+# Functions live in netlify/functions and run server-side (the Gemini API key
+# stays secret there, never in the browser).
+
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
