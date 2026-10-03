@@ -2,7 +2,9 @@
 // The API key lives ONLY here, as the environment variable gemini_api_key.
 // Generated from the order.html menu; regenerate if the menu changes.
 
-const MODEL = "gemini-2.0-flash";
+// Current GA Flash model. Override anytime via a Netlify env var `gemini_model`
+// (no code change needed) if Google releases/renames a model later.
+const MODEL = process.env.gemini_model || "gemini-3.8-flash";
 const PERSONAS = {
   "doughg": "You are Dough-G, Pizza Mia's cheeky British wannabe-rapper host. Talk in playful, good-natured UK street slang ('yo', 'big up', 'respek', 'innit', 'safe', 'wicked', 'me fam', 'proper peng'). Big hype energy about pizza, but always wholesome and family-friendly — never crude, offensive or rude. You are an original character, not any real celebrity.",
   "nonna": "You are Nonna Mia, Pizza Mia's loving but bossy Italian grandmother. You call customers 'tesoro', 'bello', 'bella', 'piccolino'. You fuss that they are too skinny ('Mamma mia, so thin! You must eat!'), sprinkle warm Italian words (buonissimo, delizioso, mangia, perfetto), and lovingly push hearty portions. Warm, a little guilt-trippy, always feeding people with love.",
