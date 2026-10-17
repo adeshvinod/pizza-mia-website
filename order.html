@@ -90,6 +90,18 @@
   .hp-calc b { color:var(--ink); }
   .opt.dis { opacity:0.45; }
 
+  /* Dine-in showcase */
+  .dine-intro { font-size:15px; color:var(--muted); line-height:1.55; margin:8px 0 16px; max-width:640px; }
+  .dine-intro a { font-weight:700; white-space:nowrap; }
+  .dine-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .dine { background:var(--card); border:1px solid var(--line); border-radius:18px; overflow:hidden; display:flex; flex-direction:column; }
+  .dine img { width:100%; aspect-ratio:4/5; object-fit:cover; display:block; background:#EFE4D0; }
+  .dine-body { padding:13px 14px 15px; display:flex; flex-direction:column; flex:1; }
+  .dine .nm { font-family:'DM Serif Display',serif; font-size:19px; color:var(--green); line-height:1.15; }
+  .dine .ds { font-size:13px; color:var(--muted); line-height:1.45; margin:6px 0 12px; }
+  .dine-tag { margin-top:auto; align-self:flex-start; font-size:11.5px; font-weight:700; letter-spacing:0.04em; padding:5px 11px; border-radius:100px; background:#F6E3C2; color:#8A5A12; }
+  @media (max-width:600px){ .dine-grid { grid-template-columns:1fr 1fr; gap:10px; } .dine .nm { font-size:16px; } }
+
   /* Bottom cart bar */
   .cartbar { position:fixed; left:0; right:0; bottom:0; z-index:45; background:var(--green); color:var(--cream); transform:translateY(120%); transition:transform .22s ease; }
   .cartbar.show { transform:translateY(0); }
@@ -463,38 +475,14 @@
     sg("sundae","Chocolate Brownie Sundae","The perfect end to a pizza night",true,"brownie-sundae.jpg",399)
   ];
 
-  // Non-alcoholic drinks only (alcohol isn't sold for delivery)
-  var DRINKS = [
-    { group:"Mocktails", items:[
-      sg("serenitea","Sereni-Tea","Green Tea, Orange & Lemon",true,null,199,MUST),
-      sg("islandbliss","Island Bliss","Pineapple & Coconut Cream",true,null,250),
-      sg("berrybreeze","Berry Breeze","Cranberry, Apple, Sprite, Ginger Ale & Lemon",true,null,250)
-    ]},
-    { group:"Iced Drinks", items:[
-      sg("coldcoffee","Cold Coffee","",true,null,275),
-      sg("peachtea","Peach Iced Tea","",true,null,200),
-      sg("icedtea","Classic Iced Tea","",true,null,200),
-      sg("vmojito","Virgin Mojito","",true,null,250)
-    ]},
-    { group:"Soft Drinks & Juices", items:[
-      sg("water","Mineral Water","",true,null,30),
-      sg("coke","Coke","",true,null,120),
-      sg("dietcoke","Diet Coke","",true,null,150),
-      sg("sprite","Sprite","",true,null,120),
-      sg("soda","Soda","",true,null,60),
-      sg("tonic","Tonic Water","",true,null,150),
-      sg("gingerale","Ginger Ale","",true,null,150),
-      sg("limesoda","Fresh Lime Soda / Water","",true,null,150,{choice:{label:"Choose",opts:["Soda","Water"]}}),
-      sg("freshjuice","Seasonal Fresh Fruit Juice","",true,null,200),
-      sg("cannedjuice","Canned Juice","Apple, Orange or Cranberry",true,null,140,{choice:{label:"Choose flavour",opts:["Apple","Orange","Cranberry"]}})
-    ]},
-    { group:"Hot Drinks", items:[
-      sg("tea","Tea","",true,null,120),
-      sg("masalatea","Masala Tea","",true,null,150),
-      sg("greentea","Green Tea","",true,null,120),
-      sg("blacktea","Black Tea","",true,null,120),
-      sg("coffee","Old School Coffee","",true,null,150)
-    ]}
+  // Dine-in only: shown to tempt people to visit, not orderable online
+  function dn(id,name,desc,veg,img,price,x){ return ext({id:id,name:name,desc:desc,veg:veg,img:img,type:"dinein",price:price},x); }
+  var DINEIN = [
+    dn("mini99","₹99 Mini Margherita","Our classic Margherita in a 6 inch size, made for little hands and little appetites.",true,"margherita.jpg",99),
+    dn("susegad","Susegad Sunset","Gin, Vodka, White Rum, Tequila, Orange & Ginger Ale",null,"susegad-sunset.jpg",null),
+    dn("yummymummy","Yummy Mummy","Gin, Cranberry, Apple & Ginger Ale",null,"yummy-mummy.jpg",null,MUST),
+    dn("shandy","Miramar Shandy","Kingfisher Beer, White Rum, Orange, Lemon & Mint",null,"miramar-shandy.jpg",null),
+    dn("whisklatte","Whisk-a-Latte","Whiskey & Coffee, under a Coconut Shell",null,"whisk-a-latte.jpg",null)
   ];
 
   // Add-on toppings: prices indexed to pizza size [Medium, Large, Godfather, Jumbo].
@@ -519,7 +507,6 @@
     tp("Ham",false,[130,150,175,205])
   ];
   var NO_MEAT_ADDONS = { marg:true };   // "Meat add-ons not available on Margherita"
-  DRINKS.forEach(function(g){ g.items.forEach(function(it){ it.ph = g.group==="Hot Drinks" ? "☕" : "🥤"; }); });
 
   var SECTIONS = [
     { id:"pizzas", label:"Pizzas", groups:PIZZAS },
@@ -529,14 +516,14 @@
     { id:"pasta",  label:"Pasta", items:PASTA },
     { id:"combos", label:"Combos", items:COMBOS },
     { id:"desserts", label:"Desserts", items:DESSERTS },
-    { id:"drinks", label:"Drinks", groups:DRINKS }
+    { id:"dinein", label:"Dine-in", items:DINEIN }
   ];
 
   // flat lookup by id
   var ITEMS = {};
   SECTIONS.forEach(function(s){
     if (s.groups) s.groups.forEach(function(g){ g.items.forEach(function(it){ ITEMS[it.id]=it; }); });
-    if (s.items) s.items.forEach(function(it){ ITEMS[it.id]=it; });
+    if (s.items) s.items.forEach(function(it){ if (it.type!=="dinein") ITEMS[it.id]=it; });
   });
 
   /* ---------- HELPERS ---------- */
@@ -619,6 +606,17 @@
       '</div></div>';
   }
 
+  // Display-only card for dine-in items (no Add button)
+  function dineCard(it){
+    return '<div class="dine">'+
+      '<img src="./images/menu/'+it.img+'" alt="'+it.name+'" loading="lazy" decoding="async"/>'+
+      '<div class="dine-body">'+
+        '<div class="nm">'+(it.veg ? vegDot(true)+' ' : '')+it.name+mustTag(it)+'</div>'+
+        '<div class="ds">'+it.desc+'</div>'+
+        '<span class="dine-tag">🍽 Dine-in only</span>'+
+      '</div></div>';
+  }
+
   function renderMenu(){
     var html = "";
     SECTIONS.forEach(function(s){
@@ -628,6 +626,12 @@
           '<div class="hb-txt"><b>Can\'t decide? Go Half &amp; Half</b>'+
           '<span>Two favourites on one pizza — pick a different flavour for each half. You pay half the price of each. Large, Godfather &amp; Jumbo.</span></div>'+
           '<button class="addbtn" id="halfStart">Build yours</button></div>';
+      }
+      if (s.id==="dinein"){
+        html += '<p class="dine-intro">Some things are best enjoyed at the pizzeria. Come see us in Miramar, Panaji, open till 3 AM. '+
+          '<a href="https://maps.google.com/?q=Pizza+Mia+Miramar+Panaji+Goa" target="_blank" rel="noopener">Get directions →</a></p>'+
+          '<div class="dine-grid">'+s.items.map(dineCard).join("")+'</div>';
+        return;
       }
       if (s.groups){
         s.groups.forEach(function(g){
