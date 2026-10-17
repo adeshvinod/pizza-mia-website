@@ -106,8 +106,8 @@
   .hp-slot.on .hp-side { color:var(--red); }
   .hp-ch { font-style:normal; }
   .hp-name { font-weight:700; font-size:14px; color:var(--green); display:flex; align-items:center; gap:6px; line-height:1.2; }
-  .hp-pr { font-size:12.5px; color:var(--ink); font-weight:700; }
-  .hp-pr small { color:var(--muted); font-weight:600; }
+  .hp-pr { font-size:17px; color:var(--ink); font-weight:700; line-height:1.2; }
+  .hp-pr small { font-size:11.5px; color:#A39F8E; font-weight:500; }
   .hp-total { text-align:center; font-size:13px; color:var(--muted); margin:11px 0 2px; }
   .hp-total b { color:var(--ink); font-size:16px; }
   .hp-pick-lbl { font-size:13.5px; color:var(--ink); margin:14px 0 8px; padding-top:12px; border-top:1px dashed var(--line); }
@@ -123,7 +123,9 @@
   .hp-tn { font-weight:700; font-size:12.5px; color:var(--green); line-height:1.2; overflow-wrap:break-word; }
   .hp-tile > .vd { position:absolute; top:7px; left:7px; width:13px; height:13px; background:#fff; }
   .hp-tile > .vd::after { width:5px; height:5px; }
-  .hp-tp { font-size:12px; color:var(--muted); font-weight:700; }
+  .hp-tp { font-size:14px; color:var(--ink); font-weight:700; line-height:1.1; }
+  .hp-tile.taken .hp-tp { font-size:12px; color:var(--muted); }
+  .hp-tf { font-size:10.5px; color:#A39F8E; font-weight:500; margin-top:-3px; }
   .hp-check { position:absolute; top:6px; right:6px; width:20px; height:20px; border-radius:50%; background:var(--green); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
   @media (max-width:480px){ .hp-pizza { width:158px; height:158px; } .hp-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .hp-tile { padding:9px 3px 8px; } .hp-tn { font-size:11.5px; } .hp-thumb { width:56px; height:56px; } .hp-ch { display:none; } }
 
@@ -432,7 +434,7 @@
 
   /* ---------- MENU DATA (Pizza Mia Menu 2026) ---------- */
   // Half & Half: allowed on these pizza size indexes (Large, Godfather, Jumbo).
-  // Price = half of each pizza's price at that size, added together (rounded up).
+  // Price = half of each pizza's price at that size (each half rounded up), added together.
   var HALF_SIZES = [1,2,3];
   // Optional extras on any item, e.g. {must:true} for the "Must Try" badge,
   // {choice:{label,opts}} for a required pick (Penne/Spaghetti), {toppings:true}.
@@ -570,7 +572,8 @@
   function placeholder(it){ return '<div class="ph">'+(it.ph || (it.veg?'🥗':'🍖'))+'</div>'; }
   function mustTag(it){ return it.must ? ' <span class="must">★ Must try</span>' : ''; }
   function allPizzas(){ var a=[]; PIZZAS.forEach(function(g){ a=a.concat(g.items); }); return a; }
-  function halfPrice(a,b,si){ return Math.ceil((a.sizes[si] + b.sizes[si]) / 2); }
+  function half(p,si){ return Math.ceil(p.sizes[si] / 2); }
+  function halfPrice(a,b,si){ return half(a,si) + half(b,si); }
 
   /* ---------- CART STATE ---------- */
   var cart = [];
@@ -752,7 +755,7 @@
       return '<button type="button" class="hp-slot'+(act===k?' on':'')+'" data-slot="'+k+'">'+
         '<span class="hp-side">'+side+' half'+(act===k?'<i class="hp-ch"> · choosing</i>':'')+'</span>'+
         '<span class="hp-name">'+vegDot(p.veg)+' '+p.name+'</span>'+
-        '<span class="hp-pr">'+money(p.sizes[mSizeIdx])+' <small>÷ 2</small></span></button>';
+        '<span class="hp-pr">'+money(half(p,mSizeIdx))+' <small>('+money(p.sizes[mSizeIdx])+' ÷ 2)</small></span></button>';
     }
     var h = '<div class="hp">'+
       '<div class="hp-stage">'+
@@ -763,7 +766,7 @@
         '</div>'+
       '</div>'+
       '<div class="hp-slots">'+slot("a",A,"Left")+slot("b",b,"Right")+'</div>'+
-      '<div class="hp-total">('+money(A.sizes[mSizeIdx])+' + '+money(b.sizes[mSizeIdx])+') ÷ 2 = <b>'+money(halfPrice(A,b,mSizeIdx))+'</b> <span>for a '+PIZZA_SIZES[mSizeIdx].label+'</span></div>'+
+      '<div class="hp-total">'+money(half(A,mSizeIdx))+' + '+money(half(b,mSizeIdx))+' = <b>'+money(halfPrice(A,b,mSizeIdx))+'</b> <span>for a '+PIZZA_SIZES[mSizeIdx].label+'</span></div>'+
       '<div class="hp-pick-lbl">Pick a pizza for the <b>'+(act==="a"?"left":"right")+' half</b></div>'+
       '<div class="hp-grid" id="hpGrid">';
     PIZZAS.forEach(function(g){
@@ -775,7 +778,8 @@
         h += '<button type="button" class="hp-tile'+(isCur?' sel':'')+(isOther?' taken':'')+'" data-pick="'+p.id+'"'+(isOther?' disabled':'')+'>'+
           '<span class="hp-thumb" style="'+pzBg(p)+'"></span>'+
           vegDot(p.veg)+'<span class="hp-tn">'+p.name+'</span>'+
-          '<span class="hp-tp">'+(isOther ? (act==="a"?"Right":"Left")+' half' : money(p.sizes[mSizeIdx]))+'</span>'+
+          (isOther ? '<span class="hp-tp">'+(act==="a"?"Right":"Left")+' half</span>'
+                   : '<span class="hp-tp">'+money(half(p,mSizeIdx))+'</span><span class="hp-tf">('+money(p.sizes[mSizeIdx])+' ÷ 2)</span>')+
           (isCur ? '<span class="hp-check">✓</span>' : '')+
         '</button>';
       });
