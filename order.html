@@ -1476,6 +1476,10 @@
   updateRewardUI();
   window.addEventListener("scroll", onScroll, {passive:true});
 
+  // Deep links from the homepage promo: order.html#half / order.html#play
+  if (location.hash==="#half" && el("halfStart")) el("halfStart").click();
+  else if (location.hash==="#play") openGames("page");
+
   // expose a few for debugging/testing
   window.__pm = { cart:function(){return cart;}, itemTotal:itemTotal, computeBill:computeBill,
     setReward:setReward, getReward:function(){return REWARD;}, scoreToReward:scoreToReward, openGames:openGames };

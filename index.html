@@ -37,6 +37,35 @@
   .wa-fab:hover { transform:scale(1.07); box-shadow:0 6px 20px rgba(0,0,0,0.33); }
   .wa-fab svg { width:34px; height:34px; display:block; }
   @media (max-width:600px) { .wa-fab { width:54px; height:54px; bottom:18px; left:18px; } .wa-fab svg { width:30px; height:30px; } }
+
+  /* Online-ordering promo (top of page) */
+  .promo { background:#1B3A2A; background-image:radial-gradient(circle at 88% -20%, rgba(232,163,61,.28), transparent 46%), radial-gradient(circle at -6% 120%, rgba(201,52,31,.30), transparent 44%); color:#FBF3E6; }
+  .promo-in { max-width:1240px; margin:0 auto; padding:34px 28px 36px; }
+  .promo-top { display:flex; align-items:flex-end; justify-content:space-between; gap:22px; flex-wrap:wrap; margin-bottom:24px; }
+  .promo-kicker { display:inline-flex; align-items:center; gap:8px; background:#E8A33D; color:#22271F; padding:6px 13px; border-radius:100px; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin-bottom:12px; }
+  .promo-kicker i { width:8px; height:8px; border-radius:50%; background:#C9341F; display:inline-block; animation:promoPulse 1.4s ease-in-out infinite; }
+  @keyframes promoPulse { 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(1.6); opacity:.45; } }
+  .promo h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:clamp(28px,3.6vw,44px); line-height:1.08; margin:0; color:#FBF3E6; max-width:640px; }
+  .promo h2 em { font-family:'Pacifico',cursive; font-style:normal; color:#E8A33D; font-size:.82em; }
+  .promo-sub { font-size:15.5px; color:#C9D8C1; margin:10px 0 0; line-height:1.55; }
+  .promo-cta { display:flex; gap:10px; flex-wrap:wrap; }
+  .promo-btn { background:#C9341F; color:#FBF3E6 !important; padding:16px 30px; border-radius:100px; font-weight:700; font-size:16.5px; box-shadow:0 4px 0 #8E2314; white-space:nowrap; display:inline-flex; align-items:center; gap:9px; transition:transform .12s; }
+  .promo-btn:hover { transform:translateY(-2px); }
+  .promo-btn.ghost { background:transparent; border:1.5px solid #C6DBBB; box-shadow:none; color:#FBF3E6 !important; }
+  .promo-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+  .promo-card { background:rgba(251,243,230,.07); border:1px solid rgba(198,219,187,.22); border-radius:20px; padding:18px; display:flex; gap:16px; align-items:center; color:#FBF3E6 !important; transition:background .15s, border-color .15s, transform .12s; }
+  .promo-card:hover { background:rgba(251,243,230,.13); border-color:#E8A33D; transform:translateY(-2px); }
+  .promo-card .pc-art { position:relative; width:84px; height:84px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; background:#FBF3E6; box-shadow:0 6px 16px rgba(0,0,0,.3); }
+  .pc-art .half { position:absolute; inset:0; border-radius:50%; background-size:auto 108%; background-position:center; }
+  .pc-art .half.l { clip-path:inset(0 50% 0 0); }
+  .pc-art .half.r { clip-path:inset(0 0 0 50%); border-left:3px solid #fff; }
+  .promo-card .pc-tag { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#22271F; background:#C6DBBB; padding:3px 9px; border-radius:100px; margin-bottom:6px; }
+  .promo-card .pc-tag.hot { background:#E8A33D; }
+  .promo-card b { display:block; font-family:'DM Serif Display',serif; font-weight:400; font-size:21px; line-height:1.15; color:#FBF3E6; }
+  .promo-card span.pc-d { display:block; font-size:13.5px; line-height:1.45; color:#C9D8C1; margin-top:5px; }
+  .promo-card .pc-go { display:block; font-size:13px; font-weight:700; color:#E8A33D; margin-top:8px; }
+  @media (max-width:900px) { .promo-cards { grid-template-columns:1fr; gap:10px; } .promo-card { padding:13px 14px; } .promo-card .pc-art { width:64px; height:64px; font-size:30px; } .promo-card b { font-size:18px; } }
+  @media (max-width:600px) { .promo-in { padding:24px 18px 26px; } .promo-top { margin-bottom:18px; } .promo-cta { width:100%; } .promo-btn { flex:1; justify-content:center; padding:14px 18px; font-size:15.5px; } .promo-card .pc-d { font-size:13px; } }
 </style>
 
 <div style="font-family:'Karla',sans-serif;color:#22271F;background:#FBF3E6;width:100%;overflow-x:hidden;">
@@ -62,6 +91,52 @@
     </div>
   </header>
 
+  <!-- ONLINE ORDERING PROMO -->
+  <section class="promo" aria-label="Order online">
+    <div class="promo-in">
+      <div class="promo-top">
+        <div>
+          <div class="promo-kicker"><i></i>Now delivering · Order on our website</div>
+          <h2>Order straight from us and get <em>more</em> than the apps</h2>
+          <p class="promo-sub">Free delivery · Cash on delivery · Better prices than the apps</p>
+        </div>
+        <div class="promo-cta">
+          <a class="promo-btn" href="./order.html">Order now →</a>
+          <a class="promo-btn ghost" href="./order.html#play">🎮 Play &amp; win</a>
+        </div>
+      </div>
+      <div class="promo-cards">
+        <a class="promo-card" href="./order.html#half">
+          <span class="pc-art"><span class="half l" style="background-image:url('./images/menu/pepperoni.jpg')"></span><span class="half r" style="background-image:url('./images/menu/margherita.jpg')"></span></span>
+          <span>
+            <span class="pc-tag hot">New · Only on our site</span>
+            <b>Half &amp; Half pizza</b>
+            <span class="pc-d">Two flavours on one pizza, like ½ Pepperoni + ½ Margherita. You pay half the price of each. Not on the apps!</span>
+            <span class="pc-go">Build yours →</span>
+          </span>
+        </a>
+        <a class="promo-card" href="./order.html#play">
+          <span class="pc-art">🎡</span>
+          <span>
+            <span class="pc-tag hot">Play &amp; win</span>
+            <b>Win discounts &amp; freebies</b>
+            <span class="pc-d">Spin the pizza wheel or play Catch the Toppings for up to 20% off, free garlic knots or a free drink.</span>
+            <span class="pc-go">Play now →</span>
+          </span>
+        </a>
+        <a class="promo-card" href="./order.html">
+          <span class="pc-art">🛵</span>
+          <span>
+            <span class="pc-tag">Free delivery</span>
+            <b>Order in a few taps</b>
+            <span class="pc-d">Pick your pizzas, send the order on WhatsApp and pay cash when it arrives.</span>
+            <span class="pc-go">See the menu →</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- HERO -->
   <section id="home" style="max-width:1240px;margin:0 auto;padding:60px 28px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:52px;align-items:center;">
     <div>
@@ -69,7 +144,8 @@
       <h1 style="font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(38px,5vw,62px);line-height:1.04;letter-spacing:-0.01em;margin:0 0 20px;color:#1B3A2A;">Pizzas, cocktails<br/>and a <span style="font-family:'Pacifico',cursive;font-size:0.82em;color:#C9341F;">family friendly</span><br/>community</h1>
       <p style="font-size:17.5px;line-height:1.6;color:#4E5347;margin:0 0 30px;max-width:470px;">A cozy corner pizzeria in Miramar. We organise community get-togethers, birthday parties and events for your loved ones along with our fresh thin crust pizzas from the oven, Garlic Knots and signature cocktails.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="#menu" style="background:#C9341F;color:#FBF3E6;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;box-shadow:0 3px 0 #8E2314;">See the pizzas</a>
+        <a href="./order.html" style="background:#C9341F;color:#FBF3E6;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;box-shadow:0 3px 0 #8E2314;">Order online</a>
+        <a href="#menu" style="background:transparent;border:1.5px solid #1B3A2A;color:#1B3A2A;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;">See the pizzas</a>
         <a href="#events" style="background:transparent;border:1.5px solid #1B3A2A;color:#1B3A2A;padding:15px 28px;border-radius:100px;font-weight:700;font-size:15.5px;">Host an event</a>
       </div>
     </div>
