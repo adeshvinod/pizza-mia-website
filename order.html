@@ -77,18 +77,55 @@
 
   /* Half & Half */
   .halfbanner { margin:16px 0 4px; background:var(--card); border:1.5px dashed var(--red); border-radius:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-  .halfbanner .hb-ico { width:46px; height:46px; border-radius:50%; flex-shrink:0; background:linear-gradient(90deg,var(--red) 50%,var(--veg) 50%); border:3px solid #E8C48A; }
+  .halfbanner .hb-ico { position:relative; width:58px; height:58px; border-radius:50%; flex-shrink:0; box-shadow:0 3px 10px rgba(60,35,10,.25); }
+  .halfbanner .hb-ico span { position:absolute; inset:0; border-radius:50%; background-size:auto 108%; background-position:center; }
+  .halfbanner .hb-ico span:first-child { clip-path:inset(0 50% 0 0); }
+  .halfbanner .hb-ico span:last-child { clip-path:inset(0 0 0 50%); border-left:2px solid #fff; }
   .halfbanner .hb-txt { flex:1; min-width:200px; }
   .halfbanner .hb-txt b { display:block; font-family:'DM Serif Display',serif; font-weight:400; font-size:20px; color:var(--green); }
   .halfbanner .hb-txt span { font-size:13px; color:var(--muted); line-height:1.45; }
   .halftog { margin-top:4px; border-style:dashed; }
-  .halfpick { background:#F2F7EE; border:1.5px solid var(--green); border-radius:12px; padding:12px 13px 10px; margin-bottom:6px; }
-  .hp-row { margin-bottom:9px; }
-  .hp-lbl { display:block; font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--green); font-weight:700; margin-bottom:4px; }
-  .hsel { width:100%; border:1.5px solid #D9CBB3; border-radius:10px; padding:10px 11px; font-size:15px; font-family:'Karla',sans-serif; background:#fff; color:var(--ink); }
-  .hp-calc { font-size:13px; color:var(--muted); }
-  .hp-calc b { color:var(--ink); }
   .opt.dis { opacity:0.45; }
+  .modal.wide { width:min(580px,calc(100% - 24px)); }
+
+  /* Half & Half builder */
+  .hp { background:#FFFCF6; border:1.5px solid var(--line); border-radius:18px; padding:16px 14px 12px; margin:2px 0 6px; }
+  .hp-stage { display:flex; justify-content:center; padding:4px 0 14px; background:radial-gradient(circle closest-side,#F6E3C2 60%, rgba(246,227,194,0)); }
+  .hp-pizza { position:relative; width:184px; height:184px; border-radius:50%; box-shadow:0 10px 26px rgba(60,35,10,.28), 0 0 0 5px #fff; }
+  .hp-layer { position:absolute; inset:0; border-radius:50%; background-size:auto 108%; background-position:center; background-repeat:no-repeat; cursor:pointer; transition:filter .2s; filter:saturate(.75) brightness(.86); }
+  .hp-layer.l { clip-path:inset(0 50% 0 0); }
+  .hp-layer.r { clip-path:inset(0 0 0 50%); }
+  .hp-layer.act { filter:none; }
+  .hp-layer.pop { animation:hpPop .45s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes hpPop { 0%{ transform:scale(.82) rotate(-14deg); opacity:.2; } 100%{ transform:none; opacity:1; } }
+  .hp-cut { position:absolute; left:50%; top:-4px; bottom:-4px; width:4px; margin-left:-2px; background:#fff; border-radius:3px; pointer-events:none; box-shadow:0 0 6px rgba(0,0,0,.25); }
+  .hp-slots { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .hp-slot { text-align:left; background:var(--card); border:1.5px solid #D9CBB3; border-radius:14px; padding:9px 11px; display:flex; flex-direction:column; gap:3px; min-width:0; transition:border-color .15s, background .15s; }
+  .hp-slot.on { border-color:var(--red); background:#FDF0EC; box-shadow:0 0 0 3px rgba(201,52,31,.12); }
+  .hp-side { font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .hp-slot.on .hp-side { color:var(--red); }
+  .hp-ch { font-style:normal; }
+  .hp-name { font-weight:700; font-size:14px; color:var(--green); display:flex; align-items:center; gap:6px; line-height:1.2; }
+  .hp-pr { font-size:12.5px; color:var(--ink); font-weight:700; }
+  .hp-pr small { color:var(--muted); font-weight:600; }
+  .hp-total { text-align:center; font-size:13px; color:var(--muted); margin:11px 0 2px; }
+  .hp-total b { color:var(--ink); font-size:16px; }
+  .hp-pick-lbl { font-size:13.5px; color:var(--ink); margin:14px 0 8px; padding-top:12px; border-top:1px dashed var(--line); }
+  .hp-pick-lbl b { color:var(--red); }
+  .hp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:8px; max-height:312px; overflow-y:auto; padding:2px 4px 4px 2px; -webkit-overflow-scrolling:touch; }
+  .hp-grp { grid-column:1/-1; font-size:10.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--red); margin:6px 0 0; }
+  .hp-tile { position:relative; min-width:0; background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:10px 6px 9px; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; transition:border-color .15s, transform .1s; }
+  .hp-tile:hover { border-color:var(--green); }
+  .hp-tile:active { transform:scale(.97); }
+  .hp-tile.sel { border-color:var(--green); background:#F2F7EE; }
+  .hp-tile.taken { opacity:.42; cursor:not-allowed; }
+  .hp-thumb { width:66px; height:66px; border-radius:50%; background-size:auto 108%; background-position:center; box-shadow:0 3px 8px rgba(60,35,10,.22); }
+  .hp-tn { font-weight:700; font-size:12.5px; color:var(--green); line-height:1.2; overflow-wrap:break-word; }
+  .hp-tile > .vd { position:absolute; top:7px; left:7px; width:13px; height:13px; background:#fff; }
+  .hp-tile > .vd::after { width:5px; height:5px; }
+  .hp-tp { font-size:12px; color:var(--muted); font-weight:700; }
+  .hp-check { position:absolute; top:6px; right:6px; width:20px; height:20px; border-radius:50%; background:var(--green); color:#fff; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  @media (max-width:480px){ .hp-pizza { width:158px; height:158px; } .hp-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; } .hp-tile { padding:9px 3px 8px; } .hp-tn { font-size:11.5px; } .hp-thumb { width:56px; height:56px; } .hp-ch { display:none; } }
 
   /* Dine-in showcase */
   .dine-intro { font-size:15px; color:var(--muted); line-height:1.55; margin:8px 0 16px; max-width:640px; }
@@ -622,7 +659,7 @@
     SECTIONS.forEach(function(s){
       html += '<div class="sec-head" id="sec-'+s.id+'"><h2>'+s.label+'</h2></div>';
       if (s.id==="pizzas"){
-        html += '<div class="halfbanner"><div class="hb-ico"></div>'+
+        html += '<div class="halfbanner"><div class="hb-ico"><span style="background-image:url(\'./images/menu/pepperoni.jpg\')"></span><span style="background-image:url(\'./images/menu/margherita.jpg\')"></span></div>'+
           '<div class="hb-txt"><b>Can\'t decide? Go Half &amp; Half</b>'+
           '<span>Two favourites on one pizza — pick a different flavour for each half. You pay half the price of each. Large, Godfather &amp; Jumbo.</span></div>'+
           '<button class="addbtn" id="halfStart">Build yours</button></div>';
@@ -668,6 +705,7 @@
   /* ---------- ITEM MODAL ---------- */
   // mHalf = id of the second-half pizza when Half & Half is on (mItem is the first half)
   var mItem=null, mSizeIdx=0, mToppings={}, mQty=1, mChoice=0, mHalf=null;
+  var mSlot="b", mPop=null;   // which half the builder is filling; which half just changed (animates)
 
   function openItem(id, opts){
     var it = ITEMS[id]; if (!it) return;
@@ -677,7 +715,7 @@
       toast("Added "+it.name);
       return;
     }
-    mItem=it; mSizeIdx=0; mToppings={}; mQty=1; mChoice=0; mHalf=null;
+    mItem=it; mSizeIdx=0; mToppings={}; mQty=1; mChoice=0; mHalf=null; mSlot="b"; mPop=null;
     if (it.type==="pizza" && opts.half && ITEMS[opts.half] && opts.half!==id){ mHalf=opts.half; mSizeIdx=HALF_SIZES[0]; }
     renderModalHead();
     renderModalBody();
@@ -705,19 +743,44 @@
     }
   }
 
-  // A <select> of every pizza (except the one on the other half), priced at the current size
-  function pizzaSelect(which, selId, otherId){
-    var h = '<select class="hsel" data-half="'+which+'">';
+  // Visual Half & Half builder: a live two-half pizza preview, two half "slots",
+  // and a grid of pizza tiles that fills whichever slot is active.
+  function pzBg(p){ return "background-image:url('./images/menu/"+p.img+"')"; }
+  function halfBuilder(b){
+    var A = mItem, act = mSlot, cur = act==="a" ? A : b, other = act==="a" ? b : A;
+    function slot(k, p, side){
+      return '<button type="button" class="hp-slot'+(act===k?' on':'')+'" data-slot="'+k+'">'+
+        '<span class="hp-side">'+side+' half'+(act===k?'<i class="hp-ch"> · choosing</i>':'')+'</span>'+
+        '<span class="hp-name">'+vegDot(p.veg)+' '+p.name+'</span>'+
+        '<span class="hp-pr">'+money(p.sizes[mSizeIdx])+' <small>÷ 2</small></span></button>';
+    }
+    var h = '<div class="hp">'+
+      '<div class="hp-stage">'+
+        '<div class="hp-pizza">'+
+          '<div class="hp-layer l'+(act==="a"?' act':'')+(mPop==="a"?' pop':'')+'" data-slot="a" style="'+pzBg(A)+'"></div>'+
+          '<div class="hp-layer r'+(act==="b"?' act':'')+(mPop==="b"?' pop':'')+'" data-slot="b" style="'+pzBg(b)+'"></div>'+
+          '<div class="hp-cut"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="hp-slots">'+slot("a",A,"Left")+slot("b",b,"Right")+'</div>'+
+      '<div class="hp-total">('+money(A.sizes[mSizeIdx])+' + '+money(b.sizes[mSizeIdx])+') ÷ 2 = <b>'+money(halfPrice(A,b,mSizeIdx))+'</b> <span>for a '+PIZZA_SIZES[mSizeIdx].label+'</span></div>'+
+      '<div class="hp-pick-lbl">Pick a pizza for the <b>'+(act==="a"?"left":"right")+' half</b></div>'+
+      '<div class="hp-grid" id="hpGrid">';
     PIZZAS.forEach(function(g){
-      var opts = g.items.filter(function(p){ return p.id!==otherId && (p.id===selId || !vegOnly || p.veg); });
-      if (!opts.length) return;
-      h += '<optgroup label="'+g.group+'">';
-      opts.forEach(function(p){
-        h += '<option value="'+p.id+'"'+(p.id===selId?' selected':'')+'>'+p.name+' — '+money(p.sizes[mSizeIdx])+'</option>';
+      var items = g.items.filter(function(p){ return !vegOnly || p.veg || p.id===cur.id || p.id===other.id; });
+      if (!items.length) return;
+      h += '<div class="hp-grp">'+g.group+'</div>';
+      items.forEach(function(p){
+        var isCur = p.id===cur.id, isOther = p.id===other.id;
+        h += '<button type="button" class="hp-tile'+(isCur?' sel':'')+(isOther?' taken':'')+'" data-pick="'+p.id+'"'+(isOther?' disabled':'')+'>'+
+          '<span class="hp-thumb" style="'+pzBg(p)+'"></span>'+
+          vegDot(p.veg)+'<span class="hp-tn">'+p.name+'</span>'+
+          '<span class="hp-tp">'+(isOther ? (act==="a"?"Right":"Left")+' half' : money(p.sizes[mSizeIdx]))+'</span>'+
+          (isCur ? '<span class="hp-check">✓</span>' : '')+
+        '</button>';
       });
-      h += '</optgroup>';
     });
-    return h + '</select>';
+    return h + '</div></div>';
   }
 
   function renderModalBody(){
@@ -727,11 +790,7 @@
         '<input type="checkbox" id="halfTog" '+(b?'checked':'')+'>'+
         '<span class="oi"><span class="on">🍕 Make it Half &amp; Half</span><span class="osub">A different flavour on each half · Large, Godfather &amp; Jumbo</span></span></label>';
       if (b){
-        html += '<div class="halfpick">'+
-          '<div class="hp-row"><span class="hp-lbl">First half</span>'+pizzaSelect("a", mItem.id, b.id)+'</div>'+
-          '<div class="hp-row"><span class="hp-lbl">Second half</span>'+pizzaSelect("b", b.id, mItem.id)+'</div>'+
-          '<div class="hp-calc">('+money(mItem.sizes[mSizeIdx])+' + '+money(b.sizes[mSizeIdx])+') ÷ 2 = <b>'+money(halfPrice(mItem,b,mSizeIdx))+'</b></div>'+
-        '</div>';
+        html += halfBuilder(b);
       }
     }
     // required choice (e.g. Penne / Spaghetti)
@@ -777,7 +836,11 @@
           '<span class="op">+ '+money(t.prices[mSizeIdx])+'</span></label>';
       });
     }
+    var gridTop = el("hpGrid") ? el("hpGrid").scrollTop : 0;
     el("modalBody").innerHTML = html;
+    el("modal").classList.toggle("wide", !!b);
+    if (el("hpGrid")) el("hpGrid").scrollTop = gridTop;
+    mPop = null;
 
     var tog = el("halfTog");
     if (tog) tog.onchange = function(){
@@ -785,12 +848,18 @@
         var pref = vegOnly ? ["garden","marg","paneer"] : ["marg","pep","garden"];
         for (var i=0;i<pref.length;i++){ if (pref[i]!==mItem.id){ mHalf=pref[i]; break; } }
         if (HALF_SIZES.indexOf(mSizeIdx)<0) mSizeIdx = HALF_SIZES[0];
+        mSlot = "b";
       } else mHalf = null;
       dropBlockedToppings(); renderModalHead(); renderModalBody();
     };
-    [].forEach.call(el("modalBody").querySelectorAll("select[data-half]"), function(s){
-      s.onchange = function(){
-        if (s.getAttribute("data-half")==="a") mItem = ITEMS[s.value]; else mHalf = s.value;
+    [].forEach.call(el("modalBody").querySelectorAll("[data-slot]"), function(x){
+      x.onclick = function(){ mSlot = x.getAttribute("data-slot"); renderModalBody(); };
+    });
+    [].forEach.call(el("modalBody").querySelectorAll("[data-pick]"), function(x){
+      x.onclick = function(){
+        var id = x.getAttribute("data-pick");
+        if (mSlot==="a") mItem = ITEMS[id]; else mHalf = id;
+        mPop = mSlot;
         dropBlockedToppings(); renderModalHead(); renderModalBody();
       };
     });
