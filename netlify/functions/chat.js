@@ -1,6 +1,6 @@
 // Pizza Mia AI host — secure Gemini proxy (Netlify Function)
 // The API key lives ONLY here, as the environment variable gemini_api_key.
-// Generated from the order.html menu; regenerate if the menu changes.
+// MENU below is generated from assets/menu.js; regenerate if the menu changes.
 
 // Current GA Flash model. Override anytime via a Netlify env var `gemini_model`
 // (no code change needed) if Google releases/renames a model later.
