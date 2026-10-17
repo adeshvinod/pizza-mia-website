@@ -6,20 +6,11 @@
   "use strict";
 
   var ENDPOINT = "/.netlify/functions/chat";
-  var PERSONA_KEY = "pizzamia_persona";
   var NUDGE_KEY = "pizzamia_chat_nudged";   // sessionStorage: nudge bubble shown/dismissed
   var SEEN_KEY = "pizzamia_chat_seen";      // sessionStorage: chat opened, so tone down the glow
-  var PERSONAS = {
-    doughg: { name:"Dough-G", emoji:"🎤", tag:"Cheeky rapper host",
-      desc:"Big up! Streetwise slang and maximum hype for pizza.",
-      greet:"Yo yo yo! Dough-G in the house, big up yourself! 🎤 What you feelin' today fam — proper cheesy, loaded meaty, or somethin' spicy? Lemme sort you right out, innit." },
-    nonna: { name:"Nonna Mia", emoji:"👵", tag:"Your Italian grandma",
-      desc:"Warm, bossy, and sure you need to eat more.",
-      greet:"Ciao tesoro! 👵 Come, come, sit! You look a little hungry, no? Tell Nonna what you like and I feed you something buonissimo. Veg or non-veg, piccolino?" },
-    cosmo: { name:"Cosmic Dave", emoji:"🌌", tag:"Chilled cosmic dude",
-      desc:"Mega mellow, finds the meaning of life in a slice.",
-      greet:"Heyyy, welcome man. 🌌 Cosmic Dave here, just vibin'. A pizza's basically a lil' edible galaxy, you know? Tell me what your soul's cravin' and we'll find your slice of the universe." }
-  };
+  // One host only: Nonna Mia (the server's persona id is "nonna")
+  var HOST = { id:"nonna", name:"Nonna Mia", emoji:"👵", tag:"Your Italian grandma",
+    greet:"Ciao tesoro! 👵 You look hungry. Veg or non-veg? Tell Nonna and I sort you out." };
 
   // orderable items by id (dine-in only items are excluded)
   var ITEMS = {};
@@ -38,14 +29,14 @@
   root.innerHTML =
     '<div class="chat-dock" id="chatDock">' +
       '<div class="chat-nudge" id="chatNudge"><button class="cn-x" id="chatNudgeX" aria-label="Dismiss">×</button>' +
-        '<b>Hungry? 👋</b>Chat with our host for picks &amp; deals</div>' +
-      '<button class="chat-fab" id="chatFab" aria-label="Chat with our host">' +
-        '<span class="cf-ico">💬</span><span class="dot"></span></button>' +
+        '<b>Hungry, tesoro? 👵</b>Ask Nonna what to order</div>' +
+      '<button class="chat-fab" id="chatFab" aria-label="Chat with Nonna">' +
+        '<span class="cf-ico">👵</span><span class="dot"></span></button>' +
     '</div>' +
     '<div class="chat-panel" id="chatPanel">' +
       '<div class="chat-head" id="chatHead"></div>' +
       '<div class="chat-body" id="chatBody"></div>' +
-      '<div class="chat-input" id="chatInputRow" style="display:none;">' +
+      '<div class="chat-input" id="chatInputRow">' +
         '<textarea id="chatText" rows="1" placeholder="Ask about the menu…"></textarea>' +
         '<button class="send" id="chatSend" aria-label="Send">➤</button>' +
       '</div>' +
@@ -55,8 +46,6 @@
   if (ss(SEEN_KEY)) el("chatFab").classList.add("seen");
 
   /* ---------- STATE ---------- */
-  var persona = null; try { persona = localStorage.getItem(PERSONA_KEY) || null; } catch (e) {}
-  if (persona && !PERSONAS[persona]) persona = null;
   var msgs = [];      // {role:'user'|'assistant', text, local?}
   var open = false, busy = false;
 
@@ -64,8 +53,9 @@
     open = true; el("chatPanel").classList.add("show");
     document.documentElement.classList.add("pm-chat-open");
     hideNudge(); el("chatFab").classList.add("seen"); ss(SEEN_KEY, "1");
-    if (persona) { if (!msgs.length) msgs.push({ role:"assistant", text:PERSONAS[persona].greet, local:true }); renderChat(); }
-    else renderPicker();
+    if (!msgs.length) msgs.push({ role:"assistant", text:HOST.greet, local:true });
+    renderChat();
+    setTimeout(function () { var t = el("chatText"); if (t) t.focus(); }, 60);
   }
   function closeChat() {
     open = false; el("chatPanel").classList.remove("show");
@@ -78,37 +68,11 @@
   el("chatNudgeX").onclick = function (e) { e.stopPropagation(); hideNudge(); };
   el("chatNudge").onclick = function () { openChat(); };
 
-  /* ---------- PERSONA PICKER ---------- */
-  function renderPicker() {
-    el("chatInputRow").style.display = "none";
-    el("chatHead").innerHTML = '<div class="av">🍕</div><div class="who"><div class="nm">Pizza Mia host</div><div class="st">Pick who you want to chat with</div></div><button class="hbtn xc" id="chatClose1">×</button>';
-    el("chatClose1").onclick = closeChat;
-    var cards = Object.keys(PERSONAS).map(function (k) {
-      var p = PERSONAS[k];
-      return '<div class="pick-card" data-persona="' + k + '"><div class="pav">' + p.emoji + '</div><div><div class="pnm">' + p.name + '</div><div class="pds">' + p.desc + '</div></div></div>';
-    }).join("");
-    el("chatBody").className = "chat-pick";
-    el("chatBody").innerHTML = '<h3>Who\'s taking your order? 🍕</h3><p class="sub">Same menu smarts, totally different vibes. Pick your host:</p>' + cards;
-    [].forEach.call(root.querySelectorAll("[data-persona]"), function (c) {
-      c.onclick = function () { pickPersona(c.getAttribute("data-persona")); };
-    });
-  }
-  function pickPersona(k) {
-    persona = k; try { localStorage.setItem(PERSONA_KEY, k); } catch (e) {}
-    msgs = [{ role:"assistant", text:PERSONAS[k].greet, local:true }];
-    renderChat();
-    setTimeout(function () { var t = el("chatText"); if (t) t.focus(); }, 60);
-  }
-
   /* ---------- CHAT ---------- */
   function renderChat() {
-    var p = PERSONAS[persona];
-    el("chatHead").innerHTML = '<div class="av">' + p.emoji + '</div><div class="who"><div class="nm">' + p.name + '</div><div class="st">' + p.tag + '</div></div>' +
-      '<button class="hbtn" id="chatSwitch">Switch</button><button class="hbtn xc" id="chatClose2">×</button>';
-    el("chatSwitch").onclick = function () { renderPicker(); };
+    el("chatHead").innerHTML = '<div class="av">' + HOST.emoji + '</div><div class="who"><div class="nm">' + HOST.name + '</div><div class="st">' + HOST.tag + '</div></div>' +
+      '<button class="hbtn xc" id="chatClose2">×</button>';
     el("chatClose2").onclick = closeChat;
-    el("chatInputRow").style.display = "flex";
-    el("chatBody").className = "chat-body";
     renderMessages();
   }
 
@@ -154,11 +118,11 @@
 
   function sendChat() {
     var t = el("chatText"); var text = (t.value || "").trim();
-    if (!text || busy || !persona) return;
+    if (!text || busy) return;
     t.value = ""; t.style.height = "auto";
     msgs.push({ role:"user", text:text });
     busy = true; renderMessages();
-    var payload = { persona: persona, messages: msgs.filter(function (m) { return !m.local; }).map(function (m) { return { role:m.role, text:m.text }; }) };
+    var payload = { persona: HOST.id, messages: msgs.filter(function (m) { return !m.local; }).map(function (m) { return { role:m.role, text:m.text }; }) };
     fetch(ENDPOINT, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
       .then(function (data) {
