@@ -1,0 +1,11 @@
+{
+  "name": "pizza-mia-website",
+  "private": true,
+  "description": "Static site; dependencies are only for the Netlify Functions.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@netlify/blobs": "10.7.13"
+  }
+}

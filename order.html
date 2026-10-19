@@ -281,6 +281,45 @@
   .conf span { position:absolute; top:-12px; font-size:20px; animation: confFall 1.5s ease-in forwards; }
   @keyframes confFall { 0%{transform:translateY(-10px) rotate(0);opacity:1} 100%{transform:translateY(240px) rotate(360deg);opacity:0} }
 
+  /* Game prizes in the cart */
+  .cartbar .cb-nudge { background:#E8A33D; color:var(--ink); font-weight:700; font-size:13px; text-align:center; padding:7px 14px; cursor:pointer; line-height:1.35; }
+  .cline.free .ci-nm { color:var(--veg); }
+  .cline.free .ci-price { color:var(--veg); }
+  .prize { background:var(--card); border:1.5px solid var(--veg); border-radius:14px; padding:12px 14px; margin:12px 0; }
+  .pz-head { display:flex; align-items:center; gap:10px; }
+  .pz-ico { font-size:24px; }
+  .pz-nm { flex:1; min-width:0; }
+  .pz-nm b { display:block; color:var(--green); font-size:15px; }
+  .pz-nm small { color:var(--muted); font-size:12px; }
+  .lnk { background:none; border:none; padding:0; color:var(--muted); text-decoration:underline; font-weight:700; font-size:12.5px; cursor:pointer; }
+  .pz-lbl { font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--red); font-weight:700; margin:12px 0 7px; }
+  .pz-pick { display:flex; flex-wrap:wrap; gap:7px; }
+  .chip { border:1.5px solid #D9CBB3; background:#fff; color:var(--green); font-weight:700; font-size:13px; padding:7px 12px; border-radius:100px; cursor:pointer; }
+  .chip.on { background:var(--green); border-color:var(--green); color:var(--cream); }
+  .chip.locked { opacity:.6; border-style:dashed; }
+  .chip small { font-weight:600; opacity:.85; }
+  .pz-sel { width:100%; border:1.5px solid #D9CBB3; border-radius:10px; padding:9px 10px; font-size:14px; font-family:'Karla',sans-serif; background:#fff; color:var(--ink); }
+  .pz-msg { font-size:13.5px; line-height:1.45; margin-top:10px; color:var(--green); }
+  .pz-msg.ok { color:var(--veg); font-weight:700; }
+  .pz-msg.warn { background:#FDF3E2; border:1px solid #F0D3A0; border-radius:10px; padding:9px 11px; color:#7A4A10; }
+  .pz-terms { font-size:11px; color:var(--muted); line-height:1.45; margin-top:12px; }
+  .nudge { margin-top:12px; background:#FFF6E6; border:1.5px dashed var(--gold); border-radius:12px; padding:10px 12px; }
+  .ng-t { font-weight:700; font-size:13.5px; color:var(--ink); line-height:1.4; }
+  .ng-bar { height:7px; background:#F0E2C8; border-radius:10px; margin:8px 0 2px; overflow:hidden; }
+  .ng-bar i { display:block; height:100%; background:linear-gradient(90deg,var(--gold),var(--red)); border-radius:10px; transition:width .3s; }
+  .ng-ups { display:flex; flex-wrap:wrap; gap:7px; margin-top:9px; }
+  .ng-up { border:1.5px solid var(--red); background:#fff; color:var(--red); font-weight:700; font-size:12.5px; padding:7px 11px; border-radius:100px; cursor:pointer; }
+  .ng-up.wide { width:100%; margin-top:10px; padding:10px; font-size:14px; }
+  .ng-up b { color:var(--ink); }
+
+  /* Game screens */
+  .ghead2 { font-family:'DM Serif Display',serif; font-size:21px; color:var(--red); text-align:center; margin:0 0 6px; }
+  .tierlist { display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:#FBE9C8; }
+  .tierlist b { color:var(--gold); }
+  .windetail { font-size:13.5px; color:var(--ink); line-height:1.5; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px 13px; margin:0 0 14px; text-align:left; }
+  .windetail small { color:var(--muted); }
+  .tierul { margin:6px 0; padding-left:20px; }
+
 </style>
 </head>
 <body>
@@ -310,8 +349,8 @@
   </div>
 </div>
 
-<div class="winbar"><div class="inner">
-  <div class="txt">🎮 <b>Play a game, win a discount!</b> Spin the pizza wheel or catch the toppings — your reward applies at checkout.</div>
+<div class="winbar" id="winbar"><div class="inner">
+  <div class="txt">🎮 <b>Play a game, win a free treat!</b> Every spin wins: a free topping, drink, garlic knots or money off your pizza order.</div>
   <button id="playWinBtn">Play &amp; Win</button>
 </div></div>
 <div class="rewardbar" id="rewardBanner"></div>
@@ -319,6 +358,7 @@
 <main id="menu"></main>
 
 <div class="cartbar" id="cartbar">
+  <div class="cb-nudge" id="cartbarNudge" style="display:none"></div>
   <div class="cartbar-in">
     <div class="cnt" id="cartbarCnt">0 items<small>₹0</small></div>
     <button class="view" id="viewCartBtn">View Cart →</button>
@@ -410,7 +450,7 @@
   /* ---------- CART STATE ---------- */
   var cart = [];
   try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]") || []; } catch(e){ cart = []; }
-  function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} }
+  function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} requote(); }
 
   function lineUnit(line){
     var t = line.basePrice;
@@ -438,22 +478,96 @@
   }
   function removeLine(idx){ cart.splice(idx,1); saveCart(); refreshCartUI(); renderMenu(); renderDrawer(); }
 
-  /* ---------- REWARD STATE ---------- */
-  var REWARD = null;
-  try { REWARD = JSON.parse(localStorage.getItem(REWARD_KEY) || "null"); } catch(e){ REWARD = null; }
-  function saveReward(){ try { if (REWARD) localStorage.setItem(REWARD_KEY, JSON.stringify(REWARD)); else localStorage.removeItem(REWARD_KEY); } catch(e){} }
-  function rewardText(r){ return !r ? "" : (r.kind==="percent" ? r.percent+"% OFF" : "Free "+r.itemName); }
-  function setReward(r){ REWARD = r; saveReward(); updateRewardUI(); refreshCartUI(); if (drawerOpen) renderDrawer(); }
-  function clearReward(){ setReward(null); }
+  /* ---------- GAME PRIZES ----------
+     The server (netlify/functions/offers.mjs) decides every prize, price and discount;
+     this page only shows what it says. Prize numbers live in offers.config.json. */
+  var OFFERS_URL = "/.netlify/functions/offers";
+  var WALLET_KEY = "pizzamia_prizes_v2";
+  try { localStorage.removeItem("pizzamia_reward"); } catch(e){}   // old-style rewards are no longer valid
+  var OFFERS = null;                 // public prize info from the server (labels, score targets, on/off)
+  var QUOTE = null, quoteKey = "", quoteErr = false, quoteT = null;
+  var skipPrize = false;             // "order without the prize" for this order
+  // One wheel prize + one arcade prize can be kept; only one is used per order.
+  var wallet = { wheel:null, arcade:null, use:null, sel:{} };
+  try { wallet = JSON.parse(localStorage.getItem(WALLET_KEY) || "null") || wallet; } catch(e){}
+  if (!wallet.sel) wallet.sel = {};
+  function saveWallet(){ try { localStorage.setItem(WALLET_KEY, JSON.stringify(wallet)); } catch(e){} }
+  function pruneWallet(){
+    ["wheel","arcade"].forEach(function(k){
+      if (wallet[k] && wallet[k].expiresAt < Date.now()){ delete wallet.sel[wallet[k].id]; wallet[k] = null; }
+    });
+    if (!wallet.use || !wallet[wallet.use]) wallet.use = wallet.wheel ? "wheel" : (wallet.arcade ? "arcade" : null);
+    saveWallet();
+  }
+  pruneWallet();
+  function prizesOn(){ return !!(OFFERS && OFFERS.enabled); }
+  function prizeCount(){ return (wallet.wheel?1:0) + (wallet.arcade?1:0); }
+  function activePrize(){ return prizesOn() && !skipPrize && wallet.use ? wallet[wallet.use] : null; }
+  function prizeSel(){ var p = activePrize(); if (!p) return {}; return wallet.sel[p.id] || (wallet.sel[p.id] = {}); }
+  function setSel(k, v){ prizeSel()[k] = v; saveWallet(); requote(true); }
+  function addPrize(r){ wallet[r.source] = r; wallet.use = r.source; skipPrize = false; saveWallet(); prizeChanged(); }
+  function dropPrize(src, msg){
+    if (wallet[src]) delete wallet.sel[wallet[src].id];
+    wallet[src] = null; pruneWallet(); prizeChanged();
+    if (msg) toast(msg);
+  }
+  function prizeChanged(){ requote(true); refreshPrizeViews(); }
+
+  function offersApi(action, data){
+    return fetch(OFFERS_URL, { method:"POST", headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(Object.assign({ action:action }, data || {})) })
+      .then(function(r){ return r.json().then(function(j){ j._status = r.status; return j; }); });
+  }
+  function loadOffers(){
+    return fetch(OFFERS_URL+"?action=config").then(function(r){ return r.json(); })
+      .then(function(j){ OFFERS = j; })
+      .catch(function(){ OFFERS = null; })
+      .then(function(){ el("winbar").style.display = (OFFERS && !OFFERS.enabled) ? "none" : ""; prizeChanged(); });
+  }
+
+  function cartPayload(){
+    return cart.map(function(l){
+      return { itemId:l.itemId, sizeLabel:l.sizeLabel, choice:l.choice || null, qty:l.qty,
+        toppings:(l.toppings||[]).map(function(t){ return t.name; }), half: l.half ? { b:{ id:l.half.b.id } } : null };
+    });
+  }
+  function quoteBody(){
+    var p = activePrize();
+    return { cart:cartPayload(), rewardId: p ? p.id : null, selection: p ? prizeSel() : null, channel:"website_delivery" };
+  }
+  // Ask the server to price the cart (and the prize). Called after every cart/prize change.
+  function requote(now){
+    clearTimeout(quoteT);
+    if (!cart.length){ QUOTE = null; quoteKey = ""; return; }
+    var body = quoteBody(), key = JSON.stringify(body);
+    if (key===quoteKey && QUOTE) return;
+    quoteT = setTimeout(function(){
+      offersApi("price", body).then(function(j){
+        if (JSON.stringify(quoteBody())!==key) return;            // cart changed meanwhile
+        if (j._status!==200){ quoteErr = true; QUOTE = null; quoteKey = ""; refreshPrizeViews(); return; }
+        quoteErr = false; QUOTE = j; quoteKey = key;
+        var p = activePrize();
+        if (p && j.reward && j.reward.status==="rejected" && !/one offer/i.test(j.reward.message||"")){ dropPrize(wallet.use, j.reward.message); return; }
+        refreshPrizeViews();
+      }).catch(function(){ quoteErr = true; QUOTE = null; quoteKey = ""; refreshPrizeViews(); });
+    }, now ? 0 : 180);
+  }
+  function freshQuote(){ return QUOTE && quoteKey===JSON.stringify(quoteBody()) ? QUOTE : null; }
+  function prizeResult(){
+    var q = freshQuote(), p = activePrize();
+    return q && p && q.reward && q.reward.reward && q.reward.reward.id===p.id ? q.reward : null;
+  }
+  function refreshPrizeViews(){
+    refreshCartUI(); updateRewardUI();
+    if (!drawerOpen) return;
+    if (checkoutMode){ if (el("billBox")) el("billBox").innerHTML = billHtml(); if (el("coPrize")) el("coPrize").innerHTML = checkoutPrizeHtml(); bindPrizeBtns(); }
+    else renderDrawer();
+  }
+  // Bill: the server's numbers when we have them; otherwise the plain menu total (no prize).
   function computeBill(){
-    var it = itemTotal(), discount = 0, freeLabel = null;
-    if (REWARD){
-      if (REWARD.kind==="percent") discount = Math.round(it * REWARD.percent/100);
-      else if (REWARD.kind==="freeitem") freeLabel = REWARD.itemName;
-    }
-    var subtotal = Math.max(0, it - discount);
-    var gst = subtotal*GST_RATE;
-    return { it:it, discount:discount, freeLabel:freeLabel, subtotal:subtotal, gst:gst, total:subtotal+gst };
+    var q = freshQuote(), it = itemTotal();
+    if (q) return { it:q.totals.itemTotal, discount:q.totals.discount, gst:q.totals.gst, total:q.totals.total, reward:q.reward, server:true };
+    return { it:it, discount:0, gst:it*GST_RATE, total:it*(1+GST_RATE), reward:null, server:false };
   }
 
   /* ---------- MENU RENDER ---------- */
@@ -763,11 +877,15 @@
   }
 
   function billHtml(){
-    var b = computeBill();
+    var b = computeBill(), rw = b.reward;
     var h = '<div class="bill">'+
       '<div class="row"><span>Item total</span><span>'+money(b.it)+'</span></div>';
-    if (b.discount>0) h += '<div class="row"><span>Discount'+(REWARD&&REWARD.label?' ('+REWARD.label+')':'')+'</span><span class="disc">− '+money(b.discount)+'</span></div>';
-    if (b.freeLabel) h += '<div class="row"><span>Reward</span><span class="disc">🎁 Free '+b.freeLabel+'</span></div>';
+    if (rw && rw.status==="applied"){
+      if (b.discount>0) h += '<div class="row"><span>'+rw.discountLabel+' <small>('+rw.reward.code+')</small></span><span class="disc">− '+money(b.discount)+'</span></div>';
+      rw.freeLines.forEach(function(f){
+        h += '<div class="row"><span>🎁 '+f.name+(f.size?' ('+f.size+')':'')+' ×'+f.qty+'</span><span class="disc">FREE</span></div>';
+      });
+    }
     h += '<div class="row"><span>GST ('+(GST_RATE*100)+'%)</span><span>'+money(b.gst)+'</span></div>'+
       '<div class="row"><span>Delivery</span><span class="free">FREE</span></div>'+
       '<div class="row total"><span>To pay</span><span>'+money(b.total)+'</span></div>'+
@@ -775,15 +893,144 @@
     return h;
   }
 
+  /* ---------- PRIZE PANEL (cart) ---------- */
+  function cap1(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
+  function hoursLeft(p){ return Math.max(1, Math.round((p.expiresAt - Date.now())/3600000)); }
+  // Paid items that close the gap to the next prize level (cheapest first)
+  function upsellItems(gap){
+    var c = [];
+    SECTIONS.forEach(function(s){
+      if (["starters","cknots","chips","desserts"].indexOf(s.id)<0) return;
+      s.items.forEach(function(it){
+        if (vegOnly && !it.veg) return;
+        if (it.type==="single") c.push({ it:it, size:"", price:it.price });
+        else if (it.type==="multi") it.sizes.forEach(function(sz){ c.push({ it:it, size:sz.label, price:sz.price }); });
+      });
+    });
+    return c.filter(function(x){ return x.price>=gap; }).sort(function(a,b){ return a.price-b.price; }).slice(0,2);
+  }
+  function nudgeHtml(rw, eligible){
+    var n = (rw.nudges||[])[0]; if (!n || !n.gap) return "";
+    var pct = Math.max(6, Math.min(96, Math.round(eligible/(eligible+n.gap)*100)));
+    var ups = upsellItems(n.gap);
+    return '<div class="nudge"><div class="ng-t">'+(rw.status==="applied"?'⬆️ ':'')+n.text+'</div>'+
+      '<div class="ng-bar"><i style="width:'+pct+'%"></i></div>'+
+      (ups.length ? '<div class="ng-ups">'+ups.map(function(u){
+        return '<button class="ng-up" data-up="'+u.it.id+'|'+u.size+'">+ '+u.it.name+(u.size?' '+u.size:'')+' <b>'+money(u.price)+'</b></button>';
+      }).join("")+'</div>' : '')+
+    '</div>';
+  }
+  function prizePanelHtml(){
+    if (!prizesOn()) return "";
+    if (!prizeCount()) return '<button class="playcart" id="cartPlay">🎮 Play a game &amp; win a free treat</button>';
+    var p = activePrize(), rw = prizeResult(), q = freshQuote(), h = '<div class="prize">';
+    if (prizeCount()>1){
+      h += '<div class="pz-lbl">You have 2 prizes · use one per order</div><div class="pz-pick">';
+      ["wheel","arcade"].forEach(function(k){
+        var r = wallet[k];
+        h += '<button class="chip'+(p && p.id===r.id?' on':'')+'" data-use="'+k+'">'+(k==="wheel"?'🎡 ':'🍕 ')+r.label+'</button>';
+      });
+      h += '</div>';
+    }
+    if (!p){
+      return h + '<div class="pz-msg">Ordering without a prize this time. <button class="lnk" id="pzUnskip">Use my prize</button></div></div>';
+    }
+    h += '<div class="pz-head"><span class="pz-ico">🎁</span><div class="pz-nm"><b>'+p.label+'</b>'+
+      '<small>Code '+p.code+' · saved for '+hoursLeft(p)+' more hour'+(hoursLeft(p)===1?'':'s')+'</small></div>'+
+      '<button class="lnk" id="pzRemove">Remove</button></div>';
+    if (!rw){
+      h += '<div class="pz-msg">'+(quoteErr ? 'We couldn\'t check your prize just now. We\'ll check it again when you place the order.' : 'Checking your prize…')+'</div>';
+    } else if (rw.status==="saved"){
+      h += '<div class="pz-msg warn">'+rw.message+'</div>';
+      if (q && !q.lines.some(function(l){ return l.isPizza; })) h += '<button class="ng-up wide" id="pzGoPizza">🍕 Add a pizza</button>';
+      else h += nudgeHtml(rw, q.totals.eligible);
+    } else if (rw.status==="rejected"){
+      h += '<div class="pz-msg warn">'+rw.message+'</div>';
+    } else {
+      if (rw.options && rw.options.length>1){
+        h += '<div class="pz-lbl">Choose your prize</div><div class="pz-pick">';
+        rw.options.forEach(function(o){
+          h += '<button class="chip'+(o.index===rw.optionIndex?' on':'')+(o.available?'':' locked')+'" data-opt="'+o.index+'">'+
+            (o.available?'':'🔒 ')+cap1(o.label)+(o.available?'':' <small>'+money(o.min)+'+ orders</small>')+'</button>';
+        });
+        h += '</div>';
+        if (rw.optionLocked) h += '<div class="pz-msg warn">'+rw.optionLocked.text+'</div>';
+      }
+      if (rw.topping){
+        if (rw.topping.lines.length>1){
+          h += '<div class="pz-lbl">Which pizza?</div><select class="pz-sel" id="pzLine">'+rw.topping.lines.map(function(i){
+            var l = cart[i]; return '<option value="'+i+'"'+(i===rw.topping.line?' selected':'')+'>'+l.name+(l.sizeLabel?' · '+l.sizeLabel:'')+'</option>';
+          }).join("")+'</select>';
+        }
+        h += '<div class="pz-lbl">Pick your free veg topping'+(cart[rw.topping.line] && cart[rw.topping.line].half ? ' (covers the whole pizza)' : '')+'</div><div class="pz-pick">';
+        (OFFERS.vegToppings||[]).forEach(function(t){
+          h += '<button class="chip'+(rw.topping.picked===t.name?' on':'')+'" data-tp="'+t.name+'">'+t.display+'</button>';
+        });
+        h += '</div>';
+      }
+      if (rw.drinks){
+        for (var d=0; d<rw.drinks.qty; d++){
+          h += '<div class="pz-lbl">'+(rw.drinks.qty>1 ? 'Free drink '+(d+1) : 'Your free drink')+'</div><div class="pz-pick">';
+          rw.drinks.options.forEach(function(o){
+            h += '<button class="chip'+(rw.drinks.chosen[d]===o?' on':'')+'" data-drink="'+d+'|'+o+'">🥤 '+o+'</button>';
+          });
+          h += '</div>';
+        }
+      }
+      if (rw.incomplete) h += '<div class="pz-msg warn">'+(rw.message||'Finish choosing your prize above.')+'</div>';
+      else h += '<div class="pz-msg ok">✓ '+(rw.discount>0 ? money(rw.discount)+' off your order' :
+        'Free '+rw.freeLines.map(function(f){ return f.name+(f.size?' ('+f.size+')':'')+(f.qty>1?' ×'+f.qty:''); }).join(' + ')+' added')+'</div>';
+      h += nudgeHtml(rw, q.totals.eligible);
+    }
+    h += '<div class="pz-terms">'+((OFFERS.copy||{}).terms||'')+'</div></div>';
+    return h;
+  }
+  function checkoutPrizeHtml(){
+    var p = activePrize(), rw = prizeResult();
+    if (!p || !rw) return "";
+    if (rw.status==="applied" && !rw.incomplete) return "";
+    return '<div class="pz-msg warn" style="margin:0 0 12px">🎁 '+(rw.message||'Your prize isn\'t ready yet.')+
+      ' <button class="lnk" id="coBackCart">Back to cart</button> <button class="lnk" id="coNoPrize">Order without it</button></div>';
+  }
+  function bindPrizeBtns(){
+    var root = el("drawerBody");
+    if (el("cartPlay")) el("cartPlay").onclick = function(){ openGames("cart"); };
+    if (el("pzRemove")) el("pzRemove").onclick = function(){ dropPrize(wallet.use, "Prize removed"); };
+    if (el("pzUnskip")) el("pzUnskip").onclick = function(){ skipPrize = false; prizeChanged(); };
+    if (el("pzGoPizza")) el("pzGoPizza").onclick = function(){ closeDrawer(); var t = el("sec-pizzas"); if (t) window.scrollTo({ top:t.getBoundingClientRect().top + window.pageYOffset - 70, behavior:"smooth" }); };
+    if (el("pzLine")) el("pzLine").onchange = function(){ setSel("toppingLine", parseInt(this.value,10)); };
+    if (el("coBackCart")) el("coBackCart").onclick = showCart;
+    if (el("coNoPrize")) el("coNoPrize").onclick = function(){ skipPrize = true; prizeChanged(); };
+    [].forEach.call(root.querySelectorAll("[data-use]"), function(b){ b.onclick = function(){ wallet.use = b.getAttribute("data-use"); skipPrize = false; saveWallet(); prizeChanged(); }; });
+    [].forEach.call(root.querySelectorAll("[data-opt]"), function(b){ b.onclick = function(){ setSel("option", parseInt(b.getAttribute("data-opt"),10)); }; });
+    [].forEach.call(root.querySelectorAll("[data-tp]"), function(b){ b.onclick = function(){ setSel("topping", b.getAttribute("data-tp")); }; });
+    [].forEach.call(root.querySelectorAll("[data-drink]"), function(b){
+      b.onclick = function(){
+        var v = b.getAttribute("data-drink").split("|"), ch = (prizeSel().choices || []).slice();
+        ch[parseInt(v[0],10)] = v[1]; setSel("choices", ch);
+      };
+    });
+    [].forEach.call(root.querySelectorAll("[data-up]"), function(b){
+      b.onclick = function(){
+        var v = b.getAttribute("data-up").split("|"), it = ITEMS[v[0]], price = it.price;
+        if (it.type==="multi") it.sizes.forEach(function(sz){ if (sz.label===v[1]) price = sz.price; });
+        addLine({ itemId:it.id, name:it.name, veg:it.veg, sizeLabel:v[1], basePrice:price, toppings:[], qty:1 });
+        toast("Added "+it.name+(v[1]?" "+v[1]:""));
+      };
+    });
+  }
+
   function renderDrawer(){
     updateDrawerHead();
     if (!cart.length){
-      el("drawerBody").innerHTML = '<div class="empty"><div class="big">🛒</div><p>Your cart is empty.<br>Add some pizzas to get started!</p></div>';
+      el("drawerBody").innerHTML = '<div class="empty"><div class="big">🛒</div><p>Your cart is empty.<br>Add some pizzas to get started!</p></div>'+
+        (prizesOn() && activePrize() ? '<div class="pz-msg" style="text-align:center">🎁 Your prize <b>'+activePrize().label+'</b> is saved. Add a pizza to use it.</div>' : '');
       el("drawerFoot").innerHTML = '<button class="cta" id="browseBtn">Browse menu</button>';
       el("browseBtn").onclick = closeDrawer;
       return;
     }
     if (!checkoutMode){
+      var rw = prizeResult();
       var lines = cart.map(function(l,idx){
         var meta = [];
         if (l.sizeLabel) meta.push(l.sizeLabel);
@@ -799,14 +1046,15 @@
           '<div class="ci-price">'+money(lineUnit(l)*l.qty)+'</div>'+
         '</div>';
       }).join("");
-      var rewardStrip = REWARD
-        ? '<div class="cart-reward">🎁 '+rewardText(REWARD)+' applied <button id="cartRewRemove">Remove</button></div>'
-        : '<button class="playcart" id="cartPlay">🎮 Play a game &amp; win a discount</button>';
-      el("drawerBody").innerHTML = lines + rewardStrip + '<div style="padding:8px 0 4px">'+billHtml()+'</div>';
+      // prize freebies show as ₹0 lines, like on the kitchen ticket
+      if (rw && rw.status==="applied") lines += rw.freeLines.map(function(f){
+        return '<div class="cline free"><div style="flex:1;min-width:0"><div class="ci-nm">🎁 '+f.name+'</div>'+
+          '<div class="ci-meta">'+(f.size?f.size+' · ':'')+'×'+f.qty+' · Game reward</div></div><div class="ci-price">FREE</div></div>';
+      }).join("");
+      el("drawerBody").innerHTML = lines + prizePanelHtml() + '<div style="padding:8px 0 4px">'+billHtml()+'</div>';
       el("drawerFoot").innerHTML = '<button class="cta" id="toCheckout">Proceed to Checkout →</button>';
       el("toCheckout").onclick = function(){ checkoutMode=true; renderDrawer(); el("drawerBody").scrollTop=0; };
-      if (el("cartPlay")) el("cartPlay").onclick = function(){ openGames("cart"); };
-      if (el("cartRewRemove")) el("cartRewRemove").onclick = function(){ clearReward(); toast("Reward removed"); };
+      bindPrizeBtns();
       bindLineBtns();
     } else {
       var c = {};
@@ -820,9 +1068,10 @@
         '<label style="display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:5px">Payment</label>'+
         '<div class="paybox"><span class="ico">💵</span> Cash on Delivery</div>'+
         '<div class="paynote">Pay cash to the delivery person when your order arrives. Card & online payment coming soon.</div>'+
-        '<div style="padding:18px 0 4px">'+billHtml()+'</div>';
-      el("drawerFoot").innerHTML = '<button class="cta wa" id="placeOrder"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.17c-.24.68-1.42 1.32-1.95 1.36-.5.04-.97.21-3.26-.68-2.76-1.09-4.5-3.91-4.64-4.09-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.24-.27.53-.34.71-.34.18 0 .36 0 .51.01.16.01.38-.06.6.46.24.56.8 1.94.87 2.08.07.14.12.3.02.48-.09.18-.14.3-.27.46-.14.16-.29.36-.41.48-.14.14-.28.29-.12.56.16.27.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.07.18-.27.36-.22.6-.13.24.09 1.55.73 1.82.86.27.14.45.2.51.31.07.11.07.64-.17 1.32z"/></svg> Place Order on WhatsApp</button>';
+        '<div style="padding:18px 0 4px"><div id="coPrize">'+checkoutPrizeHtml()+'</div><div id="billBox">'+billHtml()+'</div></div>';
+      el("drawerFoot").innerHTML = '<button class="cta wa" id="placeOrder"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.17c-.24.68-1.42 1.32-1.95 1.36-.5.04-.97.21-3.26-.68-2.76-1.09-4.5-3.91-4.64-4.09-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.24-.27.53-.34.71-.34.18 0 .36 0 .51.01.16.01.38-.06.6.46.24.56.8 1.94.87 2.08.07.14.12.3.02.48-.09.18-.14.3-.27.46-.14.16-.29.36-.41.48-.14.14-.28.29-.12.56.16.27.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.07.18-.27.36-.22.6-.13.24.09 1.55.73 1.82.86.27.14.45.2.51.31.07.11.07.64-.17 1.32z"/></svg> <span id="placeLbl">Place Order on WhatsApp</span></button>';
       el("placeOrder").onclick = placeOrder;
+      bindPrizeBtns();
     }
   }
 
@@ -832,7 +1081,10 @@
     [].forEach.call(document.querySelectorAll("[data-rm]"), function(b){ b.onclick=function(){ removeLine(parseInt(b.getAttribute("data-rm"),10)); }; });
   }
 
-  /* ---------- PLACE ORDER ---------- */
+  /* ---------- PLACE ORDER ----------
+     The server re-checks the cart and prize, uses the prize up and logs the order;
+     then the order goes to the kitchen on WhatsApp. */
+  var placing = false;
   function placeOrder(){
     var name = el("cName").value.trim();
     var phone = el("cPhone").value.trim();
@@ -846,12 +1098,40 @@
     mark("f-phone", digits.length < 10);
     mark("f-addr", !addr);
     if (!ok){ el("drawerBody").scrollTop=0; return; }
+    if (placing) return;
 
     try { localStorage.setItem(CUST_KEY, JSON.stringify({name:name,phone:phone,addr:addr,land:land})); } catch(e){}
+    var cust = { name:name, phone:phone, addr:addr, land:land, notes:notes };
+    var body = quoteBody(); body.phone = digits;
+    var usingPrize = !!body.rewardId;
+    placing = true; el("placeOrder").disabled = true; el("placeLbl").textContent = "Confirming your order…";
+    function done(){ placing = false; if (el("placeOrder")){ el("placeOrder").disabled = false; el("placeLbl").textContent = "Place Order on WhatsApp"; } }
+    function prizeProblem(msg){
+      done();
+      el("coPrize").innerHTML = '<div class="pz-msg warn" style="margin:0 0 12px">🎁 '+msg+' <button class="lnk" id="coNoPrize">Order without the prize</button></div>';
+      bindPrizeBtns();
+      el("coPrize").scrollIntoView({ behavior:"smooth", block:"center" });
+    }
+    offersApi("submit", body).then(function(j){
+      if (j._status===200) { done(); return sendOrder(j, cust); }
+      if (j.error==="reward_rejected"){ var u = wallet.use; prizeProblem(j.message); wallet[u] = null; pruneWallet(); requote(true); return; }
+      if (j.error && j.error.indexOf("reward_")===0) return prizeProblem(j.message);
+      if (j.error==="bad_phone"){ done(); mark("f-phone", true); return; }
+      if (!usingPrize){ done(); return sendOrder(null, cust); }
+      prizeProblem(j.message || "We couldn't confirm your prize. Please try again.");
+    }).catch(function(){
+      if (!usingPrize){ done(); return sendOrder(null, cust); }   // offline: the order still goes through, without a prize
+      prizeProblem("We couldn't confirm your prize (connection problem). Try again, or order without it.");
+    });
+  }
 
-    var b = computeBill();
+  function sendOrder(srv, cust){
+    var b = srv ? { it:srv.totals.itemTotal, discount:srv.totals.discount, gst:srv.totals.gst, total:srv.totals.total, reward:srv.reward }
+                : { it:itemTotal(), discount:0, gst:itemTotal()*GST_RATE, total:itemTotal()*(1+GST_RATE), reward:null };
+    var rw = b.reward && b.reward.status==="applied" ? b.reward : null;
     var L = [];
     L.push("*New Order — Pizza Mia* 🍕");
+    if (srv) L.push("Order ID: "+srv.orderId);
     L.push("");
     L.push("*Items:*");
     cart.forEach(function(l,i){
@@ -860,31 +1140,33 @@
       L.push(head);
       if (l.half) L.push("   ½ "+l.half.a.name+" | ½ "+l.half.b.name);
       if (l.toppings && l.toppings.length) L.push("   + "+l.toppings.map(function(t){return t.name;}).join(", "));
-      L.push("   "+money(lineUnit(l)*l.qty));
+      L.push("   "+money(srv && srv.lines[i] ? srv.lines[i].total : lineUnit(l)*l.qty));
     });
+    if (rw) rw.freeLines.forEach(function(f){ L.push("🎁 "+f.text); });
     L.push("");
     L.push("*Bill:*");
     L.push("Item total: "+money(b.it));
-    if (b.discount>0) L.push("Discount"+(REWARD&&REWARD.label?" ("+REWARD.label+")":"")+": -"+money(b.discount));
-    if (b.freeLabel) L.push("Reward: FREE "+b.freeLabel+" 🎁");
+    if (rw && b.discount>0) L.push(rw.discountLabel+" ("+rw.reward.code+"): -"+money(b.discount));
     L.push("GST ("+(GST_RATE*100)+"%): "+money(b.gst));
     L.push("Delivery: FREE");
     L.push("*Total: "+money(b.total)+"*");
     L.push("");
     L.push("*Deliver to:*");
-    L.push("Name: "+name);
-    L.push("Phone: "+phone);
-    L.push("Address: "+addr);
-    if (land) L.push("Landmark: "+land);
-    if (notes) L.push("Notes: "+notes);
+    L.push("Name: "+cust.name);
+    L.push("Phone: "+cust.phone);
+    L.push("Address: "+cust.addr);
+    if (cust.land) L.push("Landmark: "+cust.land);
+    if (cust.notes) L.push("Notes: "+cust.notes);
     L.push("");
     L.push("*Payment: Cash on Delivery*");
 
     var url = "https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(L.join("\n"));
-    if (typeof gtag==="function"){ try { gtag("event","place_order",{value:Math.round(b.total),items:cartCount()}); } catch(e){} }
+    if (typeof gtag==="function"){ try { gtag("event","place_order",{value:Math.round(b.total),items:cartCount(),prize:rw?rw.reward.rewardId:"none"}); } catch(e){} }
     window.open(url, "_blank");
 
-    cart = []; saveCart(); REWARD=null; saveReward(); updateRewardUI(); refreshCartUI(); renderMenu();
+    if (rw){ var src = wallet.wheel && wallet.wheel.id===rw.reward.id ? "wheel" : "arcade"; delete wallet.sel[rw.reward.id]; wallet[src] = null; pruneWallet(); }
+    skipPrize = false;
+    cart = []; saveCart(); updateRewardUI(); refreshCartUI(); renderMenu();
     el("drawerBody").innerHTML = '<div class="empty"><div class="big">✅</div><p><b>Order sent!</b><br>We\'ve opened WhatsApp with your order. Hit send and we\'ll confirm &amp; start baking. 🍕</p></div>';
     el("drawerFoot").innerHTML = '<button class="cta" id="doneBtn">Done</button>';
     el("doneBtn").onclick = closeDrawer;
@@ -897,8 +1179,17 @@
     var barShown = n>0 && !drawerOpen;
     el("cartbar").classList.toggle("show", barShown);
     if (window.PMChat) window.PMChat.raise(barShown);
-    var it = itemTotal();
-    el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(it)+" + taxes</small>";
+    var b = computeBill();
+    el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(b.it - b.discount)+" + taxes</small>";
+    // one-line prize nudge above the cart bar
+    var t = "", rw = prizeResult();
+    if (prizesOn() && n>0){
+      if (rw && rw.nudges && rw.nudges[0]) t = "🎁 "+rw.nudges[0].text;
+      else if (rw && rw.status==="applied" && !rw.incomplete) t = "🎁 Prize applied: "+(rw.discount>0 ? money(rw.discount)+" off" : "free "+rw.freeLines.map(function(f){ return f.name; }).join(" + "));
+      else if (!prizeCount()) t = "🎮 Play &amp; Win: spin the wheel for a free treat on this order";
+    }
+    el("cartbarNudge").innerHTML = t;
+    el("cartbarNudge").style.display = t ? "" : "none";
   }
 
   /* ---------- TOAST ---------- */
@@ -924,22 +1215,21 @@
   /* ---------- REWARD BANNER ---------- */
   function updateRewardUI(){
     var b = el("rewardBanner"); if (!b) return;
-    if (REWARD){
+    var p = activePrize();
+    if (p){
+      var rw = prizeResult();
+      var st = rw && rw.status==="saved" ? rw.message : (cart.length ? "applied in your cart" : "works on any pizza order (₹399+)");
       b.style.display = "block";
-      b.innerHTML = '<div class="inner"><span>🎁 Reward: <b>'+rewardText(REWARD)+'</b> — applied at checkout</span><button id="rewRemove">Remove</button></div>';
-      el("rewRemove").onclick = function(){ clearReward(); toast("Reward removed"); };
+      b.innerHTML = '<div class="inner"><span>🎁 Your prize: <b>'+p.label+'</b> — '+st+'</span><button id="rewRemove">Remove</button></div>';
+      el("rewRemove").onclick = function(){ dropPrize(wallet.use, "Prize removed"); };
     } else { b.style.display = "none"; b.innerHTML = ""; }
   }
 
   /* ---------- GAMES ---------- */
-  var WHEEL = [
-    { kind:"percent", percent:5,  label:"5% OFF",  color:"#E8A33D" },
-    { kind:"percent", percent:10, label:"10% OFF", color:"#C9341F" },
-    { kind:"freeitem", itemName:"Garlic Knots", label:"Garlic Knots", color:"#1B7A3E" },
-    { kind:"percent", percent:15, label:"15% OFF", color:"#E8A33D" },
-    { kind:"freeitem", itemName:"Soft Drink", label:"Free Drink", color:"#1B7A3E" },
-    { kind:"percent", percent:20, label:"20% OFF", color:"#C9341F" }
-  ];
+  var WHEEL_COLORS = ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D"];
+  function wheelSegs(){
+    return ((OFFERS && OFFERS.wheel) || []).map(function(s,i){ return { label:s.label, color:WHEEL_COLORS[i % WHEEL_COLORS.length] }; });
+  }
   // sf = speed factor (variety); higher-value toppings tend to fall faster
   var CATCH_ITEMS = [
     { emoji:"🍅", pts:5,  sf:0.80 }, { emoji:"🧅", pts:8,  sf:0.85 },
@@ -948,11 +1238,7 @@
     { emoji:"🌶️", pts:20, sf:1.25 }, { emoji:"🍍", pts:25, sf:1.35 },
     { emoji:"🥓", pts:30, sf:1.55 }, { emoji:"⭐", pts:40, sf:1.75 }
   ];
-  // DUMMY score→discount mapping — game is denser now, tune after playtesting
-  function scoreToReward(score){
-    var p = score>=460?20 : score>=300?15 : score>=170?10 : score>=80?5 : 0;
-    return p>0 ? { kind:"percent", percent:p, label:p+"% OFF", source:"catch" } : null;
-  }
+  function tiers(){ return (OFFERS && OFFERS.arcade) || []; }
 
   var gamesReturn = "page";
   var catchState = null;
@@ -961,6 +1247,7 @@
     gamesReturn = ctx || "page";
     el("gOverlay").classList.add("show");
     el("gameWrap").classList.add("show");
+    if (!OFFERS){ gSetHead("Play & Win 🎮", false); el("gameBody").innerHTML = '<div class="ghint">Loading the games…</div>'; loadOffers().then(renderGameMenu); return; }
     renderGameMenu();
   }
   function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); }
@@ -969,28 +1256,39 @@
   function renderGameMenu(){
     stopCatch();
     gSetHead("Play & Win 🎮", false);
-    var have = REWARD ? '<div class="ghint">Current reward: <b style="color:var(--veg)">'+rewardText(REWARD)+'</b>. Playing again replaces it.</div>' : '';
+    if (!OFFERS){ el("gameBody").innerHTML = '<div class="gresult"><div class="big">📡</div><div class="sc">The games need an internet connection. Please try again in a moment.</div><button class="gbtn wide" id="gRetry">Try again</button></div>'; el("gRetry").onclick = function(){ openGames(gamesReturn); }; return; }
+    if (!OFFERS.enabled){ el("gameBody").innerHTML = '<div class="gresult"><div class="big">🍕</div><div class="sc">The games are taking a little break. Check back soon!</div></div>'; return; }
+    var T = tiers();
+    var have = "";
+    if (prizeCount()){
+      have = '<div class="ghint">Your prize'+(prizeCount()>1?'s':'')+': '+["wheel","arcade"].filter(function(k){ return wallet[k]; }).map(function(k){
+        return '<b style="color:var(--veg)">'+wallet[k].label+'</b>'; }).join(' · ')+'<br>A new win replaces the prize from that same game. One prize per order.</div>';
+    }
     el("gameBody").innerHTML =
-      '<div class="gcard" id="gcWheel"><div class="ico">🎡</div><div class="t">Spin the Pizza Wheel</div><div class="d">One spin, instant prize — discounts, free garlic knots or a free drink.</div></div>'+
-      '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Move your pizza to catch falling toppings in 60s. Dodge the burning coal — higher score, bigger discount!</div></div>'+
-      have;
+      '<div class="gcard" id="gcWheel"><div class="ico">🎡</div><div class="t">Spin the Pizza Wheel</div><div class="d">Every spin wins: a free topping, a free drink, free garlic knots or money off.</div></div>'+
+      '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+
+        (T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free drink or topping, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '')+'</div></div>'+
+      have+
+      '<div class="pz-terms" style="text-align:center">'+((OFFERS.copy||{}).terms||'')+'</div>';
     el("gcWheel").onclick = startWheel;
     el("gcCatch").onclick = startCatch;
   }
 
-  /* --- Spin the Wheel --- */
+  /* --- Spin the Wheel (the server picks the slice; the wheel just animates to it) --- */
   var wheelRot = 0, wheelSpinning = false;
   function startWheel(){
     stopCatch();
     gSetHead("Spin the Pizza Wheel 🎡", true);
+    var copy = OFFERS.copy || {};
     el("gameBody").innerHTML =
+      '<div class="ghead2">'+(copy.wheel_heading||'')+'</div>'+
       '<div class="wheelbox"><div class="wheelptr"></div><canvas id="wheelCanvas" width="300" height="300"></canvas></div>'+
       '<button class="gbtn wide" id="spinBtn">Spin!</button>'+
-      '<div class="ghint">Each wedge is a prize. Tap Spin and see where it lands.</div>';
+      '<div class="ghint">'+(copy.under_wheel||'')+'</div>';
     wheelRot = 0; wheelSpinning = false;
     var cv = el("wheelCanvas");
     cv.style.transition = "none"; cv.style.transform = "rotate(0deg)";
-    drawWheel(cv, WHEEL);
+    drawWheel(cv, wheelSegs());
     el("spinBtn").onclick = spinWheel;
   }
   function drawWheel(cv, segs){
@@ -1021,11 +1319,15 @@
         else if (kind==="bas"){ ctx.beginPath(); ctx.arc(tx2,ty2,5,0,2*Math.PI); ctx.fillStyle="#3C7A2E"; ctx.fill(); }
         else { ctx.beginPath(); ctx.arc(tx2,ty2,5,0,2*Math.PI); ctx.fillStyle="#2E2416"; ctx.fill(); ctx.beginPath(); ctx.arc(tx2,ty2,2,0,2*Math.PI); ctx.fillStyle="#6B5A3A"; ctx.fill(); }
       }
-      // prize label (outlined for contrast on cheese)
+      // prize label on two lines (outlined for contrast on cheese)
+      var words = segs[i].label.split(" "), rows = words.length>1 ? [words[0], words.slice(1).join(" ")] : [words[0]];
       ctx.save(); ctx.translate(cx,cy); ctx.rotate(a0+seg/2);
-      ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.font="bold 15px Karla,Arial,sans-serif";
-      ctx.lineWidth=3.5; ctx.strokeStyle="rgba(255,248,230,0.92)"; ctx.strokeText(segs[i].label, rad-16, 0);
-      ctx.fillStyle="#5A1E12"; ctx.fillText(segs[i].label, rad-16, 0);
+      ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.font="bold 14px Karla,Arial,sans-serif";
+      rows.forEach(function(t, ri){
+        var y = rows.length>1 ? (ri ? 8 : -8) : 0;
+        ctx.lineWidth=3.5; ctx.strokeStyle="rgba(255,248,230,0.92)"; ctx.strokeText(t, rad-16, y);
+        ctx.fillStyle="#5A1E12"; ctx.fillText(t, rad-16, y);
+      });
       ctx.restore();
     }
     // mozzarella centre
@@ -1034,30 +1336,47 @@
   }
   function spinWheel(){
     if (wheelSpinning) return;
-    wheelSpinning = true; el("spinBtn").disabled = true;
-    var n = WHEEL.length, segDeg = 360/n, w = Math.floor(Math.random()*n);
-    var jitter = (Math.random()*2-1) * segDeg * 0.3;
-    var desiredMod = (360 - (w+0.5)*segDeg + jitter + 720) % 360;
-    var currentMod = ((wheelRot % 360) + 360) % 360;
-    wheelRot += (desiredMod - currentMod + 360) % 360 + 360*5;
-    var cv = el("wheelCanvas");
-    cv.style.transition = "transform 4.2s cubic-bezier(.16,.86,.28,1)";
-    void cv.offsetWidth;
-    cv.style.transform = "rotate("+wheelRot+"deg)";
-    var settled = false;
-    var done = function(){ if (settled) return; settled = true; cv.removeEventListener("transitionend", done); wheelSpinning=false; showResult(WHEEL[w], null, null); };
-    cv.addEventListener("transitionend", done);
-    setTimeout(done, 4600);   // fallback if transitionend doesn't fire (reduced-motion, etc.)
+    wheelSpinning = true; el("spinBtn").disabled = true; el("spinBtn").textContent = "Spinning…";
+    function fail(msg){ wheelSpinning = false; if (el("spinBtn")){ el("spinBtn").disabled = false; el("spinBtn").textContent = "Spin!"; } toast(msg); }
+    offersApi("spin").then(function(j){
+      if (j._status!==200 || typeof j.slice!=="number") return fail(j.message || "Couldn't spin just now. Please try again.");
+      var cv = el("wheelCanvas"); if (!cv) return;
+      var n = wheelSegs().length, segDeg = 360/n, w = j.slice;
+      var jitter = (Math.random()*2-1) * segDeg * 0.3;
+      var desiredMod = (360 - (w+0.5)*segDeg + jitter + 720) % 360;
+      var currentMod = ((wheelRot % 360) + 360) % 360;
+      wheelRot += (desiredMod - currentMod + 360) % 360 + 360*5;
+      cv.style.transition = "transform 4.2s cubic-bezier(.16,.86,.28,1)";
+      void cv.offsetWidth;
+      cv.style.transform = "rotate("+wheelRot+"deg)";
+      var settled = false;
+      var done = function(){
+        if (settled) return; settled = true; cv.removeEventListener("transitionend", done); wheelSpinning = false;
+        addPrize(j.reward);
+        showWon(j.reward, "Lucky spin!", ladderText(OFFERS.wheel[w].ladder));
+      };
+      cv.addEventListener("transitionend", done);
+      setTimeout(done, 4600);   // fallback if transitionend doesn't fire (reduced-motion, etc.)
+    }).catch(function(){ fail("Couldn't reach Pizza Mia. Check your connection and try again."); });
+  }
+  // "Works on any pizza order (₹399+): free Garlic Knots 2 pc. Order ₹799+ and we'll make it free Garlic Knots 4 pc."
+  function ladderText(ladder){
+    var t = "Works on any pizza order ("+money(OFFERS.floor.min_eligible_subtotal)+"+): "+ladder[0].label+".";
+    for (var i=1;i<ladder.length;i++) t += " Order "+money(ladder[i].min)+"+ and we'll make it "+ladder[i].label+".";
+    return t;
   }
 
   /* --- Catch the Toppings --- */
   function startCatch(){
     gSetHead("Catch the Toppings 🍕", true);
+    var T = tiers();
     el("gameBody").innerHTML =
       '<div class="catchwrap"><canvas id="catchCanvas" width="340" height="520"></canvas>'+
       '<div class="chud"><span class="tt" id="cScore">Score 0</span><span class="tt" id="cTime">60s</span></div>'+
-      '<div class="catchstart" id="catchStart"><div style="font-size:40px">🍕</div><p><b>Catch the toppings, dodge the coal.</b><br>Drag (or use ← →) to move your pizza. Each topping shows its points. Catch 🔥 and it\'s game over. 60 seconds — go for the highest score!</p><button class="gbtn" id="catchGo">Start</button></div></div>'+
-      '<div class="ghint">More points = bigger discount.</div>';
+      '<div class="catchstart" id="catchStart"><div style="font-size:40px">🍕</div><p><b>Catch the toppings, dodge the coal.</b><br>Drag (or use ← →) to move your pizza. Each topping shows its points. Catch 🔥 and it\'s game over. 60 seconds — go for the highest score!</p>'+
+      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free drink or topping</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
+      '<button class="gbtn" id="catchGo">Start</button></div></div>'+
+      '<div class="ghint">Higher score = bigger prize.</div>';
     el("catchGo").onclick = runCatch;
   }
   function stopCatch(){ if (catchState){ catchState.running=false; if(catchState.cleanup) catchState.cleanup(); catchState=null; } }
@@ -1068,6 +1387,7 @@
     el("catchStart").style.display = "none";
     var st = { W:W, H:H, px:W/2, tx:W/2, pr:30, py:H-46, objs:[], floats:[], score:0, t:60, spawn:0, running:true, last:null };
     catchState = st;
+    st.tokenP = offersApi("arcade_start").then(function(j){ return j.token || null; }).catch(function(){ return null; });
     function toX(cx){ var r=cv.getBoundingClientRect(); return (cx-r.left)/r.width * W; }
     cv.onpointermove = function(e){ st.tx = Math.max(st.pr, Math.min(W-st.pr, toX(e.clientX))); };
     cv.ontouchmove = function(e){ if(e.touches[0]){ st.tx = Math.max(st.pr, Math.min(W-st.pr, toX(e.touches[0].clientX))); e.preventDefault(); } };
@@ -1145,34 +1465,46 @@
   }
   function endCatch(st, hitCoal){
     st.running=false; if (st.cleanup) st.cleanup(); catchState=null;
-    showResult(scoreToReward(st.score), st.score, hitCoal);
+    var score = st.score, secs = Math.round((60 - st.t)*10)/10;
+    gSetHead("Your Score 🎉", true);
+    el("gameBody").innerHTML = '<div class="gresult"><div class="big">⏳</div><div class="sc">You scored '+score+'. Checking your prize…</div></div>';
+    // the server checks the score is believable and decides the prize
+    st.tokenP.then(function(token){
+      if (!token) throw new Error("no token");
+      return offersApi("arcade_finish", { token:token, score:score, seconds:secs });
+    }).then(function(j){
+      if (j._status!==200) return showNoPrize(score, hitCoal, j.message || "We couldn't check that game. Please play again.");
+      if (j.tier===null) return showNoPrize(score, hitCoal, null);
+      addPrize(j.reward);
+      var t = tiers()[j.tier];
+      var detail = t.options.length>1
+        ? 'Choose one in your cart:<ul class="tierul">'+t.options.map(function(o){
+            return '<li>'+cap1(o.label)+(o.min>OFFERS.floor.min_eligible_subtotal ? ' <small>(orders '+money(o.min)+'+)</small>' : '')+'</li>'; }).join("")+'</ul>'+
+          'Works on any pizza order ('+money(OFFERS.floor.min_eligible_subtotal)+'+).'
+        : ladderText(t.options[0].ladder);
+      showWon(j.reward, "You scored "+score+(hitCoal?" — then caught the coal!":"!"), detail);
+    }).catch(function(){ showNoPrize(score, hitCoal, "We couldn't reach Pizza Mia to check your score. Please check your connection and play again."); });
   }
 
   /* --- Result --- */
-  function showResult(reward, score, hitCoal){
-    gSetHead("Your Reward 🎉", true);
-    var body;
-    if (reward){
-      var txt = reward.kind==="percent" ? reward.percent+"% OFF" : "Free "+reward.itemName;
-      var conf = '<div class="conf">'+["🎉","✨","🧀","🍕","🎊","⭐","🍅","✨","🌶️","🎉"].map(function(e,i){ return '<span style="left:'+(5+i*10)+'%;animation-delay:'+(i*0.07).toFixed(2)+'s">'+e+'</span>'; }).join("")+'</div>';
-      body = '<div class="gresult">'+conf+'<div class="big">🎉</div><div class="rw">'+txt+'</div>'+
-        (score!=null?'<div class="sc">You scored '+score+' points'+(hitCoal?' — caught the coal!':'')+'</div>':'<div class="sc">Lucky spin!</div>')+
-        '<button class="gbtn wide" id="applyRw">Apply &amp; continue</button>'+
-        '<div class="growrow"><button class="gbtn ghost" id="playAgain">Play again</button></div></div>';
-    } else {
-      body = '<div class="gresult"><div class="big">😅</div><div class="rw" style="color:var(--green)">So close!</div>'+
-        '<div class="sc">'+(hitCoal?'You caught the burning coal! ':'')+'You scored '+(score||0)+' — not enough for a discount yet. Try again!</div>'+
-        '<button class="gbtn wide" id="playAgain">Try again</button></div>';
-    }
-    el("gameBody").innerHTML = body;
-    if (el("applyRw")) el("applyRw").onclick = function(){ applyAndClose(reward); };
-    if (el("playAgain")) el("playAgain").onclick = renderGameMenu;
+  function showWon(reward, scoreLine, detail){
+    gSetHead("You won! 🎉", true);
+    var conf = '<div class="conf">'+["🎉","✨","🧀","🍕","🎊","⭐","🍅","✨","🌶️","🎉"].map(function(e,i){ return '<span style="left:'+(5+i*10)+'%;animation-delay:'+(i*0.07).toFixed(2)+'s">'+e+'</span>'; }).join("")+'</div>';
+    el("gameBody").innerHTML = '<div class="gresult">'+conf+'<div class="big">🎉</div><div class="rw">'+reward.label+'</div>'+
+      '<div class="sc">'+scoreLine+'</div>'+
+      '<div class="windetail">'+detail+'<br><small>Code '+reward.code+' · saved for '+OFFERS.expiryHours+' hours · one prize per order</small></div>'+
+      '<button class="gbtn wide" id="applyRw">'+(cart.length ? 'See it in my cart' : 'Start my order')+'</button>'+
+      '<div class="growrow"><button class="gbtn ghost" id="playAgain">Play again</button></div></div>';
+    el("applyRw").onclick = function(){ closeGames(); if (cart.length || gamesReturn==="cart") openDrawer(); toast("Prize saved: "+reward.label); };
+    el("playAgain").onclick = renderGameMenu;
   }
-  function applyAndClose(reward){
-    setReward(reward);
-    closeGames();
-    if (gamesReturn==="cart") openDrawer();
-    toast("Reward applied: "+rewardText(reward));
+  function showNoPrize(score, hitCoal, err){
+    gSetHead("So close! 😅", true);
+    var T = tiers(), need = T.length ? T[0].minScore : 0;
+    el("gameBody").innerHTML = '<div class="gresult"><div class="big">😅</div><div class="rw" style="color:var(--green)">So close!</div>'+
+      '<div class="sc">'+(err ? err : (hitCoal?'You caught the burning coal! ':'')+'You scored '+(score||0)+'. Score '+need+'+ to win a free drink or topping. Try again!')+'</div>'+
+      '<button class="gbtn wide" id="playAgain">Try again</button></div>';
+    el("playAgain").onclick = startCatch;
   }
 
   /* ---------- WIRE UP ---------- */
@@ -1185,11 +1517,13 @@
   el("gClose").onclick = closeGames;
   el("gBack").onclick = renderGameMenu;
   el("gOverlay").onclick = closeGames;
+  el("cartbarNudge").onclick = function(){ if (prizeCount() || !prizesOn()) openDrawer(); else openGames("page"); };
 
   renderCats();
   renderMenu();
   refreshCartUI();
   updateRewardUI();
+  loadOffers();
   window.addEventListener("scroll", onScroll, {passive:true});
 
   // Deep links from the homepage promo: order.html#half / order.html#play
@@ -1202,7 +1536,7 @@
 
   // expose a few for debugging/testing
   window.__pm = { cart:function(){return cart;}, itemTotal:itemTotal, computeBill:computeBill,
-    setReward:setReward, getReward:function(){return REWARD;}, scoreToReward:scoreToReward, openGames:openGames };
+    wallet:function(){return wallet;}, quote:function(){return QUOTE;}, offers:function(){return OFFERS;}, openGames:openGames };
 })();
 </script>
 </body>

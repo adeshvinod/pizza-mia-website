@@ -1,4 +1,4 @@
-/* Pizza Mia menu data (Pizza Mia Menu 2026) — shared by order.html and the chat widget.
+/* Pizza Mia menu data (Pizza Mia Menu 2026) — shared by order.html, the chat widget and the offers function.
    After changing it, regenerate the AI host menu in netlify/functions/chat.js. */
 (function () {
   "use strict";
@@ -127,5 +127,8 @@
     { id:"dinein", label:"Dine-in", items:DINEIN }
   ];
 
-  window.PM_MENU = { HALF_SIZES:HALF_SIZES, PIZZAS:PIZZAS, TOPPINGS:TOPPINGS, NO_MEAT_ADDONS:NO_MEAT_ADDONS, SECTIONS:SECTIONS };
+  var PM_MENU = { HALF_SIZES:HALF_SIZES, PIZZAS:PIZZAS, TOPPINGS:TOPPINGS, NO_MEAT_ADDONS:NO_MEAT_ADDONS, SECTIONS:SECTIONS };
+  // Browser: window.PM_MENU. Server (offers function): require() so prices are checked against the same data.
+  if (typeof module !== "undefined" && module.exports) module.exports = PM_MENU;
+  else window.PM_MENU = PM_MENU;
 })();
