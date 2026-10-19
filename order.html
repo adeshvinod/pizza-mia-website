@@ -862,13 +862,18 @@
     toast("Added "+(b ? "Half & Half pizza" : mItem.name));
   };
 
-  function showModal(on){ el("modal").classList.toggle("show",on); el("overlay").classList.toggle("show", on || drawerOpen); if(!on && !drawerOpen) hideOverlay(); }
+  function showModal(on){ el("modal").classList.toggle("show",on); el("overlay").classList.toggle("show", on || drawerOpen); if(!on && !drawerOpen) hideOverlay(); syncChat(); }
+  // keep the chat button out of the way while a popup (cart, item, games) is open
+  function syncChat(){
+    if (!window.PMChat || !window.PMChat.hide) return;
+    window.PMChat.hide(drawerOpen || el("modal").classList.contains("show") || el("gameWrap").classList.contains("show"));
+  }
 
   /* ---------- DRAWER (cart + checkout) ---------- */
   var drawerOpen=false, checkoutMode=false;
 
-  function openDrawer(){ drawerOpen=true; el("drawer").classList.add("show"); el("overlay").classList.add("show"); renderDrawer(); }
-  function closeDrawer(){ drawerOpen=false; checkoutMode=false; el("drawer").classList.remove("show"); if(!el("modal").classList.contains("show")) hideOverlay(); updateDrawerHead(); }
+  function openDrawer(){ drawerOpen=true; el("drawer").classList.add("show"); el("overlay").classList.add("show"); renderDrawer(); syncChat(); }
+  function closeDrawer(){ drawerOpen=false; checkoutMode=false; el("drawer").classList.remove("show"); if(!el("modal").classList.contains("show")) hideOverlay(); updateDrawerHead(); syncChat(); refreshCartUI(); }
   function hideOverlay(){ el("overlay").classList.remove("show"); }
   function showCart(){ checkoutMode=false; renderDrawer(); }
   function updateDrawerHead(){
@@ -1178,7 +1183,6 @@
     var n = cartCount();
     var barShown = n>0 && !drawerOpen;
     el("cartbar").classList.toggle("show", barShown);
-    if (window.PMChat) window.PMChat.raise(barShown);
     var b = computeBill();
     el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(b.it - b.discount)+" + taxes</small>";
     // one-line prize nudge above the cart bar
@@ -1190,6 +1194,7 @@
     }
     el("cartbarNudge").innerHTML = t;
     el("cartbarNudge").style.display = t ? "" : "none";
+    if (window.PMChat) window.PMChat.raise(barShown, !!t);
   }
 
   /* ---------- TOAST ---------- */
@@ -1247,10 +1252,11 @@
     gamesReturn = ctx || "page";
     el("gOverlay").classList.add("show");
     el("gameWrap").classList.add("show");
+    syncChat();
     if (!OFFERS){ gSetHead("Play & Win 🎮", false); el("gameBody").innerHTML = '<div class="ghint">Loading the games…</div>'; loadOffers().then(renderGameMenu); return; }
     renderGameMenu();
   }
-  function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); }
+  function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); syncChat(); }
   function gSetHead(title, back){ el("gTitle").textContent = title; el("gBack").style.display = back ? "block" : "none"; }
 
   function renderGameMenu(){

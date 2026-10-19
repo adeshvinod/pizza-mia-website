@@ -144,6 +144,9 @@
   el("chatText").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
   el("chatText").addEventListener("input", function () { this.style.height = "auto"; this.style.height = Math.min(this.scrollHeight, 90) + "px"; });
 
-  // raise(true) lifts the button above a bottom bar (the order page's cart bar)
-  window.PMChat = { open: openChat, close: closeChat, raise: function (on) { el("chatDock").classList.toggle("raised", !!on); } };
+  // raise(true) lifts the button above a bottom bar (the order page's cart bar; tall = bar has a prize message)
+  // hide(true) tucks the button away while the cart, an item or the games are open
+  window.PMChat = { open: openChat, close: closeChat,
+    raise: function (on, tall) { el("chatDock").classList.toggle("raised", !!on); el("chatDock").classList.toggle("tall", !!(on && tall)); },
+    hide: function (on) { if (on) closeChat(); el("chatDock").classList.toggle("away", !!on); } };
 })();

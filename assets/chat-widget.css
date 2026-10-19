@@ -6,6 +6,8 @@
 /* Launcher: glowing button + nudge bubble */
 .chat-dock { position:fixed; bottom:22px; right:20px; z-index:999; display:flex; align-items:center; gap:12px; transition:bottom .2s; }
 .chat-dock.raised { bottom:92px; }
+.chat-dock.raised.tall { bottom:128px; }
+.chat-dock.away { display:none; }
 .chat-fab { position:relative; width:64px; height:64px; border-radius:50%; border:3px solid #FBF3E6; padding:0; background:linear-gradient(135deg,#C9341F,#E8A33D); color:#fff; display:flex; align-items:center; justify-content:center; animation:cfGlow 2.2s ease-in-out infinite; transition:transform .15s; }
 .chat-fab:hover { transform:scale(1.08); }
 .chat-fab .cf-ico { font-size:28px; line-height:1; display:block; animation:cfWiggle 4.4s ease-in-out infinite; }
@@ -26,7 +28,7 @@
 .chat-nudge .cn-x { position:absolute; top:3px; right:5px; background:none; border:none; color:#7A7767; font-size:17px; line-height:1; padding:2px 4px; }
 .pm-chat-open .chat-dock { opacity:0; pointer-events:none; }
 @media (prefers-reduced-motion: reduce) { .chat-fab, .chat-fab::before, .chat-fab::after, .chat-fab .cf-ico, .chat-fab .dot { animation:none; } }
-@media (max-width:600px) { .chat-dock { bottom:18px; right:16px; } .chat-dock.raised { bottom:88px; } .chat-fab { width:58px; height:58px; } .chat-nudge { max-width:170px; font-size:12.5px; } }
+@media (max-width:600px) { .chat-dock { bottom:18px; right:16px; } .chat-dock.raised { bottom:88px; } .chat-dock.raised.tall { bottom:124px; } .chat-fab { width:58px; height:58px; } .chat-nudge { max-width:170px; font-size:12.5px; } }
 
 /* Panel */
   .chat-panel { position:fixed; bottom:22px; right:20px; z-index:1001; font-family:'Karla',sans-serif; color:#22271F; text-align:left; width:min(380px,calc(100vw - 24px)); height:min(600px,calc(100vh - 110px)); background:#FBF3E6; border-radius:20px; box-shadow:0 12px 40px rgba(0,0,0,.35); display:flex; flex-direction:column; overflow:hidden; opacity:0; pointer-events:none; transform:translateY(16px) scale(.98); transition:opacity .2s, transform .2s; }
