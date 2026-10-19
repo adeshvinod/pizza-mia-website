@@ -7,7 +7,7 @@
   "max_discount_pct_of_eligible": 0.15,
   "one_reward_per_order": true,
   "mutually_exclusive_with": ["WHATSAPP_5", "REVIEW_5"],
-  "limits": { "issue_per_phone_days": 7, "redeem_per_phone_days": 7, "expiry_hours": 48 },
+  "limits": { "issue_per_phone_days": 3, "redeem_per_phone_days": 3, "expiry_hours": 48 },
   "excluded_from_eligible": ["99 Pizza", "Veg Combo", "Non-veg Combo",
                              "container_charge", "delivery_fee", "alcohol", "reward_items"],
 

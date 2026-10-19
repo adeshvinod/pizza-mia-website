@@ -189,7 +189,7 @@ test("14. Reward older than 48 h or already used → rejected with a clear messa
   assert.match(old.reward.message, /expired/);
 });
 
-test("14b. One prize per phone per 7 days", async function () {
+test("14b. One prize per phone per 3 days (owner changed from 7, 19 Oct 2026)", async function () {
   var s = setup();
   var a = await give(s, "W_PCT5"), b = await give(s, "W_PCT5");
   assert.equal((await s.api.handle("submit", { cart: [PEP_M], rewardId: a, phone: "98765 43210" })).status, 200);
