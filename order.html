@@ -450,6 +450,7 @@
   /* ---------- CART STATE ---------- */
   var cart = [];
   try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]") || []; } catch(e){ cart = []; }
+  cart = cart.filter(function(l){ return ITEMS[l.itemId] && (!l.half || ITEMS[l.half.b.id]); });   // drop items no longer sold online
   function saveCart(){ try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){} requote(); }
 
   function lineUnit(line){
@@ -597,7 +598,7 @@
     return '<div class="dine">'+
       '<img src="./images/menu/'+it.img+'" alt="'+it.name+'" loading="lazy" decoding="async"/>'+
       '<div class="dine-body">'+
-        '<div class="nm">'+(it.veg ? vegDot(true)+' ' : '')+it.name+mustTag(it)+'</div>'+
+        '<div class="nm">'+(it.veg!=null ? vegDot(it.veg)+' ' : '')+it.name+mustTag(it)+'</div>'+
         '<div class="ds">'+it.desc+'</div>'+
         '<span class="dine-tag">🍽 Dine-in only</span>'+
       '</div></div>';

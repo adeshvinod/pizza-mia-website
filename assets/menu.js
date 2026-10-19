@@ -60,11 +60,6 @@
     sg("baconknots","Bacon Cheese Knots","2 pcs · cheese knots with bacon",false,"bacon-cheese-knots.jpg",350)
   ];
 
-  var CHIPS = [
-    sg("chipsveg","Chips in a Bag — Veg","Crunchy loaded chips",true,"chips-veg.jpg",250),
-    sg("chipsch","Chips in a Bag — Chicken","Loaded chips topped with chicken",false,"chips-chicken.jpg",300)
-  ];
-
   var PASTA = [
     mu("ptomato","Tomato Sauce Pasta","Penne or spaghetti in classic tangy tomato sauce",true,"pasta-tomato.jpg",[{label:"Regular",price:300},{label:"Large",price:450}],PASTA_X),
     mu("pcheese","Cheese Sauce Pasta","Penne or spaghetti in rich, creamy cheese sauce",true,"pasta-cheese.jpg",[{label:"Regular",price:330},{label:"Large",price:499}],PASTA_X),
@@ -73,20 +68,19 @@
     mu("p3sauce","3 Sauce Pasta","Penne or spaghetti in our three-sauce blend",true,"pasta-3-sauce.jpg",[{label:"Regular",price:380},{label:"Large",price:550}],PASTA_X)
   ];
 
-  var COMBOS = [
-    sg("vegcombo","Veg Combo","Margherita Pizza + Garlic Knots + Fresh Lime Juice",true,"margherita.jpg",400),
-    sg("nvcombo","Non-Veg Combo","Chicken Keema Pizza + Garlic Knots + Fresh Lime Juice",false,"chicken-keema.jpg",500)
-  ];
-
   var DESSERTS = [
-    sg("brownie","Chocolate Brownie","Warm, fudgy chocolate brownie",true,"brownie.jpg",250),
-    sg("sundae","Chocolate Brownie Sundae","The perfect end to a pizza night",true,"brownie-sundae.jpg",399)
+    sg("brownie","Chocolate Brownie","Warm, fudgy chocolate brownie",true,"brownie.jpg",250)
   ];
 
   // Dine-in only: shown to tempt people to visit, not orderable online
   function dn(id,name,desc,veg,img,price,x){ return ext({id:id,name:name,desc:desc,veg:veg,img:img,type:"dinein",price:price},x); }
   var DINEIN = [
     dn("mini99","₹99 Mini Margherita","Our classic Margherita in a 6 inch size, made for little hands and little appetites.",true,"margherita.jpg",99),
+    dn("vegcombo","Veg Combo","Margherita Pizza + Garlic Knots + Fresh Lime Juice",true,"margherita.jpg",400),
+    dn("nvcombo","Non-Veg Combo","Chicken Keema Pizza + Garlic Knots + Fresh Lime Juice",false,"chicken-keema.jpg",500),
+    dn("chipsveg","Chips in a Bag — Veg","Crunchy loaded chips",true,"chips-veg.jpg",250),
+    dn("chipsch","Chips in a Bag — Chicken","Loaded chips topped with chicken",false,"chips-chicken.jpg",300),
+    dn("sundae","Chocolate Brownie Sundae","The perfect end to a pizza night",true,"brownie-sundae.jpg",399),
     dn("susegad","Susegad Sunset","Gin, Vodka, White Rum, Tequila, Orange & Ginger Ale",null,"susegad-sunset.jpg",null),
     dn("yummymummy","Yummy Mummy","Gin, Cranberry, Apple & Ginger Ale",null,"yummy-mummy.jpg",null,MUST),
     dn("shandy","Miramar Shandy","Kingfisher Beer, White Rum, Orange, Lemon & Mint",null,"miramar-shandy.jpg",null),
@@ -120,9 +114,7 @@
     { id:"pizzas", label:"Pizzas", groups:PIZZAS },
     { id:"starters", label:"Starters", items:STARTERS },
     { id:"cknots", label:"Cheese Knots", items:CHEESE_KNOTS },
-    { id:"chips",  label:"Chips in a Bag", items:CHIPS },
     { id:"pasta",  label:"Pasta", items:PASTA },
-    { id:"combos", label:"Combos", items:COMBOS },
     { id:"desserts", label:"Desserts", items:DESSERTS },
     { id:"dinein", label:"Dine-in", items:DINEIN }
   ];
