@@ -15,6 +15,9 @@ Runs from ~/.local/share/pizzamia-orders/start.sh, which also picks up updates.
   --demo         show sample orders (no internet needed)
   --window       run in a window instead of full screen
   --mute         no alarm sound (testing)
+
+Owner only: Ctrl+Shift+Q closes it (until the "Pizza Mia Orders" icon is
+opened or the laptop restarts).
 """
 import datetime
 import json
@@ -23,6 +26,7 @@ import os
 import queue
 import re
 import shutil
+import signal
 import struct
 import subprocess
 import sys
@@ -338,6 +342,8 @@ class App:
         for k in ("<Return>", "<KP_Enter>", "<space>"):
             root.bind(k, lambda e: self.seen())
         root.protocol("WM_DELETE_WINDOW", lambda: None)   # staff can't close it by accident
+        for k in ("<Control-Shift-KeyPress-Q>", "<Control-Shift-KeyPress-q>"):
+            root.bind(k, lambda e: self.owner_exit())
 
         self.body = tk.Frame(root, bg=CREAM)
         self.body.pack(fill="both", expand=True)
@@ -350,6 +356,18 @@ class App:
         self.render()
         self.tick()
         self.awake()
+
+    def owner_exit(self):
+        """Ctrl+Shift+Q: close for real, including the launcher that would restart it."""
+        ppid = os.getppid()
+        try:
+            with open("/proc/%d/cmdline" % ppid, "rb") as f:
+                if b"start.sh" in f.read():
+                    os.kill(ppid, signal.SIGTERM)
+        except OSError:
+            pass
+        self.root.destroy()
+        sys.exit(0)
 
     def f(self, size, bold=False):
         return (self.fam, int(size * self.s), "bold" if bold else "normal")
@@ -603,6 +621,27 @@ class App:
         self.last_ok = time.time()
 
 
+def shortcuts():
+    """'Pizza Mia Orders' icon on the desktop and in the Menu, to reopen it after Ctrl+Shift+Q."""
+    start = os.path.join(APP_DIR, "start.sh")
+    if not os.path.exists(start):
+        return
+    entry = ("[Desktop Entry]\nType=Application\nName=Pizza Mia Orders\nComment=Website orders for the counter\n"
+             "Exec=%s\nIcon=appointment-new\nTerminal=false\n" % start)
+    desk = run(["xdg-user-dir", "DESKTOP"], timeout=3).strip() or os.path.expanduser("~/Desktop")
+    for d in (os.path.expanduser("~/.local/share/applications"), desk):
+        path = os.path.join(d, "pizzamia-orders.desktop")
+        try:
+            os.makedirs(d, exist_ok=True)
+            if not os.path.exists(path):
+                with open(path, "w") as f:
+                    f.write(entry)
+                os.chmod(path, 0o755)
+                run(["gio", "set", path, "metadata::trusted", "true"], timeout=3)
+        except OSError:
+            pass
+
+
 def check(conf):
     if not conf.get("key"):
         print("No secret code saved yet.")
@@ -640,6 +679,7 @@ def main():
                 a.proc.wait()
             time.sleep(0.4)
         return
+    shortcuts()
     if "--mute" in args:
         conf["mute"] = True
     if not ("--demo" in args) and not speaker_sink(conf) and shutil.which("pactl"):
