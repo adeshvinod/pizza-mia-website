@@ -1,0 +1,73 @@
+/* Halloween look for the homepage: dark theme, falling skeletons, Halloween games promo.
+   Everything here only applies while <html class="halloween">; remove that class to switch it off. */
+
+/* ---------- Dark theme (overrides the page's inline colours) ---------- */
+html.halloween body { background:#121A15; color:#E6E9E1; }
+html.halloween a:hover { color:#FBF3E6; }
+html.halloween ::selection { background:#3A5444; }
+html.halloween .rail::-webkit-scrollbar-thumb { background:#3A5444; }
+
+html.halloween [style*="rgba(251,243,230"] { background:rgba(18,26,21,0.94) !important; border-bottom-color:#26352B !important; }
+html.halloween [style*="background:#FBF3E6"] { background:#1C2A21 !important; }
+html.halloween img[style*="background:#FBF3E6"] { background:#FBF3E6 !important; }   /* keep the footer logo's circle */
+html.halloween [style*="background:#FFFCF6"] { background:#18231C !important; }
+html.halloween [style*="background:#FFFFFF"] { background:transparent !important; }  /* no plates behind the pizzas */
+html.halloween [style*="background:#C6DBBB"] { background:#24452F !important; }
+html.halloween [style*="background:#F6EFE0"] { background:#121A15 !important; }
+html.halloween [style*="background:#E4D8C2"] { background:#26352B !important; }
+
+html.halloween [style*="#EFE4D0"],
+html.halloween [style*="#E4D8C2"] { border-color:#26352B !important; }
+html.halloween [style*="#D9CBB3"],
+html.halloween [style*="#DCCFBA"] { border-color:#3A5444 !important; }
+html.halloween [style*="border:1.5px solid #1B3A2A"] { border-color:#C6DBBB !important; }
+
+html.halloween [style*="color:#1B3A2A"] { color:#FBF3E6 !important; }
+html.halloween [style*="color:#22271F"] { color:#E6E9E1 !important; }
+html.halloween [style*="color:#4E5347"] { color:#C9CFC2 !important; }
+html.halloween [style*="color:#7A7767"] { color:#9AA393 !important; }
+html.halloween [style*="color:#C9341F"] { color:#F0705A !important; }
+html.halloween [style*="color:#1B7A3E"] { color:#4CB572 !important; border-color:#4CB572 !important; }
+html.halloween [style*="background:#1B7A3E"] { background:#4CB572 !important; }
+html.halloween [style*="background:#E8A33D"] { color:#22271F !important; }          /* gold buttons keep dark text */
+
+/* online-ordering promo */
+html.halloween .promo { background-color:#0E1611; }
+html.halloween .ptile.half { background:#1C2A21; border:1px solid #2E4636; }
+html.halloween .ptile.half h3 { color:#FBF3E6; }
+html.halloween .ptile.half p { color:#C9CFC2; }
+html.halloween .hh-pie { box-shadow:0 12px 26px rgba(0,0,0,.45), 0 0 0 6px #2E4636; }
+html.halloween .hh-pie i { background:#2E4636; }
+html.halloween .hh-lbl.a { background:#0E1611; }
+
+/* ---------- Halloween games promo tile ---------- */
+.ptile.hween { display:none; }
+html.halloween .ptile.game { display:none; }   /* Catch the Toppings is off for Halloween */
+html.halloween .ptile.hween { display:grid; grid-template-columns:auto 1fr; background:#1A0F2E;
+  background-image:radial-gradient(circle at 18% 40%, rgba(232,116,42,.30), transparent 45%), linear-gradient(160deg,#3B1F4A,#1A0F2E);
+  border:1px solid rgba(232,116,42,.5); color:#FBF3E6 !important; }
+.ptile.hween h3 { color:#FBE9C8; }
+.ptile.hween p { color:#D8CDE6; }
+.ptile.hween .pt-tag { background:#E8742A; color:#1A120B; }
+.ptile.hween .hw-btns { display:flex; gap:10px; flex-wrap:wrap; }
+.promo-btn.pumpkin { background:#E8742A; color:#1A120B !important; box-shadow:0 4px 0 #A8521E; }
+.promo-btn.ghostly { background:transparent; color:#FBF3E6 !important; border:1.5px solid rgba(251,243,230,.45); box-shadow:none; }
+.hw-scene { display:block; width:220px; height:auto; aspect-ratio:300/170; border-radius:18px; background:linear-gradient(180deg,#1A0F2E,#5A2A3A); box-shadow:inset 0 0 0 2px rgba(232,116,42,.35); overflow:hidden; }
+.hw-scene .scoot { animation:hwJump 1.6s cubic-bezier(.3,0,.4,1) infinite; transform-origin:70px 140px; }
+.hw-scene .zomb { animation:hwWalk 1.6s linear infinite; }
+@keyframes hwJump { 0%,30%,100% { transform:translateY(0) rotate(0); } 55% { transform:translateY(-58px) rotate(-8deg); } 75% { transform:translateY(-20px) rotate(-3deg); } }
+@keyframes hwWalk { 0% { transform:translateX(120px); } 100% { transform:translateX(-170px); } }
+@media (max-width:980px) { html.halloween .ptile.hween { grid-template-columns:1fr; justify-items:center; text-align:center; } .ptile.hween .hw-btns { justify-content:center; } }
+@media (max-width:600px) { .hw-scene { width:100%; max-width:300px; height:auto; aspect-ratio:300/170; } .ptile.hween .promo-btn { width:100%; justify-content:center; } }
+
+/* ---------- Falling skeletons ---------- */
+.hw-skels { display:none; }
+html.halloween .hw-skels { display:block; position:fixed; inset:0; z-index:45; pointer-events:none; overflow:hidden; }
+.hw-skel { position:absolute; top:0; will-change:transform; animation:hwFall linear infinite; }
+.hw-skel svg { display:block; animation:hwSwing 2.4s ease-in-out infinite alternate; }
+@keyframes hwFall { from { transform:translateY(-160px); } to { transform:translateY(calc(100vh + 20px)); } }
+@keyframes hwSwing { from { transform:rotate(-18deg); } to { transform:rotate(18deg); } }
+@media (prefers-reduced-motion: reduce) {
+  html.halloween .hw-skels { display:none; }
+  .hw-scene .scoot, .hw-scene .zomb { animation:none; }
+}
