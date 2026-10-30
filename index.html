@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="halloween">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MD9X07JX7S"></script>
@@ -16,6 +16,7 @@
 <body>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="./assets/chat-widget.css">
+<link rel="stylesheet" href="./assets/halloween.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pacifico&display=swap" rel="stylesheet">
 <style>
   body { margin: 0; background: #FBF3E6; }
@@ -144,7 +145,7 @@
       <div class="promo-top">
         <div>
           <div class="promo-kicker"><i></i>Now taking orders online</div>
-          <h2>Fresh from our oven to your door</h2>
+          <h2><span class="hw-hide">Fresh from our oven to your door</span><span class="hw-only">Play our Halloween games &amp; win spooky offers and discounts</span></h2>
           <div class="promo-perks"><span>🛵 Free delivery</span><span>💵 Cash on delivery</span><span>🎁 Online-only deals</span></div>
         </div>
         <a class="promo-btn" href="./order.html">Order now →</a>
@@ -165,6 +166,41 @@
           </div>
         </a>
 
+        <!-- HALLOWEEN GAMES (shown instead of the games tile while <html class="halloween">) -->
+        <div class="ptile hween">
+          <svg class="hw-scene" viewBox="0 0 300 170" aria-hidden="true">
+            <circle cx="248" cy="42" r="40" fill="#F6E7C1" opacity=".12"/><circle cx="248" cy="42" r="22" fill="#F6E7C1"/>
+            <path d="M60 30q-6-6-12 0q6-2 6 4q0-6 6-4zM170 52q-5-5-10 0q5-2 5 3q0-5 5-3z" fill="#120818"/>
+            <path d="M0 140V112q40-22 80-4t70-6q40-16 80 2t70-4V140z" fill="#2A1838"/>
+            <path d="M120 140v-16a6 6 0 0 1 12 0v16zM140 140v-12a5 5 0 0 1 10 0v12zM262 140v-14a6 6 0 0 1 12 0v14z" fill="#170C20"/>
+            <rect y="140" width="300" height="30" fill="#2B2233"/>
+            <path d="M10 155h18M50 155h18M90 155h18M130 155h18M170 155h18M210 155h18M250 155h18" stroke="#E8742A" stroke-width="3"/>
+            <g class="zomb">
+              <path d="M232 140l-4-18M232 140l4-18" stroke="#2A2440" stroke-width="6" stroke-linecap="round"/>
+              <rect x="223" y="100" width="18" height="24" fill="#5B4A7A"/>
+              <path d="M226 104h-18M228 110h-16" stroke="#7FB069" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="232" cy="92" r="9" fill="#7FB069"/><circle cx="228" cy="91" r="2.6" fill="#FBF3E6"/><circle cx="235" cy="90" r="2" fill="#FBF3E6"/>
+            </g>
+            <g class="scoot">
+              <rect x="34" y="104" width="24" height="14" fill="#F3E3C3" stroke="#B98A4E" stroke-width="1.5"/><rect x="34" y="109" width="24" height="3" fill="#C9341F"/>
+              <path d="M40 126q0-16 18-16h8l4 14h12l2 4H40z" fill="#C9341F"/>
+              <path d="M86 131l-6-31M76 99l10-2" stroke="#8E2314" stroke-width="4" stroke-linecap="round"/>
+              <path d="M54 110l4-20h10l-2 20z" fill="#1B7A3E"/><path d="M64 94l14 5" stroke="#1B7A3E" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="63" cy="84" r="8" fill="#EE7B2C"/><rect x="64" y="82" width="8" height="4" fill="#1A0F2E"/>
+              <circle cx="48" cy="131" r="9" fill="#151018"/><circle cx="48" cy="131" r="4" fill="#B9B3C4"/>
+              <circle cx="86" cy="131" r="9" fill="#151018"/><circle cx="86" cy="131" r="4" fill="#B9B3C4"/>
+            </g>
+          </svg>
+          <div>
+            <span class="pt-tag">New for Halloween</span>
+            <h3>Zombie Delivery Run</h3>
+            <p>Hop on the scooter, jump the zombies, pumpkins and ghosts, and get the pizza to the door in 60 seconds. Then spin the Haunted Pizza Wheel: every spin wins a free treat.</p>
+            <div class="hw-btns">
+              <a class="promo-btn pumpkin" href="./order.html#zombie">Play Zombie Run →</a>
+              <a class="promo-btn ghostly" href="./order.html#spin">Spin the haunted wheel</a>
+            </div>
+          </div>
+        </div>
         <a class="ptile game" href="./order.html#play">
           <div class="game-art" aria-hidden="true">
             <div class="catch">
@@ -726,5 +762,6 @@
 </script>
 <script src="./assets/menu.js"></script>
 <script src="./assets/chat-widget.js"></script>
+<script src="./assets/halloween.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="halloween">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MD9X07JX7S"></script>
@@ -320,6 +320,37 @@
   .windetail small { color:var(--muted); }
   .tierul { margin:6px 0; padding-left:20px; }
 
+  /* Zombie Delivery Run */
+  .runwrap { position:relative; width:100%; margin:0 auto; touch-action:manipulation; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; cursor:pointer; }
+  .runwrap canvas { display:block; width:100%; height:auto; border-radius:16px; background:#1A0F2E; }
+  .runstart { background:rgba(26,15,46,.86); gap:10px; padding:16px 18px; }
+  .runstart p { font-size:13px; }
+  @media (max-width:520px){ .runstart { position:static; margin-top:10px; background:#211833; } }
+  .gnew { display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:4px 10px; border-radius:100px; background:#E8742A; color:#1A120B; margin-bottom:8px; }
+
+  /* Halloween: switch off by removing class="halloween" from <html> */
+  .hw-on { display:none; }
+  html.halloween .hw-on { display:block; }
+  html.halloween .hw-off { display:none; }
+  html.halloween .winbar .inner { background:linear-gradient(100deg,#1A0F2E,#3B1F4A); }
+  html.halloween .winbar button { background:#E8742A; }
+  html.halloween .gamewrap { background:#16101F; color:#EDE6F5; }
+  html.halloween .ghead { border-bottom-color:#2E2340; }
+  html.halloween .ghead h2, html.halloween .ghead .xbtn { color:#FBF3E6; }
+  html.halloween .gcard { background:#211833; border-color:#3A2C52; }
+  html.halloween .gcard:hover { border-color:#E8742A; }
+  html.halloween .gcard.hw { background:linear-gradient(135deg,#3B1F4A,#1A0F2E); border-color:#E8742A; }
+  html.halloween .gcard .t { color:#FBE9C8; }
+  html.halloween .gcard .d, html.halloween .ghint, html.halloween .gresult .sc, html.halloween .pz-terms { color:#B9AECB; }
+  html.halloween .gcard .d b { color:#FFD27A; }
+  html.halloween .ghead2 { color:#F08A3C; }
+  html.halloween .wheelptr { border-top-color:#8E5BC7; }
+  html.halloween .gbtn { background:#E8742A; color:#1A120B; box-shadow:0 3px 0 #A8521E; }
+  html.halloween .gbtn.ghost { background:transparent; color:#EDE6F5; border-color:#4A3A62; box-shadow:none; }
+  html.halloween .gresult .rw { color:#F08A3C !important; }
+  html.halloween .windetail { background:#211833; border-color:#3A2C52; color:#EDE6F5; }
+  html.halloween .windetail small { color:#B9AECB; }
+
 </style>
 </head>
 <body>
@@ -350,7 +381,8 @@
 </div>
 
 <div class="winbar" id="winbar"><div class="inner">
-  <div class="txt">🎮 <b>Play a game, win a free treat!</b> Every spin wins: a free topping, drink, garlic knots or money off your pizza order.</div>
+  <div class="txt hw-off">🎮 <b>Play a game, win a free treat!</b> Every spin wins: a free topping, drink, garlic knots or money off your pizza order.</div>
+  <div class="txt hw-on">🎃 <b>Halloween games are here!</b> Play Zombie Delivery Run or spin the Haunted Pizza Wheel to win a free topping, drink, garlic knots or money off.</div>
   <button id="playWinBtn">Play &amp; Win</button>
 </div></div>
 <div class="rewardbar" id="rewardBanner"></div>
@@ -1232,7 +1264,10 @@
   }
 
   /* ---------- GAMES ---------- */
-  var WHEEL_COLORS = ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D"];
+  // Halloween look and the Zombie Delivery Run game: on while <html class="halloween">.
+  var HALLOWEEN = document.documentElement.classList.contains("halloween");
+  var WHEEL_COLORS = HALLOWEEN ? ["#E8742A","#6B3FA0","#1A120B","#E8742A","#6B3FA0","#1A120B"]
+                               : ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D"];
   function wheelSegs(){
     return ((OFFERS && OFFERS.wheel) || []).map(function(s,i){ return { label:s.label, color:WHEEL_COLORS[i % WHEEL_COLORS.length] }; });
   }
@@ -1249,13 +1284,14 @@
   var gamesReturn = "page";
   var catchState = null;
 
-  function openGames(ctx){
+  function openGames(ctx, game){
     gamesReturn = ctx || "page";
     el("gOverlay").classList.add("show");
     el("gameWrap").classList.add("show");
     syncChat();
-    if (!OFFERS){ gSetHead("Play & Win 🎮", false); el("gameBody").innerHTML = '<div class="ghint">Loading the games…</div>'; loadOffers().then(renderGameMenu); return; }
+    if (!OFFERS){ gSetHead("Play & Win 🎮", false); el("gameBody").innerHTML = '<div class="ghint">Loading the games…</div>'; loadOffers().then(function(){ renderGameMenu(); launchGame(game); }); return; }
     renderGameMenu();
+    launchGame(game);
   }
   function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); syncChat(); }
   function gSetHead(title, back){ el("gTitle").textContent = title; el("gBack").style.display = back ? "block" : "none"; }
@@ -1271,21 +1307,29 @@
       have = '<div class="ghint">Your prize'+(prizeCount()>1?'s':'')+': '+["wheel","arcade"].filter(function(k){ return wallet[k]; }).map(function(k){
         return '<b style="color:var(--veg)">'+wallet[k].label+'</b>'; }).join(' · ')+'<br>A new win replaces the prize from that same game. One prize per order.</div>';
     }
+    var scores = T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free drink or topping, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '';
     el("gameBody").innerHTML =
-      '<div class="gcard" id="gcWheel"><div class="ico">🎡</div><div class="t">Spin the Pizza Wheel</div><div class="d">Every spin wins: a free topping, a free drink, free garlic knots or money off.</div></div>'+
-      '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+
-        (T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free drink or topping, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '')+'</div></div>'+
+      (HALLOWEEN ? '<div class="gcard hw" id="gcRun"><span class="gnew">New for Halloween</span><div class="ico">🛵🧟</div><div class="t">Zombie Delivery Run</div><div class="d">Jump over zombies, pumpkins and ghosts and get the pizza to the door in 60s. '+scores+'</div></div>' : '')+
+      '<div class="gcard" id="gcWheel"><div class="ico">'+(HALLOWEEN ? '🎃' : '🎡')+'</div><div class="t">'+(HALLOWEEN ? 'Spin the Haunted Pizza Wheel' : 'Spin the Pizza Wheel')+'</div><div class="d">Every spin wins: a free topping, a free drink, free garlic knots or money off.</div></div>'+
+      // Catch the Toppings sits out while Halloween is on (Zombie Delivery Run replaces it)
+      (HALLOWEEN ? '' : '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+scores+'</div></div>')+
       have+
       '<div class="pz-terms" style="text-align:center">'+((OFFERS.copy||{}).terms||'')+'</div>';
+    if (HALLOWEEN) el("gcRun").onclick = startRun;
     el("gcWheel").onclick = startWheel;
-    el("gcCatch").onclick = startCatch;
+    if (!HALLOWEEN) el("gcCatch").onclick = startCatch;
+  }
+  function launchGame(g){
+    if (!OFFERS || !OFFERS.enabled) return;
+    if (g==="run" && HALLOWEEN) startRun();
+    else if (g==="wheel") startWheel();
   }
 
   /* --- Spin the Wheel (the server picks the slice; the wheel just animates to it) --- */
   var wheelRot = 0, wheelSpinning = false;
   function startWheel(){
     stopCatch();
-    gSetHead("Spin the Pizza Wheel 🎡", true);
+    gSetHead(HALLOWEEN ? "Haunted Pizza Wheel 🎃" : "Spin the Pizza Wheel 🎡", true);
     var copy = OFFERS.copy || {};
     el("gameBody").innerHTML =
       '<div class="ghead2">'+(copy.wheel_heading||'')+'</div>'+
@@ -1301,9 +1345,9 @@
   function drawWheel(cv, segs){
     var ctx = cv.getContext("2d"), S = cv.width, R = S/2, cx = R, cy = R, n = segs.length, seg = 2*Math.PI/n;
     ctx.clearRect(0,0,S,S);
-    // crust (browned outer ring)
-    ctx.beginPath(); ctx.arc(cx,cy,R-2,0,2*Math.PI); ctx.fillStyle="#C98A3A"; ctx.fill();
-    ctx.lineWidth=5; ctx.strokeStyle="#9C6322"; ctx.stroke();
+    // crust (browned outer ring; darker and charred for Halloween)
+    ctx.beginPath(); ctx.arc(cx,cy,R-2,0,2*Math.PI); ctx.fillStyle = HALLOWEEN ? "#A9682A" : "#C98A3A"; ctx.fill();
+    ctx.lineWidth=5; ctx.strokeStyle = HALLOWEEN ? "#4A2A10" : "#9C6322"; ctx.stroke();
     var rad = R-15;                                   // cheese radius (inside crust)
     // cheese base
     ctx.beginPath(); ctx.arc(cx,cy,rad,0,2*Math.PI); ctx.fillStyle="#EDBB4E"; ctx.fill();
@@ -1314,7 +1358,7 @@
       var a0 = -Math.PI/2 + i*seg, a1 = a0+seg;
       // subtle per-slice tint (prizes stay faintly colour-coded, still reads as pizza)
       ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,rad,a0,a1); ctx.closePath();
-      ctx.globalAlpha = 0.14; ctx.fillStyle = segs[i].color; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.globalAlpha = HALLOWEEN ? 0.24 : 0.14; ctx.fillStyle = segs[i].color; ctx.fill(); ctx.globalAlpha = 1;
       // slice cut line
       ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a0)*rad, cy+Math.sin(a0)*rad);
       ctx.lineWidth=2; ctx.strokeStyle="rgba(150,100,35,0.45)"; ctx.stroke();
@@ -1322,6 +1366,7 @@
       for (var s=0;s<spots.length;s++){
         var fa = ((spots[s][0] + i*0.17) % 1), ang = a0 + seg*fa, rr = rad*spots[s][1];
         var tx2 = cx + Math.cos(ang)*rr, ty2 = cy + Math.sin(ang)*rr, kind = spots[s][2];
+        if (HALLOWEEN){ drawSpookyTopping(ctx, tx2, ty2, kind); continue; }
         if (kind==="pep"){ ctx.beginPath(); ctx.arc(tx2,ty2,7,0,2*Math.PI); ctx.fillStyle="#BE3A28"; ctx.fill(); ctx.lineWidth=1.5; ctx.strokeStyle="#8E2314"; ctx.stroke(); }
         else if (kind==="bas"){ ctx.beginPath(); ctx.arc(tx2,ty2,5,0,2*Math.PI); ctx.fillStyle="#3C7A2E"; ctx.fill(); }
         else { ctx.beginPath(); ctx.arc(tx2,ty2,5,0,2*Math.PI); ctx.fillStyle="#2E2416"; ctx.fill(); ctx.beginPath(); ctx.arc(tx2,ty2,2,0,2*Math.PI); ctx.fillStyle="#6B5A3A"; ctx.fill(); }
@@ -1337,9 +1382,30 @@
       });
       ctx.restore();
     }
+    if (HALLOWEEN){ drawPumpkin(ctx, cx, cy+20, 20); return; }
     // mozzarella centre
     ctx.beginPath(); ctx.arc(cx,cy,19,0,2*Math.PI); ctx.fillStyle="#C0431F"; ctx.fill();
     ctx.beginPath(); ctx.arc(cx,cy,12,0,2*Math.PI); ctx.fillStyle="#F2E3C0"; ctx.fill();
+  }
+  // Halloween toppings: pepperoni jack-o'-lanterns, olive spiders, mozzarella ghosts
+  function drawSpookyTopping(ctx, x, y, kind){
+    if (kind==="pep"){
+      ctx.beginPath(); ctx.arc(x,y,7.5,0,2*Math.PI); ctx.fillStyle="#E06A1E"; ctx.fill();
+      ctx.fillStyle="#2A1408";
+      ctx.beginPath(); ctx.moveTo(x-4.5,y-1); ctx.lineTo(x-1.5,y-1); ctx.lineTo(x-3,y-4); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x+1.5,y-1); ctx.lineTo(x+4.5,y-1); ctx.lineTo(x+3,y-4); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(x-4,y+2); ctx.quadraticCurveTo(x,y+6,x+4,y+2); ctx.fill();
+    } else if (kind==="oli"){
+      ctx.strokeStyle="#1A120B"; ctx.lineWidth=1.3;
+      for (var l=0;l<4;l++){ var dy=-3+l*2; ctx.beginPath(); ctx.moveTo(x-8,y+dy-2); ctx.lineTo(x,y+dy*0.4); ctx.lineTo(x+8,y+dy-2); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(x,y,4.5,0,2*Math.PI); ctx.fillStyle="#1A120B"; ctx.fill();
+      ctx.fillStyle="#E8742A"; ctx.fillRect(x-2,y-2,1.3,1.3); ctx.fillRect(x+0.8,y-2,1.3,1.3);
+    } else {
+      ctx.fillStyle="#FBF8F0";
+      ctx.beginPath(); ctx.moveTo(x-5,y+6); ctx.lineTo(x-5,y-1); ctx.arc(x,y-1,5,Math.PI,0); ctx.lineTo(x+5,y+6);
+      ctx.lineTo(x+2.5,y+4); ctx.lineTo(x,y+6); ctx.lineTo(x-2.5,y+4); ctx.closePath(); ctx.fill();
+      ctx.fillStyle="#1A120B"; ctx.fillRect(x-2.6,y-2,1.6,2.2); ctx.fillRect(x+1,y-2,1.6,2.2);
+    }
   }
   function spinWheel(){
     if (wheelSpinning) return;
@@ -1386,7 +1452,7 @@
       '<div class="ghint">Higher score = bigger prize.</div>';
     el("catchGo").onclick = runCatch;
   }
-  function stopCatch(){ if (catchState){ catchState.running=false; if(catchState.cleanup) catchState.cleanup(); catchState=null; } }
+  function stopCatch(){ stopRun(); if (catchState){ catchState.running=false; if(catchState.cleanup) catchState.cleanup(); catchState=null; } }
   function runCatch(){
     var cv = el("catchCanvas"), dpr = Math.min(window.devicePixelRatio||1, 2), W = 340, H = 520;
     cv.width = W*dpr; cv.height = H*dpr;
@@ -1472,16 +1538,20 @@
   }
   function endCatch(st, hitCoal){
     st.running=false; if (st.cleanup) st.cleanup(); catchState=null;
-    var score = st.score, secs = Math.round((60 - st.t)*10)/10;
+    scoreArcade(st.tokenP, st.score, Math.round((60 - st.t)*10)/10,
+      hitCoal ? " — then caught the coal!" : "!", hitCoal ? "You caught the burning coal! " : "", startCatch);
+  }
+  // Both arcade games (Catch the Toppings, Zombie Delivery Run) are scored the same way:
+  // the server checks the score is believable and decides the prize.
+  function scoreArcade(tokenP, score, secs, wonTail, lostWhy, retry){
     gSetHead("Your Score 🎉", true);
     el("gameBody").innerHTML = '<div class="gresult"><div class="big">⏳</div><div class="sc">You scored '+score+'. Checking your prize…</div></div>';
-    // the server checks the score is believable and decides the prize
-    st.tokenP.then(function(token){
+    tokenP.then(function(token){
       if (!token) throw new Error("no token");
       return offersApi("arcade_finish", { token:token, score:score, seconds:secs });
     }).then(function(j){
-      if (j._status!==200) return showNoPrize(score, hitCoal, j.message || "We couldn't check that game. Please play again.");
-      if (j.tier===null) return showNoPrize(score, hitCoal, null);
+      if (j._status!==200) return showNoPrize(score, lostWhy, j.message || "We couldn't check that game. Please play again.", retry);
+      if (j.tier===null) return showNoPrize(score, lostWhy, null, retry);
       addPrize(j.reward);
       var t = tiers()[j.tier];
       var detail = t.options.length>1
@@ -1489,8 +1559,8 @@
             return '<li>'+cap1(o.label)+(o.min>OFFERS.floor.min_eligible_subtotal ? ' <small>(orders '+money(o.min)+'+)</small>' : '')+'</li>'; }).join("")+'</ul>'+
           'Works on any pizza order ('+money(OFFERS.floor.min_eligible_subtotal)+'+).'
         : ladderText(t.options[0].ladder);
-      showWon(j.reward, "You scored "+score+(hitCoal?" — then caught the coal!":"!"), detail);
-    }).catch(function(){ showNoPrize(score, hitCoal, "We couldn't reach Pizza Mia to check your score. Please check your connection and play again."); });
+      showWon(j.reward, "You scored "+score+wonTail, detail);
+    }).catch(function(){ showNoPrize(score, lostWhy, "We couldn't reach Pizza Mia to check your score. Please check your connection and play again.", retry); });
   }
 
   /* --- Result --- */
@@ -1505,13 +1575,312 @@
     el("applyRw").onclick = function(){ closeGames(); if (cart.length || gamesReturn==="cart") openDrawer(); toast("Prize saved: "+reward.label); };
     el("playAgain").onclick = renderGameMenu;
   }
-  function showNoPrize(score, hitCoal, err){
+  function showNoPrize(score, why, err, retry){
     gSetHead("So close! 😅", true);
     var T = tiers(), need = T.length ? T[0].minScore : 0;
     el("gameBody").innerHTML = '<div class="gresult"><div class="big">😅</div><div class="rw" style="color:var(--green)">So close!</div>'+
-      '<div class="sc">'+(err ? err : (hitCoal?'You caught the burning coal! ':'')+'You scored '+(score||0)+'. Score '+need+'+ to win a free drink or topping. Try again!')+'</div>'+
+      '<div class="sc">'+(err ? err : why+'You scored '+(score||0)+'. Score '+need+'+ to win a free drink or topping. Try again!')+'</div>'+
       '<button class="gbtn wide" id="playAgain">Try again</button></div>';
-    el("playAgain").onclick = startCatch;
+    el("playAgain").onclick = retry;
+  }
+
+  /* --- Zombie Delivery Run (Halloween): jump the monsters, deliver in 60s --- */
+  // Scored like Catch the Toppings so the same prize scores apply:
+  // +15/20/25 per monster cleared, +10 per candy corn, +50 for making the delivery. 5 lives.
+  var RUN_SECS = 60, RUN_W = 400, RUN_H = 250, RUN_GROUND = 214, RUN_X = 64, RUN_BONUS = 50, RUN_LIVES = 5;
+  var RUN_MONSTERS = [
+    { kind:"pumpkin", w:34, h:30, pts:15, from:0 },
+    { kind:"tomb",    w:30, h:42, pts:15, from:0 },
+    { kind:"zombie",  w:30, h:54, pts:20, from:6 },
+    { kind:"ghost",   w:34, h:36, pts:20, from:14 },
+    { kind:"pumpkins",w:68, h:30, pts:25, from:24 }
+  ];
+  var runState = null;
+  function stopRun(){ if (runState){ runState.running=false; if(runState.cleanup) runState.cleanup(); runState=null; } }
+
+  function startRun(){
+    stopCatch();
+    gSetHead("Zombie Delivery Run 🧟", true);
+    var T = tiers();
+    el("gameBody").innerHTML =
+      '<div class="runwrap" id="runWrap"><canvas id="runCanvas" width="'+RUN_W+'" height="'+RUN_H+'"></canvas>'+
+      '<div class="chud"><span class="tt" id="rScore">Score 0</span><span class="tt" id="rTime">'+RUN_SECS+'s</span></div>'+
+      '<div class="catchstart runstart" id="runStart"><p><b>Deliver the pizza before it gets cold!</b><br>Tap (or press Space) to jump the monsters. Hold to jump higher. Grab the candy corn. You have '+RUN_LIVES+' lives. Reach the door in '+RUN_SECS+'s for +'+RUN_BONUS+'!</p>'+
+      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free drink or topping</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
+      '<button class="gbtn" id="runGo">Start</button></div></div>'+
+      '<div class="ghint">Higher score = bigger prize.</div>';
+    var st = newRun();
+    var ctx = runCanvas(st);
+    drawRun(ctx, st);
+    el("runGo").onclick = function(){ runRun(st, ctx); };
+  }
+  function newRun(){
+    return { t:RUN_SECS, el:0, score:0, y:0, vy:0, held:false, holdT:0, air:false, objs:[], candy:[], floats:[],
+      spawn:1.8, scroll:0, speed:220, running:false, last:null, crashed:false, wheel:0, lives:RUN_LIVES, inv:0 };
+  }
+  function runCanvas(st){
+    var cv = el("runCanvas"), dpr = Math.min(window.devicePixelRatio||1, 2);
+    cv.width = RUN_W*dpr; cv.height = RUN_H*dpr;
+    var ctx = cv.getContext("2d"); ctx.scale(dpr,dpr);
+    st.bg = runBackdrop(dpr);
+    return ctx;
+  }
+  function runRun(st, ctx){
+    el("runStart").style.display = "none";
+    if (document.activeElement) document.activeElement.blur();
+    st.running = true; runState = st;
+    st.tokenP = offersApi("arcade_start").then(function(j){ return j.token || null; }).catch(function(){ return null; });
+    var press = function(){
+      if (!st.running) return;
+      st.held = true;
+      if (!st.air){ st.air = true; st.vy = -620; st.holdT = 0; }
+    };
+    var release = function(){ st.held = false; };
+    var wrap = el("runWrap");
+    wrap.onpointerdown = function(e){ e.preventDefault(); press(); };
+    var keyd = function(e){ if (e.code==="Space" || e.key==="ArrowUp" || e.key==="w"){ e.preventDefault(); if (!e.repeat) press(); } };
+    var keyu = function(e){ if (e.code==="Space" || e.key==="ArrowUp" || e.key==="w") release(); };
+    window.addEventListener("keydown", keyd); window.addEventListener("keyup", keyu);
+    window.addEventListener("pointerup", release); window.addEventListener("pointercancel", release);
+    st.cleanup = function(){
+      window.removeEventListener("keydown", keyd); window.removeEventListener("keyup", keyu);
+      window.removeEventListener("pointerup", release); window.removeEventListener("pointercancel", release);
+    };
+    requestAnimationFrame(function loop(ts){
+      if (!st.running) return;
+      if (st.last==null) st.last = ts;
+      var dt = Math.min((ts-st.last)/1000, 0.05); st.last = ts;
+      st.t -= dt; st.el = RUN_SECS - st.t;
+      if (st.t<=0){ st.t = 0; st.score += RUN_BONUS; return endRun(st, true); }
+      stepRun(st, dt);
+      drawRun(ctx, st);
+      el("rScore").textContent = "Score "+st.score;
+      el("rTime").textContent = Math.ceil(st.t)+"s";
+      if (st.crashed){ st.running = false; setTimeout(function(){ if (runState===st) endRun(st, false); }, 650); return; }
+      requestAnimationFrame(loop);
+    });
+  }
+  function stepRun(st, dt){
+    // speed climbs gently from 220 to ~375 px/s over the run
+    st.speed = 220 + st.el*2.6;
+    if (st.inv>0) st.inv -= dt;
+    var dx = st.speed*dt;
+    st.scroll += dx; st.wheel += dx/9;
+    // jump: holding while rising floats a little higher
+    if (st.air){
+      if (st.held && st.vy<0 && st.holdT<0.22){ st.holdT += dt; st.vy += 1250*dt; }
+      else st.vy += 2100*dt;
+      st.y -= st.vy*dt;
+      if (st.y<=0){ st.y = 0; st.vy = 0; st.air = false; }
+    }
+    // spawn: gaps shrink from ~1.6–2.5s to ~1.1–1.75s, never too tight to clear
+    st.spawn -= dt;
+    if (st.spawn<=0){
+      var k = Math.min(1, st.el/50);
+      st.spawn = (1.6 - 0.5*k) + Math.random()*(0.9 - 0.25*k);
+      var pool = RUN_MONSTERS.filter(function(m){ return st.el >= m.from; });
+      var m = pool[Math.floor(Math.random()*pool.length)];
+      st.objs.push({ kind:m.kind, w:m.w, h:m.h, pts:m.pts, x:RUN_W+10, phase:Math.random()*6, done:false });
+      if (Math.random() < 0.8)
+        st.candy.push({ x:RUN_W+10 + st.spawn*st.speed*0.5, y:RUN_GROUND-74-Math.random()*26, got:false });
+    }
+    var px0 = RUN_X+10, px1 = RUN_X+46, pyB = RUN_GROUND-4-st.y, pyT = RUN_GROUND-34-st.y;
+    for (var i=st.objs.length-1;i>=0;i--){
+      var o = st.objs[i];
+      o.x -= dx + (o.kind==="zombie" ? 28*dt : 0);
+      o.phase += dt*6;
+      var lift = o.kind==="ghost" ? 6+Math.sin(o.phase)*5 : 0;
+      var ox0 = o.x+7, ox1 = o.x+o.w-7, oyT = RUN_GROUND-o.h-lift+8, oyB = RUN_GROUND-lift;
+      if (!o.hit && st.inv<=0 && px1>ox0 && px0<ox1 && pyB>oyT && pyT<oyB){
+        // a hit costs a life (no points for that monster); a short flash of safety follows
+        o.hit = true; o.done = true; st.lives--;
+        if (st.lives<=0){ st.crashed = true; return; }
+        st.inv = 1.4; st.floats.push({ x:RUN_X+30, y:RUN_GROUND-80-st.y, txt:"Ouch! "+st.lives+" left", life:1 });
+      }
+      if (!o.done && o.x+o.w < RUN_X){ o.done = true; st.score += o.pts; st.floats.push({ x:RUN_X+30, y:RUN_GROUND-70-st.y, txt:"+"+o.pts, life:0.8 }); }
+      if (o.x+o.w < -20) st.objs.splice(i,1);
+    }
+    for (var c=st.candy.length-1;c>=0;c--){
+      var cd = st.candy[c]; cd.x -= dx;
+      if (!cd.got && Math.abs(cd.x-(RUN_X+28))<24 && Math.abs(cd.y-(RUN_GROUND-20-st.y))<26){
+        cd.got = true; st.score += 10; st.floats.push({ x:cd.x, y:cd.y-10, txt:"+10", life:0.7 });
+      }
+      if (cd.got || cd.x < -20) st.candy.splice(c,1);
+    }
+    for (var f=st.floats.length-1;f>=0;f--){ st.floats[f].y -= dt*40; st.floats[f].life -= dt; if (st.floats[f].life<=0) st.floats.splice(f,1); }
+  }
+  function endRun(st, delivered){
+    st.running = false; if (st.cleanup) st.cleanup(); runState = null;
+    scoreArcade(st.tokenP, st.score, Math.round(Math.min(st.el, RUN_SECS)*10)/10,
+      delivered ? " and delivered the pizza! 🍕" : "!", delivered ? "" : "The zombies got the pizza! ", startRun);
+  }
+
+  // Sky, moon, stars, hills and graveyard are drawn once; only the scroll offset changes.
+  function runBackdrop(dpr){
+    function layer(w, h, paint){ var c = document.createElement("canvas"); c.width = w*dpr; c.height = h*dpr; var x = c.getContext("2d"); x.scale(dpr,dpr); paint(x); return c; }
+    var sky = layer(RUN_W, RUN_H, function(x){
+      var g = x.createLinearGradient(0,0,0,RUN_H); g.addColorStop(0,"#1A0F2E"); g.addColorStop(0.6,"#3B1F4A"); g.addColorStop(1,"#5A2A3A");
+      x.fillStyle = g; x.fillRect(0,0,RUN_W,RUN_H);
+      for (var i=0;i<40;i++){ x.globalAlpha = 0.3+((i*37)%7)/10; x.fillStyle = "#FBF3E6"; x.fillRect((i*97)%RUN_W, (i*53)%120, 1.5, 1.5); }
+      x.globalAlpha = 1;
+      var mg = x.createRadialGradient(318,58,10,318,58,70); mg.addColorStop(0,"rgba(255,226,160,.45)"); mg.addColorStop(1,"rgba(255,226,160,0)");
+      x.fillStyle = mg; x.fillRect(240,0,160,140);
+      x.beginPath(); x.arc(318,58,30,0,7); x.fillStyle = "#F6E7C1"; x.fill();
+      x.beginPath(); x.arc(308,50,5,0,7); x.arc(326,66,4,0,7); x.fillStyle = "#E3D2A6"; x.fill();
+    });
+    var hills = layer(800, 120, function(x){
+      x.fillStyle = "#2A1838";
+      x.beginPath(); x.moveTo(0,120); x.lineTo(0,70);
+      for (var i=0;i<=800;i+=40) x.quadraticCurveTo(i+20, 40+((i*7)%30), i+40, 66+((i*3)%14));
+      x.lineTo(800,120); x.fill();
+      // haunted house on the hill
+      x.fillStyle = "#1E1029"; x.fillRect(520,34,46,40); x.beginPath(); x.moveTo(514,36); x.lineTo(543,12); x.lineTo(572,36); x.fill(); x.fillRect(556,16,8,16);
+      x.fillStyle = "#F0B44A"; x.fillRect(530,46,7,8); x.fillRect(549,46,7,8); x.fillRect(539,60,8,14);
+    });
+    var yard = layer(600, 90, function(x){
+      x.fillStyle = "#170C20"; x.strokeStyle = "#170C20"; x.lineCap = "round";
+      // dead trees
+      [[60,1],[330,0.8],[470,1.15]].forEach(function(t){
+        var bx = t[0], s = t[1]; x.lineWidth = 6*s;
+        x.beginPath(); x.moveTo(bx,90); x.lineTo(bx,90-60*s); x.stroke();
+        x.lineWidth = 3*s; x.beginPath();
+        x.moveTo(bx,90-40*s); x.lineTo(bx-22*s,90-62*s); x.moveTo(bx,90-50*s); x.lineTo(bx+20*s,90-72*s);
+        x.moveTo(bx-12*s,90-52*s); x.lineTo(bx-16*s,90-70*s); x.moveTo(bx+10*s,90-62*s); x.lineTo(bx+24*s,90-64*s); x.stroke();
+      });
+      // fence and graves
+      x.lineWidth = 2; x.beginPath(); x.moveTo(140,70); x.lineTo(290,70); x.stroke();
+      for (var f=140; f<=290; f+=12){ x.beginPath(); x.moveTo(f,90); x.lineTo(f,62); x.lineTo(f+3,58); x.stroke(); }
+      [[180,16],[215,20],[255,14],[400,18],[540,15]].forEach(function(g){
+        x.beginPath(); x.moveTo(g[0],90); x.lineTo(g[0],90-g[1]); x.arc(g[0]+7,90-g[1],7,Math.PI,0); x.lineTo(g[0]+14,90); x.fill();
+      });
+    });
+    return { sky:sky, hills:hills, yard:yard };
+  }
+
+  function drawRun(ctx, st){
+    var W = RUN_W, H = RUN_H, G = RUN_GROUND, bg = st.bg;
+    ctx.drawImage(bg.sky, 0, 0, W, H);
+    var hx = -((st.scroll*0.15) % 800); ctx.drawImage(bg.hills, hx, 120, 800, 120); ctx.drawImage(bg.hills, hx+800, 120, 800, 120);
+    var yx = -((st.scroll*0.45) % 600); ctx.drawImage(bg.yard, yx, G-88, 600, 90); ctx.drawImage(bg.yard, yx+600, G-88, 600, 90);
+    // bats drifting across the moon
+    ctx.fillStyle = "#120818";
+    for (var b=0;b<3;b++){
+      var bt = st.el*0.9 + b*2.1, bx = W - ((bt*60 + b*140) % (W+60)), by = 40 + b*22 + Math.sin(bt*3)*6, fl = Math.sin(bt*14)*4;
+      ctx.beginPath(); ctx.moveTo(bx,by); ctx.quadraticCurveTo(bx-8,by-6-fl,bx-14,by+fl); ctx.quadraticCurveTo(bx-7,by-1,bx,by+3);
+      ctx.quadraticCurveTo(bx+7,by-1,bx+14,by+fl); ctx.quadraticCurveTo(bx+8,by-6-fl,bx,by); ctx.fill();
+    }
+    // road
+    ctx.fillStyle = "#2B2233"; ctx.fillRect(0,G,W,H-G);
+    ctx.fillStyle = "#4A3A55"; ctx.fillRect(0,G,W,3);
+    ctx.fillStyle = "#E8742A";
+    var dash = -(st.scroll % 40); for (var d=dash; d<W; d+=40) ctx.fillRect(d, G+18, 20, 3);
+    // delivery door appears in the last 3 seconds
+    if (st.t < 3){
+      var dxp = W - (3-st.t)/3*(W-RUN_X-70) + 10;
+      ctx.fillStyle = "#3B2416"; ctx.fillRect(dxp, G-84, 50, 84);
+      ctx.fillStyle = "#F0B44A"; ctx.fillRect(dxp+6, G-76, 38, 70);
+      ctx.fillStyle = "#3B2416"; ctx.beginPath(); ctx.arc(dxp+36, G-40, 3, 0, 7); ctx.fill();
+      ctx.font = "bold 10px Karla,Arial,sans-serif"; ctx.textAlign = "center"; ctx.fillText("ORDER", dxp+25, G-62);
+    }
+    for (var c=0;c<st.candy.length;c++) drawCandy(ctx, st.candy[c].x, st.candy[c].y + Math.sin(st.el*5+c)*3);
+    for (var i=0;i<st.objs.length;i++) drawMonster(ctx, st.objs[i]);
+    if (!(st.inv>0 && Math.floor(st.inv*10)%2)) drawScooter(ctx, RUN_X, G - st.y, st.wheel, st.air, st.crashed);
+    // lives: little pizza slices under the score
+    for (var l=0;l<RUN_LIVES;l++){
+      var lx = 22 + l*20, ly = 56;
+      ctx.globalAlpha = l < st.lives ? 1 : 0.25;
+      ctx.beginPath(); ctx.moveTo(lx-7,ly-6); ctx.lineTo(lx+7,ly-6); ctx.lineTo(lx,ly+8); ctx.closePath(); ctx.fillStyle = "#EDBB4E"; ctx.fill();
+      ctx.fillStyle = "#C98A3A"; ctx.fillRect(lx-7,ly-8,14,3);
+      ctx.beginPath(); ctx.arc(lx-1,ly-2,1.8,0,7); ctx.arc(lx+2,ly+2,1.5,0,7); ctx.fillStyle = "#BE3A28"; ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "bold 15px Karla,Arial,sans-serif";
+    for (var f=0;f<st.floats.length;f++){ ctx.globalAlpha = Math.max(0, st.floats[f].life); ctx.fillStyle = "#FFD27A"; ctx.fillText(st.floats[f].txt, st.floats[f].x, st.floats[f].y); }
+    ctx.globalAlpha = 1;
+    if (st.crashed){ ctx.fillStyle = "rgba(120,20,20,.35)"; ctx.fillRect(0,0,W,H); }
+  }
+  function drawCandy(ctx, x, y){
+    ctx.beginPath(); ctx.moveTo(x-8,y-7); ctx.lineTo(x+8,y-7); ctx.lineTo(x,y+10); ctx.closePath(); ctx.fillStyle = "#FBF3E6"; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x-5.3,y-1.3); ctx.lineTo(x+5.3,y-1.3); ctx.lineTo(x,y+10); ctx.closePath(); ctx.fillStyle = "#F08A3C"; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x-2.6,y+4.3); ctx.lineTo(x+2.6,y+4.3); ctx.lineTo(x,y+10); ctx.closePath(); ctx.fillStyle = "#FFD23F"; ctx.fill();
+  }
+  function drawPumpkin(ctx, cx, by, r){
+    ctx.fillStyle = "#4E8A55"; ctx.fillRect(cx-2, by-2*r-5, 4, 7);
+    ctx.fillStyle = "#C9561A";
+    ctx.beginPath(); ctx.ellipse(cx-r*0.45, by-r, r*0.62, r, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx+r*0.45, by-r, r*0.62, r, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = "#EE7B2C"; ctx.beginPath(); ctx.ellipse(cx, by-r, r*0.62, r*1.02, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = "#FFD27A";
+    ctx.beginPath(); ctx.moveTo(cx-r*0.55,by-r*1.15); ctx.lineTo(cx-r*0.2,by-r*1.15); ctx.lineTo(cx-r*0.37,by-r*1.5); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx+r*0.2,by-r*1.15); ctx.lineTo(cx+r*0.55,by-r*1.15); ctx.lineTo(cx+r*0.37,by-r*1.5); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx-r*0.6,by-r*0.75); ctx.quadraticCurveTo(cx,by-r*0.15,cx+r*0.6,by-r*0.75); ctx.quadraticCurveTo(cx,by-r*0.45,cx-r*0.6,by-r*0.75); ctx.fill();
+  }
+  function drawMonster(ctx, o){
+    var G = RUN_GROUND, x = o.x, w = o.w, h = o.h;
+    if (o.kind==="pumpkin"){ drawPumpkin(ctx, x+w/2, G, h/2); }
+    else if (o.kind==="pumpkins"){ drawPumpkin(ctx, x+16, G, 15); drawPumpkin(ctx, x+w-16, G, 14); drawPumpkin(ctx, x+w/2, G, 11); }
+    else if (o.kind==="tomb"){
+      ctx.fillStyle = "#7D8291"; ctx.beginPath(); ctx.moveTo(x,G); ctx.lineTo(x,G-h+w/2); ctx.arc(x+w/2,G-h+w/2,w/2,Math.PI,0); ctx.lineTo(x+w,G); ctx.fill();
+      ctx.fillStyle = "#5C6070"; ctx.fillRect(x+w-6,G-h+w/2,6,h-w/2);
+      ctx.fillStyle = "#3A3D48"; ctx.font = "bold 9px Karla,Arial,sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("RIP", x+w/2-2, G-h+20);
+      ctx.fillStyle = "#3C6E3A"; ctx.fillRect(x-4,G-3,w+8,3);
+    }
+    else if (o.kind==="zombie"){
+      var sw = Math.sin(o.phase)*5, cx = x+w/2;
+      ctx.strokeStyle = "#2A2440"; ctx.lineWidth = 6; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(cx,G-22); ctx.lineTo(cx-sw,G-2); ctx.moveTo(cx,G-22); ctx.lineTo(cx+sw,G-2); ctx.stroke();
+      ctx.fillStyle = "#5B4A7A"; ctx.fillRect(cx-9,G-42,18,22);
+      ctx.fillStyle = "#3E3158"; ctx.beginPath(); ctx.moveTo(cx-9,G-20); ctx.lineTo(cx-5,G-25); ctx.lineTo(cx-1,G-20); ctx.lineTo(cx+4,G-25); ctx.lineTo(cx+9,G-20); ctx.fill();
+      ctx.strokeStyle = "#7FB069"; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(cx-4,G-38); ctx.lineTo(cx-20,G-37+sw*0.4); ctx.moveTo(cx+2,G-34); ctx.lineTo(cx-17,G-31-sw*0.4); ctx.stroke();
+      ctx.fillStyle = "#7FB069"; ctx.beginPath(); ctx.arc(cx,G-h+8,9,0,7); ctx.fill();
+      ctx.fillStyle = "#FBF3E6"; ctx.beginPath(); ctx.arc(cx-4,G-h+7,2.6,0,7); ctx.arc(cx+3,G-h+6,2,0,7); ctx.fill();
+      ctx.fillStyle = "#C9341F"; ctx.beginPath(); ctx.arc(cx-4,G-h+7,1.1,0,7); ctx.fill();
+      ctx.strokeStyle = "#2A2440"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx-6,G-h+12); ctx.lineTo(cx+2,G-h+13); ctx.stroke();
+    }
+    else if (o.kind==="ghost"){
+      var lift = 6+Math.sin(o.phase)*5, top = G-h-lift, gx = x;
+      ctx.fillStyle = "rgba(246,240,255,.93)";
+      ctx.beginPath(); ctx.moveTo(gx,top+h); ctx.lineTo(gx,top+w/2); ctx.arc(gx+w/2,top+w/2,w/2,Math.PI,0); ctx.lineTo(gx+w,top+h);
+      for (var s=0;s<4;s++){ var sx = gx+w - (s+0.5)*w/4; ctx.quadraticCurveTo(sx+w/8, top+h-7+(s%2?6:0), sx-w/8+1, top+h); }
+      ctx.fill();
+      ctx.fillStyle = "#1A0F2E"; ctx.beginPath(); ctx.ellipse(gx+w/2-6,top+15,3,4.5,0,0,7); ctx.ellipse(gx+w/2+5,top+15,3,4.5,0,0,7); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(gx+w/2,top+25,3.5,4,0,0,7); ctx.fill();
+    }
+  }
+  function drawScooter(ctx, x, by, spin, air, crashed){
+    var bob = air ? 0 : Math.sin(spin*0.6)*0.8, y = by + bob;
+    ctx.save();
+    if (air) { ctx.translate(x+30, y-20); ctx.rotate(-0.12); ctx.translate(-(x+30), -(y-20)); }
+    if (crashed) { ctx.translate(x+30, y-20); ctx.rotate(0.5); ctx.translate(-(x+30), -(y-20)); }
+    function wheel(cx){
+      ctx.beginPath(); ctx.arc(cx, y-9, 9, 0, 7); ctx.fillStyle = "#151018"; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, y-9, 4.5, 0, 7); ctx.fillStyle = "#B9B3C4"; ctx.fill();
+      ctx.strokeStyle = "#151018"; ctx.lineWidth = 1.5; ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(spin)*4.5, y-9+Math.sin(spin)*4.5); ctx.lineTo(cx-Math.cos(spin)*4.5, y-9-Math.sin(spin)*4.5); ctx.stroke();
+    }
+    wheel(x+12); wheel(x+50);
+    // body
+    ctx.fillStyle = "#C9341F";
+    ctx.beginPath(); ctx.moveTo(x+4,y-14); ctx.quadraticCurveTo(x+4,y-30,x+22,y-30); ctx.lineTo(x+30,y-30); ctx.lineTo(x+34,y-16); ctx.lineTo(x+46,y-16); ctx.lineTo(x+48,y-12); ctx.lineTo(x+4,y-12); ctx.fill();
+    ctx.strokeStyle = "#8E2314"; ctx.lineWidth = 4; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x+50,y-9); ctx.lineTo(x+44,y-40); ctx.stroke();
+    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x+40,y-41); ctx.lineTo(x+50,y-43); ctx.stroke();
+    ctx.fillStyle = "#FFE08A"; ctx.beginPath(); ctx.arc(x+50,y-34,3,0,7); ctx.fill();
+    // headlight beam
+    var lg = ctx.createLinearGradient(x+52,0,x+120,0); lg.addColorStop(0,"rgba(255,224,138,.35)"); lg.addColorStop(1,"rgba(255,224,138,0)");
+    ctx.fillStyle = lg; ctx.beginPath(); ctx.moveTo(x+52,y-36); ctx.lineTo(x+120,y-48); ctx.lineTo(x+120,y-14); ctx.fill();
+    // pizza box on the back
+    ctx.fillStyle = "#F3E3C3"; ctx.fillRect(x-2,y-44,24,14); ctx.strokeStyle = "#B98A4E"; ctx.lineWidth = 1.5; ctx.strokeRect(x-2,y-44,24,14);
+    ctx.fillStyle = "#C9341F"; ctx.fillRect(x-2,y-39,24,3);
+    // rider
+    ctx.strokeStyle = "#22271F"; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(x+24,y-32); ctx.lineTo(x+34,y-24); ctx.lineTo(x+36,y-16); ctx.stroke();
+    ctx.fillStyle = "#1B7A3E"; ctx.beginPath(); ctx.moveTo(x+18,y-30); ctx.lineTo(x+22,y-50); ctx.lineTo(x+32,y-50); ctx.lineTo(x+30,y-30); ctx.fill();
+    ctx.strokeStyle = "#1B7A3E"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x+28,y-46); ctx.lineTo(x+42,y-41); ctx.stroke();
+    ctx.fillStyle = "#EE7B2C"; ctx.beginPath(); ctx.arc(x+27,y-56,8,0,7); ctx.fill();
+    ctx.fillStyle = "#1A0F2E"; ctx.fillRect(x+28,y-58,8,4);
+    ctx.restore();
   }
 
   /* ---------- WIRE UP ---------- */
@@ -1539,11 +1908,14 @@
   var addHash = /^#add=([a-z0-9_]+)$/i.exec(location.hash);
   if (location.hash==="#half" && el("halfStart")) el("halfStart").click();
   else if (location.hash==="#play") openGames("page");
+  else if (location.hash==="#zombie") openGames("page", "run");
+  else if (location.hash==="#spin") openGames("page", "wheel");
   else if (addHash) openItem(addHash[1].toLowerCase());
 
   // expose a few for debugging/testing
   window.__pm = { cart:function(){return cart;}, itemTotal:itemTotal, computeBill:computeBill,
-    wallet:function(){return wallet;}, quote:function(){return QUOTE;}, offers:function(){return OFFERS;}, openGames:openGames };
+    wallet:function(){return wallet;}, quote:function(){return QUOTE;}, offers:function(){return OFFERS;}, openGames:openGames,
+    run:function(){return runState;} };
 })();
 </script>
 </body>
