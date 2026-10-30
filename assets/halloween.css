@@ -1,6 +1,10 @@
 /* Halloween look for the homepage: dark theme, falling skeletons, Halloween games promo.
    Everything here only applies while <html class="halloween">; remove that class to switch it off. */
 
+.hw-only { display:none; }
+html.halloween .hw-only { display:inline; }
+html.halloween .hw-hide { display:none; }
+
 /* ---------- Dark theme (overrides the page's inline colours) ---------- */
 html.halloween body { background:#121A15; color:#E6E9E1; }
 html.halloween a:hover { color:#FBF3E6; }
