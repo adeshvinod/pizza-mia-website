@@ -1586,14 +1586,14 @@
 
   /* --- Zombie Delivery Run (Halloween): jump the monsters, deliver in 60s --- */
   // Scored like Catch the Toppings so the same prize scores apply:
-  // +10/15/20 per monster cleared, +5 per candy corn, +50 for making the delivery.
-  var RUN_SECS = 60, RUN_W = 400, RUN_H = 250, RUN_GROUND = 214, RUN_X = 64, RUN_BONUS = 50;
+  // +15/20/25 per monster cleared, +10 per candy corn, +50 for making the delivery. 5 lives.
+  var RUN_SECS = 60, RUN_W = 400, RUN_H = 250, RUN_GROUND = 214, RUN_X = 64, RUN_BONUS = 50, RUN_LIVES = 5;
   var RUN_MONSTERS = [
-    { kind:"pumpkin", w:34, h:30, pts:10, from:0 },
-    { kind:"tomb",    w:30, h:42, pts:10, from:0 },
-    { kind:"zombie",  w:30, h:54, pts:15, from:6 },
-    { kind:"ghost",   w:34, h:36, pts:15, from:14 },
-    { kind:"pumpkins",w:68, h:30, pts:20, from:24 }
+    { kind:"pumpkin", w:34, h:30, pts:15, from:0 },
+    { kind:"tomb",    w:30, h:42, pts:15, from:0 },
+    { kind:"zombie",  w:30, h:54, pts:20, from:6 },
+    { kind:"ghost",   w:34, h:36, pts:20, from:14 },
+    { kind:"pumpkins",w:68, h:30, pts:25, from:24 }
   ];
   var runState = null;
   function stopRun(){ if (runState){ runState.running=false; if(runState.cleanup) runState.cleanup(); runState=null; } }
@@ -1605,7 +1605,7 @@
     el("gameBody").innerHTML =
       '<div class="runwrap" id="runWrap"><canvas id="runCanvas" width="'+RUN_W+'" height="'+RUN_H+'"></canvas>'+
       '<div class="chud"><span class="tt" id="rScore">Score 0</span><span class="tt" id="rTime">'+RUN_SECS+'s</span></div>'+
-      '<div class="catchstart runstart" id="runStart"><p><b>Deliver the pizza before it gets cold!</b><br>Tap (or press Space) to jump the monsters. Hold to jump higher. Grab the candy corn. Reach the door in '+RUN_SECS+'s for +'+RUN_BONUS+'!</p>'+
+      '<div class="catchstart runstart" id="runStart"><p><b>Deliver the pizza before it gets cold!</b><br>Tap (or press Space) to jump the monsters. Hold to jump higher. Grab the candy corn. You have '+RUN_LIVES+' lives. Reach the door in '+RUN_SECS+'s for +'+RUN_BONUS+'!</p>'+
       (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free drink or topping</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
       '<button class="gbtn" id="runGo">Start</button></div></div>'+
       '<div class="ghint">Higher score = bigger prize.</div>';
@@ -1616,7 +1616,7 @@
   }
   function newRun(){
     return { t:RUN_SECS, el:0, score:0, y:0, vy:0, held:false, holdT:0, air:false, objs:[], candy:[], floats:[],
-      spawn:1.6, scroll:0, speed:230, running:false, last:null, crashed:false, wheel:0 };
+      spawn:1.8, scroll:0, speed:220, running:false, last:null, crashed:false, wheel:0, lives:RUN_LIVES, inv:0 };
   }
   function runCanvas(st){
     var cv = el("runCanvas"), dpr = Math.min(window.devicePixelRatio||1, 2);
@@ -1661,8 +1661,9 @@
     });
   }
   function stepRun(st, dt){
-    // speed climbs from 230 to ~445 px/s over the run
-    st.speed = 230 + st.el*3.6;
+    // speed climbs gently from 220 to ~375 px/s over the run
+    st.speed = 220 + st.el*2.6;
+    if (st.inv>0) st.inv -= dt;
     var dx = st.speed*dt;
     st.scroll += dx; st.wheel += dx/9;
     // jump: holding while rising floats a little higher
@@ -1672,15 +1673,15 @@
       st.y -= st.vy*dt;
       if (st.y<=0){ st.y = 0; st.vy = 0; st.air = false; }
     }
-    // spawn: gaps shrink from ~1.5–2.4s to ~0.85–1.5s, never too tight to clear
+    // spawn: gaps shrink from ~1.6–2.5s to ~1.1–1.75s, never too tight to clear
     st.spawn -= dt;
     if (st.spawn<=0){
       var k = Math.min(1, st.el/50);
-      st.spawn = (1.5 - 0.65*k) + Math.random()*(0.9 - 0.3*k);
+      st.spawn = (1.6 - 0.5*k) + Math.random()*(0.9 - 0.25*k);
       var pool = RUN_MONSTERS.filter(function(m){ return st.el >= m.from; });
       var m = pool[Math.floor(Math.random()*pool.length)];
       st.objs.push({ kind:m.kind, w:m.w, h:m.h, pts:m.pts, x:RUN_W+10, phase:Math.random()*6, done:false });
-      if (Math.random() < 0.55)
+      if (Math.random() < 0.8)
         st.candy.push({ x:RUN_W+10 + st.spawn*st.speed*0.5, y:RUN_GROUND-74-Math.random()*26, got:false });
     }
     var px0 = RUN_X+10, px1 = RUN_X+46, pyB = RUN_GROUND-4-st.y, pyT = RUN_GROUND-34-st.y;
@@ -1689,15 +1690,20 @@
       o.x -= dx + (o.kind==="zombie" ? 28*dt : 0);
       o.phase += dt*6;
       var lift = o.kind==="ghost" ? 6+Math.sin(o.phase)*5 : 0;
-      var ox0 = o.x+5, ox1 = o.x+o.w-5, oyT = RUN_GROUND-o.h-lift+5, oyB = RUN_GROUND-lift;
-      if (px1>ox0 && px0<ox1 && pyB>oyT && pyT<oyB){ st.crashed = true; st.hit = o; return; }
+      var ox0 = o.x+7, ox1 = o.x+o.w-7, oyT = RUN_GROUND-o.h-lift+8, oyB = RUN_GROUND-lift;
+      if (!o.hit && st.inv<=0 && px1>ox0 && px0<ox1 && pyB>oyT && pyT<oyB){
+        // a hit costs a life (no points for that monster); a short flash of safety follows
+        o.hit = true; o.done = true; st.lives--;
+        if (st.lives<=0){ st.crashed = true; return; }
+        st.inv = 1.4; st.floats.push({ x:RUN_X+30, y:RUN_GROUND-80-st.y, txt:"Ouch! "+st.lives+" left", life:1 });
+      }
       if (!o.done && o.x+o.w < RUN_X){ o.done = true; st.score += o.pts; st.floats.push({ x:RUN_X+30, y:RUN_GROUND-70-st.y, txt:"+"+o.pts, life:0.8 }); }
       if (o.x+o.w < -20) st.objs.splice(i,1);
     }
     for (var c=st.candy.length-1;c>=0;c--){
       var cd = st.candy[c]; cd.x -= dx;
       if (!cd.got && Math.abs(cd.x-(RUN_X+28))<24 && Math.abs(cd.y-(RUN_GROUND-20-st.y))<26){
-        cd.got = true; st.score += 5; st.floats.push({ x:cd.x, y:cd.y-10, txt:"+5", life:0.7 });
+        cd.got = true; st.score += 10; st.floats.push({ x:cd.x, y:cd.y-10, txt:"+10", life:0.7 });
       }
       if (cd.got || cd.x < -20) st.candy.splice(c,1);
     }
@@ -1778,7 +1784,16 @@
     }
     for (var c=0;c<st.candy.length;c++) drawCandy(ctx, st.candy[c].x, st.candy[c].y + Math.sin(st.el*5+c)*3);
     for (var i=0;i<st.objs.length;i++) drawMonster(ctx, st.objs[i]);
-    drawScooter(ctx, RUN_X, G - st.y, st.wheel, st.air, st.crashed);
+    if (!(st.inv>0 && Math.floor(st.inv*10)%2)) drawScooter(ctx, RUN_X, G - st.y, st.wheel, st.air, st.crashed);
+    // lives: little pizza slices under the score
+    for (var l=0;l<RUN_LIVES;l++){
+      var lx = 22 + l*20, ly = 56;
+      ctx.globalAlpha = l < st.lives ? 1 : 0.25;
+      ctx.beginPath(); ctx.moveTo(lx-7,ly-6); ctx.lineTo(lx+7,ly-6); ctx.lineTo(lx,ly+8); ctx.closePath(); ctx.fillStyle = "#EDBB4E"; ctx.fill();
+      ctx.fillStyle = "#C98A3A"; ctx.fillRect(lx-7,ly-8,14,3);
+      ctx.beginPath(); ctx.arc(lx-1,ly-2,1.8,0,7); ctx.arc(lx+2,ly+2,1.5,0,7); ctx.fillStyle = "#BE3A28"; ctx.fill();
+    }
+    ctx.globalAlpha = 1;
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "bold 15px Karla,Arial,sans-serif";
     for (var f=0;f<st.floats.length;f++){ ctx.globalAlpha = Math.max(0, st.floats[f].life); ctx.fillStyle = "#FFD27A"; ctx.fillText(st.floats[f].txt, st.floats[f].x, st.floats[f].y); }
     ctx.globalAlpha = 1;
