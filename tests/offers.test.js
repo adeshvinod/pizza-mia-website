@@ -311,11 +311,22 @@ test("10% under the cap nudges toward the full ₹100", async function () {
 test("Weekly summary needs the admin key and shows totals", async function () {
   var s = setup({ env: { OFFERS_ADMIN_KEY: "k" } }), id = await give(s, "W_PCT10");
   await s.api.handle("submit", { cart: [PEP_M], rewardId: id, phone: "9876543210" });
-  await s.api.handle("submit", { cart: [MARG_M], phone: "9876500000" });
+  await s.api.handle("submit", { cart: [MARG_M], phone: "9876500000",
+    customer: { name: "Asha <b>D'Souza</b>", address: "Flat 4, Miramar", landmark: "London Hotel", notes: "=call on arrival" } });
   assert.equal((await s.api.handle("summary", { key: "nope" })).status, 403);
+  assert.match((await s.api.handle("summary", {})).html, /type=password/);
   var r = await s.api.handle("summary", { key: "k" });
   assert.match(r.html, /Website orders<\/td><td>2</);
   assert.match(r.html, /Orders that used a prize<\/td><td>1</);
+  assert.match(r.html, /Asha &lt;b&gt;D'Souza/);
+  assert.match(r.html, /9876500000/);
+  assert.match(r.html, /Flat 4, Miramar \(near London Hotel\)/);
+  assert.match(r.html, /1 × Margherita \(Medium\)/);
+  var csv = await s.api.handle("summary", { key: "k", format: "csv" });
+  assert.equal(csv.status, 200);
+  assert.match(csv.csv, /"Asha <b>D'Souza<\/b>","9876500000","Flat 4, Miramar"/);
+  assert.match(csv.csv, /"'=call on arrival"/);
+  assert.equal(csv.csv.trim().split("\r\n").length, 3);
 });
 
 test("Every reward version costs less than the 13.5% website-vs-app gap at its unlock value (brief §1.1, §8)", function () {

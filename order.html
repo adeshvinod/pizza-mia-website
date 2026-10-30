@@ -1141,6 +1141,7 @@
     try { localStorage.setItem(CUST_KEY, JSON.stringify({name:name,phone:phone,addr:addr,land:land})); } catch(e){}
     var cust = { name:name, phone:phone, addr:addr, land:land, notes:notes };
     var body = quoteBody(); body.phone = digits;
+    body.customer = { name:name, address:addr, landmark:land, notes:notes };
     var usingPrize = !!body.rewardId;
     placing = true; el("placeOrder").disabled = true; el("placeLbl").textContent = "Confirming your order…";
     function done(){ placing = false; if (el("placeOrder")){ el("placeOrder").disabled = false; el("placeLbl").textContent = "Place Order on WhatsApp"; } }

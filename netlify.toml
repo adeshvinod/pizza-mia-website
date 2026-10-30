@@ -9,3 +9,9 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Short address for the prize report (password page).
+[[redirects]]
+  from = "/report"
+  to = "/.netlify/functions/offers?action=summary"
+  status = 302

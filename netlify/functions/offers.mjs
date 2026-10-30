@@ -2,7 +2,7 @@
 // wheel spins, arcade scores, cart prices, prizes and the final order total.
 // Rules live in netlify/lib; numbers live in offers.config.json.
 // Kill switch without a code change: set the Netlify env var OFFERS_ENABLED=false.
-// Weekly summary: /.netlify/functions/offers?action=summary&key=<OFFERS_ADMIN_KEY>
+// Weekly summary: pizzamia.in/report (asks for the OFFERS_ADMIN_KEY password)
 import crypto from "node:crypto";
 import { getStore } from "@netlify/blobs";
 import offersApi from "../lib/offers-api.js";
@@ -24,7 +24,11 @@ export default async (req, context) => {
   const url = new URL(req.url);
   let body = {};
   if (req.method === "POST") {
-    try { body = await req.json(); } catch (e) { return Response.json({ error: "bad_request" }, { status: 400 }); }
+    if ((req.headers.get("content-type") || "").includes("application/x-www-form-urlencoded")) {
+      new URLSearchParams(await req.text()).forEach((v, k) => { body[k] = v; });   // report password form
+    } else {
+      try { body = await req.json(); } catch (e) { return Response.json({ error: "bad_request" }, { status: 400 }); }
+    }
   } else {
     url.searchParams.forEach((v, k) => { body[k] = v; });
   }
@@ -35,6 +39,7 @@ export default async (req, context) => {
   const api = offersApi.Api({ config, menu, crypto, store: blobStore(), env: process.env });
   try {
     const r = await api.handle(action, body, { ip: context.ip });
+    if (r.csv) return new Response(r.csv, { status: r.status, headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${r.filename}"`, "Cache-Control": "no-store" } });
     if (r.html) return new Response(r.html, { status: r.status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
     return Response.json(r.json, { status: r.status, headers: { "Cache-Control": "no-store" } });
   } catch (e) {
