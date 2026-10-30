@@ -80,8 +80,64 @@ function Api(deps) {
       }), reward: q.ev, totals: q.totals };
   }
 
+  // Counter laptop (kitchen screen): its own secret, separate from the report password.
+  function kitchenKeyOk(given) {
+    var key = String(env.KITCHEN_KEY || "").trim();
+    if (key.length < 16 || typeof given !== "string") return false;
+    var a = crypto.createHash("sha256").update(key).digest(), b = crypto.createHash("sha256").update(given.trim()).digest();
+    return crypto.timingSafeEqual(a, b);
+  }
+  // The shop's day starts at 6 AM IST (it is open till 3 AM), as a UTC timestamp.
+  function shopDayStart(t) {
+    var IST = 330 * 60000, d = new Date(t + IST - 6 * 3600000);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) + 6 * 3600000 - IST;
+  }
+  async function recentOrderKeys() {
+    var t = now(), keys = [];
+    for (var d = 0; d < 2; d++) keys = keys.concat(await store.list("orders/" + day(t - d * 86400000) + "/"));
+    return keys;
+  }
+  function kitchenOrder(r) {
+    return { orderId: r.orderId, at: r.at, channel: r.channel, customer: r.customer || null, items: r.items || [],
+      freeItems: r.freeItems || [], itemTotal: r.itemTotal, prize: r.reward ? r.reward.code + " · " + r.reward.versionLabel : "",
+      discount: r.discount || 0, gst: r.gst, total: r.total, newCustomer: !!r.newPhone, seenAt: r.seenAt || null };
+  }
+
   var actions = {
     config: async function () { return ok(E.publicConfig(config, menu, env)); },
+
+    // Today's website orders (since 6 AM IST) for the counter laptop. "known" = orders it already has and
+    // staff have seen, so those aren't re-read every poll; the laptop drops any older than "from".
+    kitchen_feed: async function (body) {
+      if (!env.KITCHEN_KEY) return err(403, "not_set_up", "KITCHEN_KEY is not set in Netlify.");
+      if (!kitchenKeyOk(body.key)) return err(403, "bad_key", "Wrong secret code.");
+      var known = {}, from = shopDayStart(now());
+      (Array.isArray(body.known) ? body.known : []).slice(0, 500).forEach(function (id) { known[id] = true; });
+      var keys = await recentOrderKeys(), ids = [], orders = [];
+      for (var i = 0; i < keys.length; i++) {
+        var id = keys[i].split("/").pop();
+        if (known[id]) { ids.push(id); continue; }
+        var r = await store.get(keys[i]);
+        if (!r || Date.parse(r.at) < from) continue;
+        ids.push(id); orders.push(kitchenOrder(r));
+      }
+      return ok({ now: new Date(now()).toISOString(), from: new Date(from).toISOString(), ids: ids, orders: orders });
+    },
+
+    // Staff pressed Enter on the laptop: record when the order was seen.
+    kitchen_ack: async function (body) {
+      if (!kitchenKeyOk(body.key)) return err(403, "bad_key", "Wrong secret code.");
+      var id = String(body.orderId || "");
+      if (!/^PM-\d{4}-[A-Z0-9]{4}$/.test(id)) return err(400, "bad_order", "Unknown order");
+      var keys = await recentOrderKeys();
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i].split("/").pop() !== id) continue;
+        var r = await store.get(keys[i]);
+        if (!r.seenAt) { r.seenAt = new Date(now()).toISOString(); await store.set(keys[i], r); }
+        return ok({ orderId: id, seenAt: r.seenAt });
+      }
+      return err(404, "bad_order", "Unknown order");
+    },
 
     spin: async function (body, ctx) {
       if (!isOn()) return err(403, "paused", "Game prizes are paused right now.");
@@ -277,6 +333,7 @@ function summaryHtml(rows, nDays, key) {
       (r.reward ? "<tr><td>Prize: " + esc(prizeText(r)) + "</td><td>-" + inr(r.discount || 0) + "</td></tr>" : "") +
       (r.gst != null ? "<tr><td>GST</td><td>" + inr(r.gst) + "</td></tr>" : "") +
       "<tr><td><b>Total</b></td><td>" + inr(r.total) + "</td></tr>" +
+      "<tr><td class=m>Seen by staff on the counter laptop</td><td class=m>" + (r.seenAt ? esc(ist(r.seenAt).slice(11)) : "Not yet") + "</td></tr>" +
       (r.reward ? "<tr><td class=m>Estimated cost of the prize to us</td><td class=m>" + inr(r.estCost || 0) + "</td></tr>" : "") +
       "</table></div>";
   }).join("") : "<p>No website orders yet.</p>");
@@ -284,12 +341,12 @@ function summaryHtml(rows, nDays, key) {
 }
 function csvCell(v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
 function ordersCsv(rows) {
-  var head = ["Date (IST)", "Order ID", "Name", "Phone", "Address", "Landmark", "Notes", "Items", "Free items", "Item total", "Prize", "Discount", "GST", "Total", "Est. prize cost", "New customer"];
+  var head = ["Date (IST)", "Order ID", "Name", "Phone", "Address", "Landmark", "Notes", "Items", "Free items", "Item total", "Prize", "Discount", "GST", "Total", "Est. prize cost", "New customer", "Seen by staff (IST)"];
   var lines = rows.map(function (r) {
     var c = cust(r);
     return [ist(r.at), r.orderId, c.name, c.phone, c.address, c.landmark, c.notes,
       (r.items || []).map(itemText).join("; "), (r.freeItems || []).join("; "), r.itemTotal, prizeText(r), r.discount || 0,
-      r.gst != null ? r.gst : "", r.total, r.estCost || 0, r.newPhone ? "Yes" : "No"].map(csvCell).join(",");
+      r.gst != null ? r.gst : "", r.total, r.estCost || 0, r.newPhone ? "Yes" : "No", r.seenAt ? ist(r.seenAt) : ""].map(csvCell).join(",");
   });
   return "﻿" + [head.map(csvCell).join(",")].concat(lines).join("\r\n");
 }

@@ -342,3 +342,30 @@ test("Every reward version costs less than the 13.5% website-vs-app gap at its u
     });
   });
 });
+
+test("Counter laptop: needs its own secret, gets today's orders, Enter marks them seen", async function () {
+  var s = setup({ env: { KITCHEN_KEY: "kitchen-secret-123456", OFFERS_ADMIN_KEY: "k" } });   // clock: 19 Oct 17:30 IST
+  var a = await s.api.handle("submit", { cart: [PEP_M], phone: "9876543210", customer: { name: "Asha", address: "Miramar" } });
+  assert.equal((await s.api.handle("kitchen_feed", { key: "k" })).status, 403);
+  assert.equal((await s.api.handle("kitchen_feed", {})).status, 403);
+  assert.equal(setup().api && (await setup().api.handle("kitchen_feed", { key: "kitchen-secret-123456" })).json.error, "not_set_up");
+  var f = await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456" });
+  assert.equal(f.status, 200);
+  assert.equal(f.json.orders.length, 1);
+  var o = f.json.orders[0];
+  assert.equal(o.orderId, a.json.orderId);
+  assert.equal(o.customer.name, "Asha");
+  assert.equal(o.total, a.json.totals.total);
+  assert.equal(o.seenAt, null);
+  assert.equal((await s.api.handle("kitchen_ack", { key: "nope", orderId: o.orderId })).status, 403);
+  var ack = await s.api.handle("kitchen_ack", { key: "kitchen-secret-123456", orderId: o.orderId });
+  assert.equal(ack.status, 200);
+  var f2 = await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456" });
+  assert.ok(f2.json.orders[0].seenAt);
+  var f3 = await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456", known: [o.orderId] });
+  assert.deepEqual(f3.json.ids, [o.orderId]);
+  assert.equal(f3.json.orders.length, 0);
+  assert.match((await s.api.handle("summary", { key: "k" })).html, /Seen by staff on the counter laptop<\/td><td class=m>17:30/);
+  s.clock.t += 14 * 3600e3;   // next day 7:30 AM IST: yesterday's order is gone from the screen
+  assert.equal((await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456" })).json.orders.length, 0);
+});
