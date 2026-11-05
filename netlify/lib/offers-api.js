@@ -143,6 +143,7 @@ function Api(deps) {
       if (!isOn()) return err(403, "paused", "Game prizes are paused right now.");
       if (await rateLimited(ctx.ip)) return err(429, "slow_down", "That's a lot of spins! Please try again in a while.");
       var i = E.pickWheelSlice(config, function (n) { return crypto.randomInt(n); });
+      if (config.wheel[i].nothing) return ok({ slice: i, label: config.wheel[i].label, nothing: true, reward: null });
       var rec = await issue(config.wheel[i], "wheel", ctx.ip);
       return ok({ slice: i, label: config.wheel[i].label, reward: publicReward(rec) });
     },

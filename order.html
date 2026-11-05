@@ -381,7 +381,7 @@
 </div>
 
 <div class="winbar" id="winbar"><div class="inner">
-  <div class="txt hw-off">🎮 <b>Play a game, win a free treat!</b> Every spin wins: a free topping, drink, garlic knots or money off your pizza order.</div>
+  <div class="txt hw-off">🎮 <b>Play a game, win a free treat!</b> Win a free topping, soft drink, garlic knots or money off your pizza order.</div>
   <div class="txt hw-on">🎃 <b>Halloween games are here!</b> Play Zombie Delivery Run or spin the Haunted Pizza Wheel to win a free topping, drink, garlic knots or money off.</div>
   <button id="playWinBtn">Play &amp; Win</button>
 </div></div>
@@ -1008,7 +1008,7 @@
       }
       if (rw.drinks){
         for (var d=0; d<rw.drinks.qty; d++){
-          h += '<div class="pz-lbl">'+(rw.drinks.qty>1 ? 'Free drink '+(d+1) : 'Your free drink')+'</div><div class="pz-pick">';
+          h += '<div class="pz-lbl">'+(rw.drinks.qty>1 ? 'Free soft drink '+(d+1) : 'Your free soft drink')+'</div><div class="pz-pick">';
           rw.drinks.options.forEach(function(o){
             h += '<button class="chip'+(rw.drinks.chosen[d]===o?' on':'')+'" data-drink="'+d+'|'+o+'">🥤 '+o+'</button>';
           });
@@ -1269,8 +1269,8 @@
   var HALLOWEEN = document.documentElement.classList.contains("halloween");
   // The scooter game (Zombie Delivery Run) stays on all year in place of Catch the Toppings.
   var RUN_GAME = true;
-  var WHEEL_COLORS = HALLOWEEN ? ["#E8742A","#6B3FA0","#1A120B","#E8742A","#6B3FA0","#1A120B"]
-                               : ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D"];
+  var WHEEL_COLORS = HALLOWEEN ? ["#E8742A","#6B3FA0","#1A120B","#E8742A","#6B3FA0","#1A120B","#6B3FA0"]
+                               : ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D","#7A5C3A"];
   function wheelSegs(){
     return ((OFFERS && OFFERS.wheel) || []).map(function(s,i){ return { label:s.label, color:WHEEL_COLORS[i % WHEEL_COLORS.length] }; });
   }
@@ -1310,10 +1310,10 @@
       have = '<div class="ghint">Your prize'+(prizeCount()>1?'s':'')+': '+["wheel","arcade"].filter(function(k){ return wallet[k]; }).map(function(k){
         return '<b style="color:var(--veg)">'+wallet[k].label+'</b>'; }).join(' · ')+'<br>A new win replaces the prize from that same game. One prize per order.</div>';
     }
-    var scores = T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free drink or topping, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '';
+    var scores = T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free topping or soft drink, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '';
     el("gameBody").innerHTML =
       (RUN_GAME ? '<div class="gcard" id="gcRun"><span class="gnew">New</span><div class="ico">🛵🧟</div><div class="t">Zombie Delivery Run</div><div class="d">Jump over zombies, pumpkins and ghosts and get the pizza to the door in 60s. '+scores+'</div></div>' : '')+
-      '<div class="gcard" id="gcWheel"><div class="ico">'+(HALLOWEEN ? '🎃' : '🎡')+'</div><div class="t">'+(HALLOWEEN ? 'Spin the Haunted Pizza Wheel' : 'Spin the Pizza Wheel')+'</div><div class="d">Every spin wins: a free topping, a free drink, free garlic knots or money off.</div></div>'+
+      '<div class="gcard" id="gcWheel"><div class="ico">'+(HALLOWEEN ? '🎃' : '🎡')+'</div><div class="t">'+(HALLOWEEN ? 'Spin the Haunted Pizza Wheel' : 'Spin the Pizza Wheel')+'</div><div class="d">Spin to win a free topping, a free soft drink, free garlic knots or money off.</div></div>'+
       // Catch the Toppings sits out while the scooter game is on
       (RUN_GAME ? '' : '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+scores+'</div></div>')+
       have+
@@ -1378,6 +1378,9 @@
       var words = segs[i].label.split(" "), rows = words.length>1 ? [words[0], words.slice(1).join(" ")] : [words[0]];
       ctx.save(); ctx.translate(cx,cy); ctx.rotate(a0+seg/2);
       ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.font="bold 14px Karla,Arial,sans-serif";
+      // long labels (e.g. GARLIC KNOTS) shrink so they stay clear of the centre
+      var widest = Math.max.apply(null, rows.map(function(t){ return ctx.measureText(t).width; })), room = rad-16-30;
+      if (widest > room) ctx.font = "bold "+Math.floor(14*room/widest)+"px Karla,Arial,sans-serif";
       rows.forEach(function(t, ri){
         var y = rows.length>1 ? (ri ? 8 : -8) : 0;
         ctx.lineWidth=3.5; ctx.strokeStyle="rgba(255,248,230,0.92)"; ctx.strokeText(t, rad-16, y);
@@ -1428,6 +1431,7 @@
       var settled = false;
       var done = function(){
         if (settled) return; settled = true; cv.removeEventListener("transitionend", done); wheelSpinning = false;
+        if (j.nothing) return showNothing();
         addPrize(j.reward);
         showWon(j.reward, "Lucky spin!", ladderText(OFFERS.wheel[w].ladder));
       };
@@ -1435,9 +1439,11 @@
       setTimeout(done, 4600);   // fallback if transitionend doesn't fire (reduced-motion, etc.)
     }).catch(function(){ fail("Couldn't reach Pizza Mia. Check your connection and try again."); });
   }
-  // "Works on any pizza order (₹399+): free Garlic Knots 2 pc. Order ₹799+ and we'll make it free Garlic Knots 4 pc."
+  // "Works on any pizza order (₹399+): free Garlic Knots 2 pc. Order ₹799+ and we'll make it free Cheese Garlic Knots 2 pc."
+  // A prize that starts above the floor says so: "Works on pizza orders of ₹999+: a free soft drink (Coke or Sprite). …"
   function ladderText(ladder){
-    var t = "Works on any pizza order ("+money(OFFERS.floor.min_eligible_subtotal)+"+): "+ladder[0].label+".";
+    var floor = OFFERS.floor.min_eligible_subtotal;
+    var t = (ladder[0].min > floor ? "Works on pizza orders of "+money(ladder[0].min)+"+: " : "Works on any pizza order ("+money(floor)+"+): ")+ladder[0].label+".";
     for (var i=1;i<ladder.length;i++) t += " Order "+money(ladder[i].min)+"+ and we'll make it "+ladder[i].label+".";
     return t;
   }
@@ -1450,7 +1456,7 @@
       '<div class="catchwrap"><canvas id="catchCanvas" width="340" height="520"></canvas>'+
       '<div class="chud"><span class="tt" id="cScore">Score 0</span><span class="tt" id="cTime">60s</span></div>'+
       '<div class="catchstart" id="catchStart"><div style="font-size:40px">🍕</div><p><b>Catch the toppings, dodge the coal.</b><br>Drag (or use ← →) to move your pizza. Each topping shows its points. Catch 🔥 and it\'s game over. 60 seconds — go for the highest score!</p>'+
-      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free drink or topping</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
+      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free topping or soft drink</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
       '<button class="gbtn" id="catchGo">Start</button></div></div>'+
       '<div class="ghint">Higher score = bigger prize.</div>';
     el("catchGo").onclick = runCatch;
@@ -1578,11 +1584,19 @@
     el("applyRw").onclick = function(){ closeGames(); if (cart.length || gamesReturn==="cart") openDrawer(); toast("Prize saved: "+reward.label); };
     el("playAgain").onclick = renderGameMenu;
   }
+  // The wheel landed on NOTHING: no prize this time.
+  function showNothing(){
+    gSetHead("Spin the Pizza Wheel 🎡", true);
+    el("gameBody").innerHTML = '<div class="gresult"><div class="big">🍕</div><div class="rw" style="color:var(--green)">Try again next time!</div>'+
+      '<div class="sc">No prize on this spin.</div>'+
+      '<button class="gbtn wide" id="playAgain">Back to games</button></div>';
+    el("playAgain").onclick = renderGameMenu;
+  }
   function showNoPrize(score, why, err, retry){
     gSetHead("So close! 😅", true);
     var T = tiers(), need = T.length ? T[0].minScore : 0;
     el("gameBody").innerHTML = '<div class="gresult"><div class="big">😅</div><div class="rw" style="color:var(--green)">So close!</div>'+
-      '<div class="sc">'+(err ? err : why+'You scored '+(score||0)+'. Score '+need+'+ to win a free drink or topping. Try again!')+'</div>'+
+      '<div class="sc">'+(err ? err : why+'You scored '+(score||0)+'. Score '+need+'+ to win a free topping or soft drink. Try again!')+'</div>'+
       '<button class="gbtn wide" id="playAgain">Try again</button></div>';
     el("playAgain").onclick = retry;
   }
@@ -1609,7 +1623,7 @@
       '<div class="runwrap" id="runWrap"><canvas id="runCanvas" width="'+RUN_W+'" height="'+RUN_H+'"></canvas>'+
       '<div class="chud"><span class="tt" id="rScore">Score 0</span><span class="tt" id="rTime">'+RUN_SECS+'s</span></div>'+
       '<div class="catchstart runstart" id="runStart"><p><b>Deliver the pizza before it gets cold!</b><br>Tap (or press Space) to jump the monsters. Hold to jump higher. Grab the candy corn. You have '+RUN_LIVES+' lives. Reach the door in '+RUN_SECS+'s for +'+RUN_BONUS+'!</p>'+
-      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free drink or topping</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
+      (T.length===3 ? '<div class="tierlist"><span><b>'+T[0].minScore+'+</b> free topping or soft drink</span><span><b>'+T[1].minScore+'+</b> free garlic knots</span><span><b>'+T[2].minScore+'+</b> up to 15% off</span></div>' : '')+
       '<button class="gbtn" id="runGo">Start</button></div></div>'+
       '<div class="ghint">Higher score = bigger prize.</div>';
     var st = newRun();

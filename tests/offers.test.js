@@ -46,14 +46,16 @@ async function price(s, cart, rewardId, sel, other) {
 
 var MARG_M = L("marg", "Medium"), PEP_M = L("pep", "Medium");
 
-test("1. Margherita M ₹399 + W_KNOTS → Garlic Knots 2 pc free, nudge to 4 pc", async function () {
+test("1. Margherita M ₹399 + W_KNOTS → Garlic Knots 2 pc free, never more than 2 pc", async function () {
   var s = setup(), id = await give(s, "W_KNOTS");
   var r = await price(s, [MARG_M], id);
   assert.equal(r.totals.eligible, 399);
   assert.equal(r.reward.status, "applied");
   assert.equal(r.reward.freeLines[0].text, "Garlic Knots (2 pc) ×1 ₹0 (Game reward TST123)");
   assert.equal(r.reward.discount, 0);
-  assert.equal(r.reward.nudges[0].text, "Add ₹400 more to upgrade your prize to free Garlic Knots 4 pc.");
+  assert.equal(r.reward.nudges.length, 0);
+  var big = await price(s, [L("pep", "Jumbo")], id);
+  assert.equal(big.reward.freeLines[0].text, "Garlic Knots (2 pc) ×1 ₹0 (Game reward TST123)");
 });
 
 test("2. Garlic Knots 2 pc + Coke ₹300, no pizza → not applied, kept saved", async function () {
@@ -106,43 +108,40 @@ test("7. Garden M + Coke ₹599 + W_CHEESY → Cheese Garlic Knots 2 pc", async 
   assert.equal(r.reward.freeLines[0].size, "2 pc");
 });
 
-test("8. Cart ₹1,049 → item removed → ₹699: W_CHEESY downgrades 4 pc → 2 pc", async function () {
+test("8. Cart ₹1,049: W_CHEESY stays at Cheese Garlic Knots 2 pc (max 2 pc)", async function () {
   var s = setup(), id = await give(s, "W_CHEESY");
   var big = await price(s, [PEP_M, L("chorizoknots")], id);
   assert.equal(big.totals.eligible, 1049);
-  assert.equal(big.reward.freeLines[0].text, "Cheese Garlic Knots (4 pc) ×1 ₹0 (Game reward TST123)");
+  assert.equal(big.reward.freeLines[0].text, "Cheese Garlic Knots (2 pc) ×1 ₹0 (Game reward TST123)");
   var small = await price(s, [PEP_M], id);
   assert.equal(small.reward.freeLines[0].text, "Cheese Garlic Knots (2 pc) ×1 ₹0 (Game reward TST123)");
 });
 
-test("9. ₹1,199 + A_T3 choosing 15% → not allowed; 10% or Cheese Garlic Knots 4 pc offered", async function () {
+test("9. ₹1,199 + A_T3 choosing 15% → not allowed; falls back to 10%", async function () {
   var s = setup(), id = await give(s, "A_T3", "arcade");
-  var r = await price(s, [MARG_M, L("cheeseknots", "4 pcs", 2)], id, { option: 2 });
+  var r = await price(s, [MARG_M, L("cheeseknots", "4 pcs", 2)], id, { option: 1 });
   assert.equal(r.totals.eligible, 1199);
-  assert.equal(r.reward.optionLocked.index, 2);
+  assert.equal(r.reward.optionLocked.index, 1);
   assert.match(r.reward.optionLocked.text, /needs a ₹1,499\+ order/);
-  assert.deepEqual(r.reward.options.map(function (o) { return o.available; }), [true, true, false]);
+  assert.deepEqual(r.reward.options.map(function (o) { return o.available; }), [true, false]);
   assert.equal(r.reward.optionIndex, 0);
   assert.equal(r.totals.discount, 100);       // falls back to 10% (cap ₹100)
-  var r2 = await price(s, [MARG_M, L("cheeseknots", "4 pcs", 2)], id, { option: 1 });
-  assert.equal(r2.reward.freeLines[0].text, "Cheese Garlic Knots (4 pc) ×1 ₹0 (Game reward TST123)");
-  assert.equal(r2.totals.discount, 0);
 });
 
 test("10. ₹1,499 + A_T3 choosing 15% → ₹200 (cap)", async function () {
   var s = setup(), id = await give(s, "A_T3", "arcade");
-  var r = await price(s, [L("chtikka", "Godfather")], id, { option: 2 });
+  var r = await price(s, [L("chtikka", "Godfather")], id, { option: 1 });
   assert.equal(r.totals.eligible, 1499);
   assert.equal(r.totals.discount, 200);
 });
 
 test("11. WhatsApp 5% + Review 5% also claimed → never combined", async function () {
   var s = setup(), id = await give(s, "A_T3", "arcade");
-  var r = await price(s, [L("chtikka", "Godfather")], id, { option: 2 }, ["WHATSAPP_5", "REVIEW_5"]);
+  var r = await price(s, [L("chtikka", "Godfather")], id, { option: 1 }, ["WHATSAPP_5", "REVIEW_5"]);
   assert.equal(r.reward.status, "rejected");
   assert.match(r.reward.message, /Only one offer per order/);
   assert.equal(r.totals.discount, 0);
-  var sub = await s.api.handle("submit", { cart: [L("chtikka", "Godfather")], rewardId: id, selection: { option: 2 },
+  var sub = await s.api.handle("submit", { cart: [L("chtikka", "Godfather")], rewardId: id, selection: { option: 1 },
     otherOffers: ["WHATSAPP_5"], phone: "9876543210" });
   assert.equal(sub.status, 409);
 });
@@ -252,9 +251,9 @@ test("Wheel spin issues a stored reward from one of the 6 slices", async functio
 });
 
 test("Wheel weights roughly match config", function () {
-  var counts = [0, 0, 0, 0, 0, 0], N = 100000;
+  var counts = CONFIG.wheel.map(function () { return 0; }), N = 100000, total = CONFIG.wheel.reduce(function (t, w) { return t + w.weight; }, 0);
   for (var i = 0; i < N; i++) counts[E.pickWheelSlice(CONFIG, function (n) { return Math.floor(Math.random() * n); })]++;
-  CONFIG.wheel.forEach(function (s, i) { assert.ok(Math.abs(counts[i] / N - s.weight / 100) < 0.01, s.id); });
+  CONFIG.wheel.forEach(function (s, i) { assert.ok(Math.abs(counts[i] / N - s.weight / total) < 0.01, s.id); });
 });
 
 test("Arcade: tiers, one result per run, implausible scores refused", async function () {
@@ -293,13 +292,45 @@ test("Free topping: customer picks the pizza and topping; needed before submit",
   assert.equal(notAllowed.reward.incomplete, true);
 });
 
-test("Free drinks: 1 below ₹999, 2 from ₹999, customer picks Coke or Sprite", async function () {
+test("Free soft drinks: none below ₹999, 1 from ₹999, 2 from ₹2,000, customer picks Coke or Sprite", async function () {
   var s = setup(), id = await give(s, "W_DRINK");
-  var r = await price(s, [PEP_M], id, { choices: ["Sprite"] });
+  var none = await price(s, [PEP_M], id);
+  assert.equal(none.reward.status, "saved");
+  assert.equal(none.reward.message, "A free soft drink (Coke or Sprite) needs a ₹999+ order. Add ₹300 more to use your prize. It's saved for 48 hours.");
+  assert.equal(none.reward.freeLines.length, 0);
+  var bad = await s.api.handle("submit", { cart: [PEP_M], rewardId: id, phone: "9876543210" });
+  assert.equal(bad.json.error, "reward_not_usable");
+  var r = await price(s, [L("pep", "Large")], id, { choices: ["Sprite"] });
   assert.equal(r.reward.freeLines[0].text, "Sprite ×1 ₹0 (Game reward TST123)");
-  assert.equal(r.reward.nudges[0].text, "Add ₹300 more to upgrade your prize to 2 free drinks (Coke or Sprite).");
-  var r2 = await price(s, [L("pep", "Large")], id, { choices: ["Sprite", "Coke"] });
+  assert.equal(r.reward.nudges[0].text, "Add ₹701 more to upgrade your prize to 2 free soft drinks (Coke or Sprite).");
+  var r2 = await price(s, [L("pep", "Jumbo")], id, { choices: ["Sprite", "Coke"] });
+  assert.equal(r2.totals.eligible, 2199);
   assert.equal(r2.reward.freeLines.length, 2);
+});
+
+test("Arcade free soft drink needs ₹999+; below that the topping is used", async function () {
+  var s = setup(), id = await give(s, "A_T1", "arcade");
+  var r = await price(s, [PEP_M], id, { option: 1, topping: "Sweet Corn" });
+  assert.equal(r.reward.optionIndex, 0);
+  assert.match(r.reward.optionLocked.text, /needs a ₹999\+ order/);
+  assert.match(r.reward.freeLines[0].text, /^Extra Sweet Corn on Pepperoni/);
+});
+
+test("Wheel NOTHING slice: no prize is issued", async function () {
+  var s = setup(), n = CONFIG.wheel.findIndex(function (w) { return w.nothing; });
+  assert.ok(n >= 0);
+  var orig = require("crypto"), fake = Object.assign({}, orig, { randomInt: function (k) {
+    if (k === CONFIG.wheel.reduce(function (t, w) { return t + w.weight; }, 0))
+      return CONFIG.wheel.slice(0, n).reduce(function (t, w) { return t + w.weight; }, 0);
+    return orig.randomInt(k);
+  } });
+  var s2 = setup({ crypto: fake });
+  var r = await s2.api.handle("spin", {});
+  assert.equal(r.json.slice, n);
+  assert.equal(r.json.nothing, true);
+  assert.equal(r.json.reward, null);
+  assert.equal((await s2.store.list("reward/")).length, 0);
+  assert.equal(E.evaluateReward(CONFIG, { eligible: 999, lines: [], hasPizza: true }, { rewardId: "W_NOTHING" }).status, "rejected");
 });
 
 test("10% under the cap nudges toward the full ₹100", async function () {

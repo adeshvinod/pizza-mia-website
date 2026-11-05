@@ -99,12 +99,13 @@ function findDef(config, rewardId) {
   return null;
 }
 // Wheel slices have one ladder of versions; arcade tiers have a list of options (each a ladder).
-function optionsOf(def) { return def.options ? def.options : [def.versions]; }
+// The wheel's "nothing" slice has no versions and never becomes a prize.
+function optionsOf(def) { return def.options ? def.options : (def.versions ? [def.versions] : []); }
 
 function versionLabel(v) {
   if (v.type === "pct_off") return Math.round(v.pct * 100) + "% off (max " + rupees(v.cap) + ")";
   if (v.type === "free_topping") return (v.qty > 1 ? v.qty + " free veg toppings" : "a free veg topping");
-  if (v.choice) return (v.qty > 1 ? v.qty + " free drinks (" + v.choice.join(" or ") + ")" : "a free " + v.choice.join(" or "));
+  if (v.choice) return (v.qty > 1 ? v.qty + " free soft drinks" : "a free soft drink") + " (" + v.choice.join(" or ") + ")";
   return (v.qty > 1 ? v.qty + " × " : "") + "free " + v.item + " " + v.size;
 }
 function optionLabel(opt) {
@@ -141,7 +142,7 @@ function evaluateReward(config, priced, reward, sel, opts) {
   var out = { status: "none", discount: 0, freeLines: [], nudges: [], estCost: 0, incomplete: false };
   if (!reward) return out;
   var def = findDef(config, reward.rewardId);
-  if (!def) { out.status = "rejected"; out.message = "This prize is no longer available."; return out; }
+  if (!def || def.nothing) { out.status = "rejected"; out.message = "This prize is no longer available."; return out; }
   out.reward = { id: reward.id, code: reward.code, rewardId: def.id, label: def.label, source: reward.source };
 
   var others = (opts.otherOffers || []).filter(function (o) { return (config.mutually_exclusive_with || []).indexOf(o) >= 0; });
@@ -168,10 +169,21 @@ function evaluateReward(config, priced, reward, sel, opts) {
     return out;
   }
 
+  // A prize that needs a bigger order than the floor (e.g. free soft drinks from ₹999) waits until then.
+  var firstOpen = out.options.filter(function (o) { return o.available; })[0];
+  if (!firstOpen) {
+    var low = out.options.slice().sort(function (a, b) { return a.min - b.min; })[0];
+    out.status = "saved";
+    out.message = cap1(low.label) + " needs a " + rupees(low.min) + "+ order. Add " + rupees(low.min - eligible) +
+      " more to use your prize. It's saved for " + config.limits.expiry_hours + " hours.";
+    out.nudges.push({ kind: "floor", gap: low.min - eligible, text: out.message });
+    return out;
+  }
+
   // Which option? Customer's pick if unlocked, else the first unlocked one.
   var want = typeof sel.option === "number" ? sel.option : 0;
   var oi = out.options[want] && out.options[want].available ? want : 0;
-  if (!out.options[oi].available) oi = out.options.filter(function (o) { return o.available; })[0].index;
+  if (!out.options[oi].available) oi = firstOpen.index;
   if (want !== oi && out.options[want]) {
     var lk = out.options[want];
     out.optionLocked = { index: want, label: lk.label, min: lk.min, gap: lk.min - eligible,
@@ -262,7 +274,7 @@ function publicConfig(config, menu, env) {
     expiryHours: config.limits.expiry_hours,
     copy: config.copy,
     wheel: config.wheel.map(function (s) {
-      return { id: s.id, label: s.label, ladder: s.versions.map(function (v) { return { min: v.min, label: versionLabel(v) }; }) };
+      return { id: s.id, label: s.label, nothing: !!s.nothing, ladder: (s.versions || []).map(function (v) { return { min: v.min, label: versionLabel(v) }; }) };
     }),
     arcade: config.arcade.map(function (t) {
       return { id: t.id, label: t.label, minScore: config.arcade_scores[t.min_score],

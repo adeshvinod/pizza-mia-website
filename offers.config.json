@@ -1,5 +1,5 @@
 {
-  "_readme": "Pizza Mia game prizes: the ONLY place reward numbers live (from the Oct 2026 offers brief). Set offers_enabled to false to switch every prize off. Before changing a number, run the Section 8 check in the brief (cost of the prize must stay under 13% of the cart value where it unlocks).",
+  "_readme": "Pizza Mia game prizes: the ONLY place reward numbers live (from the Oct 2026 offers brief; Nov 2026: knots max 2 pc, soft drinks 1 from ₹999 / 2 from ₹2,000, wheel has a NOTHING slice). Set offers_enabled to false to switch every prize off. Before changing a number, run the Section 8 check in the brief (cost of the prize must stay under 13% of the cart value where it unlocks).",
 
   "offers_enabled": true,
   "channel": ["website_delivery", "website_pickup"],
@@ -14,32 +14,30 @@
   "wheel": [
     { "id": "W_TOPPING", "label": "FREE TOPPING", "weight": 25,
       "versions": [ { "min": 399, "type": "free_topping", "qty": 1, "list": "VEG_TOPPINGS" } ] },
-    { "id": "W_DRINK", "label": "FREE DRINK", "weight": 20,
-      "versions": [ { "min": 399, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 1 },
-                    { "min": 999, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 2 } ] },
-    { "id": "W_KNOTS", "label": "FREE KNOTS", "weight": 20,
-      "versions": [ { "min": 399, "type": "free_item", "item": "Garlic Knots", "size": "2 pc" },
-                    { "min": 799, "type": "free_item", "item": "Garlic Knots", "size": "4 pc" } ] },
+    { "id": "W_DRINK", "label": "FREE SOFT DRINK", "weight": 20,
+      "versions": [ { "min": 999, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 1 },
+                    { "min": 2000, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 2 } ] },
+    { "id": "W_KNOTS", "label": "FREE GARLIC KNOTS", "weight": 20,
+      "versions": [ { "min": 399, "type": "free_item", "item": "Garlic Knots", "size": "2 pc" } ] },
+    { "id": "W_NOTHING", "label": "NOTHING", "weight": 20, "nothing": true },
     { "id": "W_PCT5", "label": "5% OFF", "weight": 15,
       "versions": [ { "min": 399, "type": "pct_off", "pct": 0.05, "cap": 50 } ] },
     { "id": "W_PCT10", "label": "10% OFF", "weight": 8,
       "versions": [ { "min": 399, "type": "pct_off", "pct": 0.10, "cap": 100 } ] },
     { "id": "W_CHEESY", "label": "CHEESY KNOTS", "weight": 12,
       "versions": [ { "min": 399, "type": "free_item", "item": "Garlic Knots", "size": "2 pc" },
-                    { "min": 449, "type": "free_item", "item": "Cheese Garlic Knots", "size": "2 pc" },
-                    { "min": 999, "type": "free_item", "item": "Cheese Garlic Knots", "size": "4 pc" } ] }
+                    { "min": 449, "type": "free_item", "item": "Cheese Garlic Knots", "size": "2 pc" } ] }
   ],
 
   "arcade": [
-    { "id": "A_T1", "label": "FREE DRINK OR TOPPING", "min_score": "T1_SCORE",
-      "options": [ [ { "min": 399, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 1 } ],
-                   [ { "min": 399, "type": "free_topping", "qty": 1, "list": "VEG_TOPPINGS" } ] ] },
+    { "id": "A_T1", "label": "FREE TOPPING OR SOFT DRINK", "min_score": "T1_SCORE",
+      "options": [ [ { "min": 399, "type": "free_topping", "qty": 1, "list": "VEG_TOPPINGS" } ],
+                   [ { "min": 999, "type": "free_item", "choice": ["Coke", "Sprite"], "qty": 1 } ] ] },
     { "id": "A_T2", "label": "FREE GARLIC KNOTS", "min_score": "T2_SCORE",
       "options": [ [ { "min": 399, "type": "free_item", "item": "Garlic Knots", "size": "2 pc" },
                      { "min": 799, "type": "free_item", "item": "Cheese Garlic Knots", "size": "2 pc" } ] ] },
     { "id": "A_T3", "label": "UP TO 15% OFF", "min_score": "T3_SCORE",
       "options": [ [ { "min": 399,  "type": "pct_off", "pct": 0.10, "cap": 100 } ],
-                   [ { "min": 999,  "type": "free_item", "item": "Cheese Garlic Knots", "size": "4 pc" } ],
                    [ { "min": 1499, "type": "pct_off", "pct": 0.15, "cap": 200 } ] ] }
   ],
 
@@ -58,8 +56,8 @@
                     "pct_off_cost_factor": 0.98 },
 
   "copy": {
-    "wheel_heading": "Spin for a free treat! Every spin wins.",
-    "under_wheel": "Prize works on any order with a pizza (₹399+). Bigger orders get bigger prizes.",
+    "wheel_heading": "Spin for a free treat!",
+    "under_wheel": "Prizes work on any order with a pizza (₹399+). Free soft drinks need a ₹999+ order.",
     "below_floor": "Add a pizza to use your prize. It's saved for 48 hours.",
     "terms": "One prize per order. Website orders only. Not valid with other offers, on alcohol, combos or the ₹99 pizza. Prize expires 48 hours after winning. Pizza Mia may change or end offers."
   }

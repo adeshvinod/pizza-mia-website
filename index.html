@@ -86,12 +86,15 @@
   .catch { position:relative; width:170px; height:220px; border-radius:18px; overflow:hidden; background:linear-gradient(180deg,#46301D,#1C120A); box-shadow:inset 0 0 0 2px rgba(232,163,61,.35); }
   .catch .hud { z-index:3; position:absolute; top:8px; left:8px; right:8px; display:flex; justify-content:space-between; font-size:10.5px; font-weight:700; }
   .catch .hud b { background:rgba(0,0,0,.45); color:#fff; padding:3px 8px; border-radius:100px; font-weight:700; }
-  .catch .drop { position:absolute; top:-30px; font-size:24px; line-height:1; animation:drop 2.6s linear infinite; }
-  .catch .drop::after { content:attr(data-p); position:absolute; right:-9px; bottom:-5px; font-family:'Karla',sans-serif; font-size:9px; font-weight:700; color:#fff; background:#1B3A2A; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; }
-  .catch .drop.coal::after { display:none; }
-  @keyframes drop { 0% { transform:translateY(0) rotate(0); } 100% { transform:translateY(260px) rotate(200deg); } }
-  .catch .paddle { position:absolute; bottom:10px; left:50%; font-size:38px; line-height:1; margin-left:-19px; animation:slide 3.4s ease-in-out infinite; }
-  @keyframes slide { 0%,100% { transform:translateX(-46px); } 50% { transform:translateX(46px); } }
+  /* mini scooter run: the scooter hops the road cones */
+  .catch .road { position:absolute; left:0; right:0; bottom:0; height:34px; background:#2E2418; border-top:2px solid #6B4E2E; }
+  .catch .road::after { content:''; position:absolute; left:0; right:0; top:15px; height:3px; background:repeating-linear-gradient(90deg,#E8A33D 0 16px,transparent 16px 32px); animation:lines .6s linear infinite; }
+  @keyframes lines { to { background-position:-32px 0; } }
+  .catch .scoot { position:absolute; left:22px; bottom:28px; font-size:40px; line-height:1; transform:scaleX(-1); animation:hop 1.3s ease-in-out infinite; }
+  @keyframes hop { 0%,30%,100% { translate:0 0; } 55% { translate:0 -58px; } }
+  .catch .obs { position:absolute; bottom:32px; left:100%; font-size:24px; line-height:1; animation:ride 2.6s linear infinite; }
+  .catch .obs.star { bottom:110px; font-size:20px; }
+  @keyframes ride { to { left:-40px; } }
   .wheel { position:absolute; right:-30px; bottom:-14px; width:76px; height:76px; z-index:2; }
   .wheel .wd { width:100%; height:100%; border-radius:50%; border:4px solid #C98A3A; box-shadow:0 6px 14px rgba(0,0,0,.45);
     background:conic-gradient(#E8A33D 0 60deg,#C9341F 60deg 120deg,#1B7A3E 120deg 180deg,#E8A33D 180deg 240deg,#C9341F 240deg 300deg,#1B7A3E 300deg 360deg); animation:hhSpin 4s cubic-bezier(.3,.1,.3,1) infinite; }
@@ -101,7 +104,7 @@
   .prizes { display:flex; gap:6px; flex-wrap:wrap; margin:-6px 0 16px; }
   .prizes span { font-size:12px; font-weight:700; color:#FBE9C8; background:rgba(232,163,61,.16); border:1px solid rgba(232,163,61,.4); padding:4px 10px; border-radius:100px; }
 
-  @media (prefers-reduced-motion: reduce) { .hh-pie, .catch .drop, .catch .paddle, .wheel .wd, .promo-kicker i { animation:none; } .catch .drop { top:60px; } }
+  @media (prefers-reduced-motion: reduce) { .hh-pie, .catch .scoot, .catch .obs, .catch .road::after, .wheel .wd, .promo-kicker i { animation:none; } .catch .obs { left:110px; } }
   @media (max-width:980px) { .promo-tiles { grid-template-columns:1fr; } }
   @media (max-width:600px) {
     .promo-in { padding:20px 16px 24px; }
@@ -169,21 +172,19 @@
           <div class="game-art" aria-hidden="true">
             <div class="catch">
               <div class="hud"><b>Score 180</b><b>42s</b></div>
-              <span class="drop" data-p="10" style="left:14px;animation-delay:0s">🧀</span>
-              <span class="drop" data-p="25" style="left:62px;animation-delay:-.9s;animation-duration:2.1s">🍍</span>
-              <span class="drop coal" style="left:112px;animation-delay:-1.7s;animation-duration:2.3s">🔥</span>
-              <span class="drop" data-p="15" style="left:38px;animation-delay:-1.3s;animation-duration:2.9s">🫒</span>
-              <span class="drop" data-p="30" style="left:92px;animation-delay:-.4s;animation-duration:2s">🥓</span>
-              <span class="drop" data-p="10" style="left:130px;animation-delay:-2.2s;animation-duration:2.7s">🍄</span>
-              <span class="paddle">🍕</span>
+              <span class="obs" style="animation-delay:-.2s">🚧</span>
+              <span class="obs star" style="animation-delay:-1.1s">⭐</span>
+              <span class="obs" style="animation-delay:-1.5s">🚧</span>
+              <div class="road"></div>
+              <span class="scoot">🛵</span>
             </div>
             <div class="wheel"><div class="wd"></div></div>
           </div>
           <div>
             <span class="pt-tag">Play &amp; win</span>
             <h3>Play a game, win a treat</h3>
-            <p>Catch the falling toppings or spin the pizza wheel before you check out.</p>
-            <div class="prizes"><span>Every spin wins</span><span>Free garlic knots</span><span>Free toppings &amp; drinks</span></div>
+            <p>Ride the delivery scooter or spin the pizza wheel before you check out.</p>
+            <div class="prizes"><span>Spin to win</span><span>Free garlic knots</span><span>Free toppings &amp; soft drinks</span></div>
             <span class="promo-btn gold">Play &amp; win →</span>
           </div>
         </a>
