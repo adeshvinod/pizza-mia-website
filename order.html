@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="halloween">
+<html>
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MD9X07JX7S"></script>
@@ -1265,8 +1265,10 @@
   }
 
   /* ---------- GAMES ---------- */
-  // Halloween look and the Zombie Delivery Run game: on while <html class="halloween">.
+  // Halloween look: on while <html class="halloween"> (off now).
   var HALLOWEEN = document.documentElement.classList.contains("halloween");
+  // The scooter game (Zombie Delivery Run) stays on all year in place of Catch the Toppings.
+  var RUN_GAME = true;
   var WHEEL_COLORS = HALLOWEEN ? ["#E8742A","#6B3FA0","#1A120B","#E8742A","#6B3FA0","#1A120B"]
                                : ["#1B7A3E","#E8A33D","#C9341F","#2E5B41","#C9341F","#E8A33D"];
   function wheelSegs(){
@@ -1310,19 +1312,19 @@
     }
     var scores = T.length===3 ? 'Score <b>'+T[0].minScore+'+</b> for a free drink or topping, <b>'+T[1].minScore+'+</b> for free garlic knots, <b>'+T[2].minScore+'+</b> for up to 15% off.' : '';
     el("gameBody").innerHTML =
-      (HALLOWEEN ? '<div class="gcard hw" id="gcRun"><span class="gnew">New for Halloween</span><div class="ico">🛵🧟</div><div class="t">Zombie Delivery Run</div><div class="d">Jump over zombies, pumpkins and ghosts and get the pizza to the door in 60s. '+scores+'</div></div>' : '')+
+      (RUN_GAME ? '<div class="gcard" id="gcRun"><span class="gnew">New</span><div class="ico">🛵🧟</div><div class="t">Zombie Delivery Run</div><div class="d">Jump over zombies, pumpkins and ghosts and get the pizza to the door in 60s. '+scores+'</div></div>' : '')+
       '<div class="gcard" id="gcWheel"><div class="ico">'+(HALLOWEEN ? '🎃' : '🎡')+'</div><div class="t">'+(HALLOWEEN ? 'Spin the Haunted Pizza Wheel' : 'Spin the Pizza Wheel')+'</div><div class="d">Every spin wins: a free topping, a free drink, free garlic knots or money off.</div></div>'+
-      // Catch the Toppings sits out while Halloween is on (Zombie Delivery Run replaces it)
-      (HALLOWEEN ? '' : '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+scores+'</div></div>')+
+      // Catch the Toppings sits out while the scooter game is on
+      (RUN_GAME ? '' : '<div class="gcard" id="gcCatch"><div class="ico">🍕</div><div class="t">Catch the Toppings</div><div class="d">Catch falling toppings for 60s and dodge the burning coal. '+scores+'</div></div>')+
       have+
       '<div class="pz-terms" style="text-align:center">'+((OFFERS.copy||{}).terms||'')+'</div>';
-    if (HALLOWEEN) el("gcRun").onclick = startRun;
+    if (RUN_GAME) el("gcRun").onclick = startRun;
     el("gcWheel").onclick = startWheel;
-    if (!HALLOWEEN) el("gcCatch").onclick = startCatch;
+    if (!RUN_GAME) el("gcCatch").onclick = startCatch;
   }
   function launchGame(g){
     if (!OFFERS || !OFFERS.enabled) return;
-    if (g==="run" && HALLOWEEN) startRun();
+    if (g==="run" && RUN_GAME) startRun();
     else if (g==="wheel") startWheel();
   }
 
@@ -1585,7 +1587,7 @@
     el("playAgain").onclick = retry;
   }
 
-  /* --- Zombie Delivery Run (Halloween): jump the monsters, deliver in 60s --- */
+  /* --- Zombie Delivery Run (scooter game): jump the monsters, deliver in 60s --- */
   // Scored like Catch the Toppings so the same prize scores apply:
   // +15/20/25 per monster cleared, +10 per candy corn, +50 for making the delivery. 5 lives.
   var RUN_SECS = 60, RUN_W = 400, RUN_H = 250, RUN_GROUND = 214, RUN_X = 64, RUN_BONUS = 50, RUN_LIVES = 5;
