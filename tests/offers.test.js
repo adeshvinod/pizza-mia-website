@@ -24,7 +24,7 @@ function memStore() {
   };
 }
 function setup(over) {
-  var clock = { t: Date.UTC(2026, 9, 19, 12) };
+  var clock = { t: Date.UTC(2026, 9, 19, 13) };   // 19 Oct, 6:30 PM India time (open for orders)
   var store = memStore();
   var api = Api(Object.assign({ config: CONFIG, menu: TMENU, crypto: require("crypto"), store: store, env: {}, now: function () { return clock.t; } }, over || {}));
   return { api: api, store: store, clock: clock };
@@ -375,7 +375,7 @@ test("Every reward version costs less than the 13.5% website-vs-app gap at its u
 });
 
 test("Counter laptop: needs its own secret, gets today's orders, Enter marks them seen", async function () {
-  var s = setup({ env: { KITCHEN_KEY: "kitchen-secret-123456", OFFERS_ADMIN_KEY: "k" } });   // clock: 19 Oct 17:30 IST
+  var s = setup({ env: { KITCHEN_KEY: "kitchen-secret-123456", OFFERS_ADMIN_KEY: "k" } });   // clock: 19 Oct 18:30 IST
   var a = await s.api.handle("submit", { cart: [PEP_M], phone: "9876543210", customer: { name: "Asha", address: "Miramar" } });
   assert.equal((await s.api.handle("kitchen_feed", { key: "k" })).status, 403);
   assert.equal((await s.api.handle("kitchen_feed", {})).status, 403);
@@ -396,7 +396,21 @@ test("Counter laptop: needs its own secret, gets today's orders, Enter marks the
   var f3 = await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456", known: [o.orderId] });
   assert.deepEqual(f3.json.ids, [o.orderId]);
   assert.equal(f3.json.orders.length, 0);
-  assert.match((await s.api.handle("summary", { key: "k" })).html, /Seen by staff on the counter laptop<\/td><td class=m>17:30/);
-  s.clock.t += 14 * 3600e3;   // next day 7:30 AM IST: yesterday's order is gone from the screen
+  assert.match((await s.api.handle("summary", { key: "k" })).html, /Seen by staff on the counter laptop<\/td><td class=m>18:30/);
+  s.clock.t += 14 * 3600e3;   // next day 8:30 AM IST: yesterday's order is gone from the screen
   assert.equal((await s.api.handle("kitchen_feed", { key: "kitchen-secret-123456" })).json.orders.length, 0);
+});
+
+test("Orders only between 12 PM – 3 PM and 6 PM – 2 AM India time", async function () {
+  function ist(h, m) { return Date.UTC(2026, 10, 5, h, m || 0) - 330 * 60000; }
+  [[12, 0], [14, 59], [18, 0], [23, 30], [0, 30], [1, 59]].forEach(function (t) { assert.ok(E.orderingOpen(CONFIG, ist(t[0], t[1])), t.join(":")); });
+  [[11, 59], [15, 0], [17, 59], [2, 0], [6, 0], [9, 0]].forEach(function (t) { assert.ok(!E.orderingOpen(CONFIG, ist(t[0], t[1])), t.join(":")); });
+  var s = setup();
+  s.clock.t = ist(16, 30);
+  var r = await s.api.handle("submit", { cart: [PEP_M], phone: "9876543210" });
+  assert.equal(r.status, 403);
+  assert.equal(r.json.error, "closed");
+  assert.equal(r.json.message, "Orders are available only between 12 PM – 3 PM and 6 PM – 2 AM.");
+  s.clock.t = ist(19, 0);
+  assert.equal((await s.api.handle("submit", { cart: [PEP_M], phone: "9876543210" })).status, 200);
 });

@@ -177,6 +177,11 @@
   .cta { width:100%; background:var(--red); color:var(--cream); border:none; font-weight:700; font-size:16px; padding:15px; border-radius:100px; box-shadow:0 3px 0 #8E2314; margin-top:12px; display:flex; align-items:center; justify-content:center; gap:10px; }
   .cta.wa { background:#25D366; box-shadow:0 3px 0 #128C7E; color:#fff; }
   .cta:disabled { opacity:0.5; box-shadow:none; }
+  /* ordering hours + delivery area */
+  .closedmsg { margin-top:10px; font-size:13px; font-weight:700; line-height:1.45; color:#8A2A16; background:#FBE3DA; border:1px solid #F0B8A6; border-radius:12px; padding:10px 13px; text-align:center; }
+  .hoursbar { display:none; background:#FBE3DA; color:#8A2A16; border-bottom:1px solid #F0B8A6; text-align:center; font-size:13.5px; font-weight:700; padding:10px 16px; line-height:1.4; }
+  .hoursbar.show { display:block; }
+  .areanote { font-size:12px; color:var(--green); font-weight:700; margin:-6px 0 14px; }
 
   .field { margin-bottom:13px; }
   .field label { display:block; font-size:12.5px; font-weight:700; color:var(--green); margin-bottom:5px; }
@@ -368,10 +373,13 @@
     <div class="badges">
       <span class="badge">🛵 Free delivery</span>
       <span class="badge gold">💵 Cash on Delivery</span>
+      <span class="badge">📍 Delivers within 4 km of Miramar</span>
       <span class="badge">📞 92844 99027</span>
     </div>
   </div>
 </div>
+
+<div class="hoursbar" id="hoursBar">🕒 Orders are available only between 12 PM – 3 PM and 6 PM – 2 AM.</div>
 
 <div class="catnav">
   <div class="catnav-in">
@@ -447,6 +455,25 @@
 
   /* ---------- CONFIG ---------- */
   var WHATSAPP = "919284499027";
+  // Website ordering hours (India time). The offers function sends the live copy; this is the fallback.
+  // The server refuses orders outside these hours too.
+  var ORDER_HOURS = { windows:[["12:00","15:00"],["18:00","02:00"]],
+                      message:"Orders are available only between 12 PM – 3 PM and 6 PM – 2 AM." };
+  function orderHours(){ return (OFFERS && OFFERS.orderHours) || ORDER_HOURS; }
+  function ordersOpen(){
+    var d = new Date(Date.now() + 330*60000), m = d.getUTCHours()*60 + d.getUTCMinutes();
+    function hm(x){ var p = x.split(":"); return +p[0]*60 + +p[1]; }
+    return orderHours().windows.some(function(w){
+      var a = hm(w[0]), b = hm(w[1]);
+      return a <= b ? (m >= a && m < b) : (m >= a || m < b);
+    });
+  }
+  function closedHtml(){ return '<div class="closedmsg">🕒 '+orderHours().message+'</div>'; }
+  function updateHoursBar(){
+    var b = document.getElementById("hoursBar"); if (!b) return;
+    b.textContent = "🕒 "+orderHours().message;
+    b.classList.toggle("show", !ordersOpen());
+  }
   var GST_RATE = 0.05;               // menu is "not inclusive of taxes"
   var CART_KEY = "pizzamia_cart_2026";   // new key so carts saved with old prices are dropped
   var CUST_KEY = "pizzamia_customer";
@@ -1090,8 +1117,8 @@
           '<div class="ci-meta">'+(f.size?f.size+' · ':'')+'×'+f.qty+' · Game reward</div></div><div class="ci-price">FREE</div></div>';
       }).join("");
       el("drawerBody").innerHTML = lines + prizePanelHtml() + '<div style="padding:8px 0 4px">'+billHtml()+'</div>';
-      el("drawerFoot").innerHTML = '<button class="cta" id="toCheckout">Proceed to Checkout →</button>';
-      el("toCheckout").onclick = function(){ checkoutMode=true; renderDrawer(); el("drawerBody").scrollTop=0; };
+      el("drawerFoot").innerHTML = '<button class="cta" id="toCheckout"'+(ordersOpen()?'':' disabled')+'>Proceed to Checkout →</button>'+(ordersOpen()?'':closedHtml());
+      el("toCheckout").onclick = function(){ if (!ordersOpen()) return renderDrawer(); checkoutMode=true; renderDrawer(); el("drawerBody").scrollTop=0; };
       bindPrizeBtns();
       bindLineBtns();
     } else {
@@ -1101,6 +1128,7 @@
         '<div class="field" id="f-name"><label>Your name *</label><input id="cName" value="'+(c.name||"")+'" placeholder="e.g. Rohan"><div class="err">Please enter your name.</div></div>'+
         '<div class="field" id="f-phone"><label>Phone number *</label><input id="cPhone" inputmode="numeric" value="'+(c.phone||"")+'" placeholder="10-digit mobile"><div class="err">Enter a valid 10-digit number.</div></div>'+
         '<div class="field" id="f-addr"><label>Delivery address *</label><textarea id="cAddr" rows="3" placeholder="Flat / house no., building, area">'+(c.addr||"")+'</textarea><div class="err">Please enter your delivery address.</div></div>'+
+        '<div class="areanote">📍 We deliver only within a 4 km radius of Miramar.</div>'+
         '<div class="field" id="f-land"><label>Landmark (optional)</label><input id="cLand" value="'+(c.land||"")+'" placeholder="e.g. near London Hotel"></div>'+
         '<div class="field"><label>Delivery notes (optional)</label><textarea id="cNotes" rows="2" placeholder="e.g. less spicy, call on arrival"></textarea></div>'+
         '<label style="display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:5px">Payment</label>'+
@@ -1108,6 +1136,7 @@
         '<div class="paynote">Pay cash to the delivery person when your order arrives. Card & online payment coming soon.</div>'+
         '<div style="padding:18px 0 4px"><div id="coPrize">'+checkoutPrizeHtml()+'</div><div id="billBox">'+billHtml()+'</div></div>';
       el("drawerFoot").innerHTML = '<button class="cta wa" id="placeOrder"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.17c-.24.68-1.42 1.32-1.95 1.36-.5.04-.97.21-3.26-.68-2.76-1.09-4.5-3.91-4.64-4.09-.13-.18-1.1-1.46-1.1-2.79s.7-1.98.95-2.25c.24-.27.53-.34.71-.34.18 0 .36 0 .51.01.16.01.38-.06.6.46.24.56.8 1.94.87 2.08.07.14.12.3.02.48-.09.18-.14.3-.27.46-.14.16-.29.36-.41.48-.14.14-.28.29-.12.56.16.27.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.07.18-.27.36-.22.6-.13.24.09 1.55.73 1.82.86.27.14.45.2.51.31.07.11.07.64-.17 1.32z"/></svg> <span id="placeLbl">Place Order on WhatsApp</span></button>';
+      if (!ordersOpen()){ el("placeOrder").disabled = true; el("drawerFoot").insertAdjacentHTML("beforeend", closedHtml()); }
       el("placeOrder").onclick = placeOrder;
       bindPrizeBtns();
     }
@@ -1137,6 +1166,7 @@
     mark("f-addr", !addr);
     if (!ok){ el("drawerBody").scrollTop=0; return; }
     if (placing) return;
+    if (!ordersOpen()){ renderDrawer(); return; }
 
     try { localStorage.setItem(CUST_KEY, JSON.stringify({name:name,phone:phone,addr:addr,land:land})); } catch(e){}
     var cust = { name:name, phone:phone, addr:addr, land:land, notes:notes };
@@ -1156,6 +1186,7 @@
       if (j.error==="reward_rejected"){ var u = wallet.use; prizeProblem(j.message); wallet[u] = null; pruneWallet(); requote(true); return; }
       if (j.error && j.error.indexOf("reward_")===0) return prizeProblem(j.message);
       if (j.error==="bad_phone"){ done(); mark("f-phone", true); return; }
+      if (j.error==="closed"){ done(); el("placeOrder").disabled = true; el("drawerFoot").insertAdjacentHTML("beforeend", '<div class="closedmsg">🕒 '+j.message+'</div>'); return; }
       if (!usingPrize){ done(); return sendOrder(null, cust); }
       prizeProblem(j.message || "We couldn't confirm your prize. Please try again.");
     }).catch(function(){
@@ -1916,7 +1947,9 @@
   renderMenu();
   refreshCartUI();
   updateRewardUI();
-  loadOffers();
+  updateHoursBar();
+  setInterval(updateHoursBar, 60000);
+  loadOffers().then(updateHoursBar);
   window.addEventListener("scroll", onScroll, {passive:true});
 
   // Deep links from the homepage promo: order.html#half / order.html#play

@@ -3,6 +3,10 @@
 
   "offers_enabled": true,
   "channel": ["website_delivery", "website_pickup"],
+  "_order_hours_note": "Website orders can only be placed inside these windows (India time, 24h clock). A window like 18:00-02:00 runs past midnight.",
+  "order_hours": { "windows": [["12:00", "15:00"], ["18:00", "02:00"]],
+                   "message": "Orders are available only between 12 PM – 3 PM and 6 PM – 2 AM." },
+  "delivery_radius_km": 4,
   "floor": { "min_eligible_subtotal": 399, "require_regular_pizza": true },
   "max_discount_pct_of_eligible": 0.15,
   "one_reward_per_order": true,

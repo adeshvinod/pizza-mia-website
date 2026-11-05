@@ -185,6 +185,7 @@ function Api(deps) {
 
     // Final submit: re-check everything, use up the prize, log the order.
     submit: async function (body, ctx) {
+      if (!E.orderingOpen(config, now())) return err(403, "closed", (config.order_hours || {}).message || "We're not taking orders right now.");
       var digits = phoneDigits(body.phone);
       if (!digits) return err(400, "bad_phone", "Please enter a valid 10-digit phone number.");
       var channel = (config.channel || []).indexOf(body.channel) >= 0 ? body.channel : config.channel[0];

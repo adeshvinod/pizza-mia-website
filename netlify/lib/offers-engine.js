@@ -251,6 +251,19 @@ function totals(priced, discount) {
            subtotal: subtotal, gstRate: GST_RATE, gst: gst, total: round2(subtotal + gst) };
 }
 
+/* ---------- ordering hours ---------- */
+// Is the shop taking website orders at time t? Windows are India time (UTC+5:30); "18:00"-"02:00" crosses midnight.
+function hhmm(x) { var p = String(x).split(":"); return Number(p[0]) * 60 + Number(p[1] || 0); }
+function orderingOpen(config, t) {
+  var w = (config.order_hours || {}).windows;
+  if (!w || !w.length) return true;
+  var d = new Date(t + 330 * 60000), m = d.getUTCHours() * 60 + d.getUTCMinutes();
+  return w.some(function (win) {
+    var a = hhmm(win[0]), b = hhmm(win[1]);
+    return a <= b ? (m >= a && m < b) : (m >= a || m < b);
+  });
+}
+
 /* ---------- games ---------- */
 function pickWheelSlice(config, randInt) {
   var w = config.wheel, sum = 0;
@@ -272,6 +285,8 @@ function publicConfig(config, menu, env) {
     enabled: enabled(config, env),
     floor: config.floor,
     expiryHours: config.limits.expiry_hours,
+    orderHours: config.order_hours || null,
+    deliveryRadiusKm: config.delivery_radius_km || null,
     copy: config.copy,
     wheel: config.wheel.map(function (s) {
       return { id: s.id, label: s.label, nothing: !!s.nothing, ladder: (s.versions || []).map(function (v) { return { min: v.min, label: versionLabel(v) }; }) };
@@ -288,5 +303,5 @@ function publicConfig(config, menu, env) {
 module.exports = {
   SIZE_NAMES: SIZE_NAMES, norm: norm, priceCart: priceCart, findDef: findDef, optionsOf: optionsOf,
   versionLabel: versionLabel, evaluateReward: evaluateReward, totals: totals, enabled: enabled,
-  pickWheelSlice: pickWheelSlice, arcadeTierFor: arcadeTierFor, publicConfig: publicConfig, ceilingFor: ceilingFor
+  pickWheelSlice: pickWheelSlice, orderingOpen: orderingOpen, arcadeTierFor: arcadeTierFor, publicConfig: publicConfig, ceilingFor: ceilingFor
 };
