@@ -239,11 +239,11 @@ test("16. offers_enabled = false → no prizes, checkout ignores rewards", async
 });
 
 /* ---------- extra checks on the games and pickers ---------- */
-test("Wheel spin issues a stored reward from one of the 6 slices", async function () {
-  var s = setup();
-  var r = await s.api.handle("spin", {}, { ip: "1.2.3.4" });
+test("Wheel spin issues a stored reward from one of the prize slices", async function () {
+  var s = setup(), r;
+  do { r = await s.api.handle("spin", {}, { ip: "1.2.3.4" }); } while (r.json.nothing);   // NOTHING gives no reward; spin again
   assert.equal(r.status, 200);
-  assert.ok(r.json.slice >= 0 && r.json.slice < 6);
+  assert.ok(r.json.slice >= 0 && r.json.slice < CONFIG.wheel.length && !CONFIG.wheel[r.json.slice].nothing);
   assert.equal(r.json.label, CONFIG.wheel[r.json.slice].label);
   var rec = await s.store.get("reward/" + r.json.reward.id);
   assert.equal(rec.used, false);
