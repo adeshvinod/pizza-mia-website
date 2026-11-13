@@ -45,9 +45,23 @@ async function fallbackModels(key) {
       .filter(function (n) { return /^gemini-\d+(\.\d+)?-flash(-lite)?$/.test(n) && n !== MODEL; });
     const ver = function (n) { return parseFloat(n.split("-")[1]) || 0; };
     names.sort(function (a, b) { return ver(b) - ver(a) || a.length - b.length; });
-    found.list = names.slice(0, MAX_FALLBACKS);
+    // one more Flash plus the newest Flash-Lite (lite models are quicker and usually less busy)
+    const flash = names.filter(function (n) { return !/-lite$/.test(n); })[0];
+    const lite = names.filter(function (n) { return /-lite$/.test(n); })[0];
+    found.list = [lite, flash].filter(Boolean).slice(0, MAX_FALLBACKS);
   } catch (e) { found.list = []; }
   return found.list;
+}
+
+// Gemini 3 models "think" before answering by default, which is slow and eats the reply length.
+// Nonna only chats about the menu, so ask for as little thinking as possible.
+function quick(payload) {
+  const gc = Object.assign({}, payload.generationConfig, { thinkingConfig: { thinkingLevel: "low" } });
+  return Object.assign({}, payload, { generationConfig: gc });
+}
+function call(model, payload, ms) {
+  return fetchJson(API + "models/" + model + ":generateContent?key=" + process.env.gemini_api_key,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, ms);
 }
 
 // Ask Gemini. If a model fails, or hasn't answered within HEDGE_MS, the next model is asked too;
@@ -67,8 +81,12 @@ async function ask(key, payload) {
       const model = models[next++];
       running++;
       timer = setTimeout(launch, HEDGE_MS);   // still waiting: bring in the next model too
-      fetchJson(API + "models/" + model + ":generateContent?key=" + key,
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, left)
+      call(model, quick(payload), left)
+        .then(function (r) {
+          // a model that doesn't accept the thinking setting gets the plain request
+          if (r.status === 400 && /think/i.test(JSON.stringify(r.data || ""))) return call(model, payload, BUDGET_MS - (Date.now() - start));
+          return r;
+        })
         .then(function (r) {
           if (!r.ok) { lastErr = model + ": " + ((r.data && r.data.error && r.data.error.message) || ("HTTP " + r.status)); return false; }
           const cand = r.data && r.data.candidates && r.data.candidates[0];
@@ -104,7 +122,7 @@ exports.handler = async (event) => {
     if (!key) return json({ ok: false });
     if (Date.now() - health.at < 120e3) return json({ ok: health.ok, model: health.model, why: health.why, tried: health.tried });
     const r = await ask(key, { contents: [{ role: "user", parts: [{ text: "Reply with the word OK." }] }],
-      generationConfig: { maxOutputTokens: 20 } });
+      generationConfig: { maxOutputTokens: 200 } });
     health = { at: Date.now(), ok: !r.error, model: r.model, why: r.error, tried: r.tried };
     return json({ ok: health.ok, model: health.model, why: health.why, tried: health.tried });
   }
@@ -131,7 +149,7 @@ exports.handler = async (event) => {
   const r = await ask(key, {
     system_instruction: { parts: [{ text: system }] },
     contents: contents,
-    generationConfig: { temperature: 0.9, topP: 0.95, maxOutputTokens: 500 }
+    generationConfig: { temperature: 0.9, topP: 0.95, maxOutputTokens: 1000 }
   });
   // Customers see a friendly line from the widget, never Google's raw error.
   if (r.error || !r.reply) { health = { at: Date.now(), ok: false, why: r.error || "empty reply", tried: r.tried }; return json({ error: "unavailable" }); }
