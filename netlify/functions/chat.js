@@ -58,7 +58,7 @@ async function ask(key, payload) {
   const models = [MODEL].concat(await fallbackModels(key));
   return new Promise(function (resolve) {
     let next = 0, running = 0, done = false, lastErr = "busy", timer = null;
-    function finish(r) { if (done) return; done = true; clearTimeout(timer); if (r.error) console.error("chat: every model failed:", r.error); resolve(r); }
+    function finish(r) { if (done) return; done = true; clearTimeout(timer); r.tried = models.slice(0, next); if (r.error) console.error("chat: every model failed:", r.tried, r.error); resolve(r); }
     function launch() {
       clearTimeout(timer);
       if (done || next >= models.length) { if (!running) finish({ error: lastErr }); return; }
@@ -77,7 +77,7 @@ async function ask(key, payload) {
           finish({ reply: reply, model: model });
           return true;
         })
-        .catch(function () { lastErr = model + ": timeout"; return false; })
+        .catch(function () { lastErr = model + ": no answer in time"; return false; })
         .then(function (ok) { running--; if (!ok && !done) launch(); });
     }
     launch();
@@ -102,11 +102,11 @@ exports.handler = async (event) => {
 
   if (body.ping) {
     if (!key) return json({ ok: false });
-    if (Date.now() - health.at < 120e3) return json({ ok: health.ok, model: health.model });
+    if (Date.now() - health.at < 120e3) return json({ ok: health.ok, model: health.model, why: health.why, tried: health.tried });
     const r = await ask(key, { contents: [{ role: "user", parts: [{ text: "Reply with the word OK." }] }],
       generationConfig: { maxOutputTokens: 20 } });
-    health = { at: Date.now(), ok: !r.error, model: r.model };
-    return json({ ok: health.ok, model: health.model });
+    health = { at: Date.now(), ok: !r.error, model: r.model, why: r.error, tried: r.tried };
+    return json({ ok: health.ok, model: health.model, why: health.why, tried: health.tried });
   }
   if (!key) return json({ error: "unavailable" });
 
@@ -134,7 +134,7 @@ exports.handler = async (event) => {
     generationConfig: { temperature: 0.9, topP: 0.95, maxOutputTokens: 500 }
   });
   // Customers see a friendly line from the widget, never Google's raw error.
-  if (r.error || !r.reply) { health = { at: Date.now(), ok: false }; return json({ error: "unavailable" }); }
+  if (r.error || !r.reply) { health = { at: Date.now(), ok: false, why: r.error || "empty reply", tried: r.tried }; return json({ error: "unavailable" }); }
   health = { at: Date.now(), ok: true, model: r.model };
   return json({ reply: r.reply });
 };
