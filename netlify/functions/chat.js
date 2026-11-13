@@ -50,26 +50,38 @@ async function fallbackModels(key) {
   return found.list;
 }
 
-// Ask Gemini, moving to the next model when one is busy or slow. Returns { reply } or { error }.
+// Ask Gemini. If a model fails, or hasn't answered within HEDGE_MS, the next model is asked too;
+// the first good answer wins. Everything stops at BUDGET_MS. Returns { reply, model } or { error }.
+const HEDGE_MS = 3000;
 async function ask(key, payload) {
   const start = Date.now();
   const models = [MODEL].concat(await fallbackModels(key));
-  let lastErr = "busy";
-  for (let i = 0; i < models.length; i++) {
-    const left = BUDGET_MS - (Date.now() - start);
-    if (left < 1500) break;
-    try {
-      const r = await fetchJson(API + "models/" + models[i] + ":generateContent?key=" + key,
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, left);
-      if (!r.ok) { lastErr = (r.data && r.data.error && r.data.error.message) || ("HTTP " + r.status); continue; }
-      const cand = r.data && r.data.candidates && r.data.candidates[0];
-      const reply = cand && cand.content && cand.content.parts
-        ? cand.content.parts.map(function (p) { return p.text || ""; }).join("").trim() : "";
-      return { reply: reply, model: models[i] };
-    } catch (e) { lastErr = "timeout"; }
-  }
-  console.error("chat: every model failed:", lastErr);
-  return { error: lastErr };
+  return new Promise(function (resolve) {
+    let next = 0, running = 0, done = false, lastErr = "busy", timer = null;
+    function finish(r) { if (done) return; done = true; clearTimeout(timer); if (r.error) console.error("chat: every model failed:", r.error); resolve(r); }
+    function launch() {
+      clearTimeout(timer);
+      if (done || next >= models.length) { if (!running) finish({ error: lastErr }); return; }
+      const left = BUDGET_MS - (Date.now() - start);
+      if (left < 1500) { if (!running) finish({ error: lastErr }); return; }
+      const model = models[next++];
+      running++;
+      timer = setTimeout(launch, HEDGE_MS);   // still waiting: bring in the next model too
+      fetchJson(API + "models/" + model + ":generateContent?key=" + key,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, left)
+        .then(function (r) {
+          if (!r.ok) { lastErr = model + ": " + ((r.data && r.data.error && r.data.error.message) || ("HTTP " + r.status)); return false; }
+          const cand = r.data && r.data.candidates && r.data.candidates[0];
+          const reply = cand && cand.content && cand.content.parts
+            ? cand.content.parts.map(function (p) { return p.text || ""; }).join("").trim() : "";
+          finish({ reply: reply, model: model });
+          return true;
+        })
+        .catch(function () { lastErr = model + ": timeout"; return false; })
+        .then(function (ok) { running--; if (!ok && !done) launch(); });
+    }
+    launch();
+  });
 }
 
 // Health check for the chat button: a tiny real request, remembered for 2 minutes per warm instance.
@@ -90,11 +102,11 @@ exports.handler = async (event) => {
 
   if (body.ping) {
     if (!key) return json({ ok: false });
-    if (Date.now() - health.at < 120e3) return json({ ok: health.ok });
+    if (Date.now() - health.at < 120e3) return json({ ok: health.ok, model: health.model });
     const r = await ask(key, { contents: [{ role: "user", parts: [{ text: "Reply with the word OK." }] }],
       generationConfig: { maxOutputTokens: 20 } });
-    health = { at: Date.now(), ok: !r.error };
-    return json({ ok: health.ok });
+    health = { at: Date.now(), ok: !r.error, model: r.model };
+    return json({ ok: health.ok, model: health.model });
   }
   if (!key) return json({ error: "unavailable" });
 
@@ -123,6 +135,6 @@ exports.handler = async (event) => {
   });
   // Customers see a friendly line from the widget, never Google's raw error.
   if (r.error || !r.reply) { health = { at: Date.now(), ok: false }; return json({ error: "unavailable" }); }
-  health = { at: Date.now(), ok: true };
+  health = { at: Date.now(), ok: true, model: r.model };
   return json({ reply: r.reply });
 };
