@@ -8,6 +8,8 @@
   var ENDPOINT = "/.netlify/functions/chat";
   var NUDGE_KEY = "pizzamia_chat_nudged";   // sessionStorage: nudge bubble shown/dismissed
   var SEEN_KEY = "pizzamia_chat_seen";      // sessionStorage: chat opened, so tone down the glow
+  var UP_KEY = "pizzamia_chat_up";          // sessionStorage: when the server last said Nonna is working
+  var BUSY_TEXT = "Mamma mia, the kitchen is very busy! Nonna can't chat right now. Please try again in a minute, tesoro.";
   // One host only: Nonna Mia (the server's persona id is "nonna")
   var HOST = { id:"nonna", name:"Nonna Mia", emoji:"👵", tag:"Your Italian grandma",
     greet:"Ciao tesoro! 👵 You look hungry. Veg or non-veg? Tell Nonna and I sort you out." };
@@ -27,7 +29,7 @@
   var root = document.createElement("div");
   root.className = "pm-chat";
   root.innerHTML =
-    '<div class="chat-dock" id="chatDock">' +
+    '<div class="chat-dock offline" id="chatDock">' +
       '<div class="chat-nudge" id="chatNudge"><button class="cn-x" id="chatNudgeX" aria-label="Dismiss">×</button>' +
         '<b>Hungry, tesoro? 👵</b>Ask Nonna what to order</div>' +
       '<button class="chat-fab" id="chatFab" aria-label="Chat with Nonna">' +
@@ -62,9 +64,27 @@
     document.documentElement.classList.remove("pm-chat-open");
   }
 
+  /* ---------- SHOW ONLY WHEN NONNA IS WORKING ---------- */
+  // The button stays hidden until the server confirms the AI answers (remembered for 5 minutes).
+  // If it doesn't, check again a couple of times while the page is open.
+  function showNonna() {
+    el("chatDock").classList.remove("offline");
+    if (!ss(NUDGE_KEY)) setTimeout(function () { if (!open) el("chatNudge").classList.add("show"); }, 2500);
+  }
+  var tries = 0;
+  function checkNonna() {
+    var up = Number(ss(UP_KEY)) || 0;
+    if (Date.now() - up < 5 * 60e3) return showNonna();
+    fetch(ENDPOINT, { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ ping:true }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok) { ss(UP_KEY, String(Date.now())); showNonna(); } else retry(); })
+      .catch(retry);
+  }
+  function retry() { if (++tries < 3) setTimeout(checkNonna, 90e3); }
+  setTimeout(checkNonna, 1200);
+
   /* ---------- NUDGE BUBBLE ---------- */
   function hideNudge() { el("chatNudge").classList.remove("show"); ss(NUDGE_KEY, "1"); }
-  if (!ss(NUDGE_KEY)) setTimeout(function () { if (!open) el("chatNudge").classList.add("show"); }, 2500);
   el("chatNudgeX").onclick = function (e) { e.stopPropagation(); hideNudge(); };
   el("chatNudge").onclick = function () { openChat(); };
 
@@ -128,12 +148,12 @@
       .then(function (data) {
         busy = false;
         if (data && data.reply) msgs.push({ role:"assistant", text:data.reply });
-        else msgs.push({ role:"assistant", text: (data && data.error) ? data.error : "Hmm, I couldn't think of a reply — try asking again?" });
+        else { ss(UP_KEY, "0"); msgs.push({ role:"assistant", text:BUSY_TEXT, local:true }); }
         renderMessages();
       })
       .catch(function () {
-        busy = false;
-        msgs.push({ role:"assistant", text:"I couldn't reach the kitchen brain just now — please try again in a moment." });
+        busy = false; ss(UP_KEY, "0");
+        msgs.push({ role:"assistant", text:BUSY_TEXT, local:true });
         renderMessages();
       });
   }

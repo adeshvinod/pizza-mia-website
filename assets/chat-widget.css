@@ -8,6 +8,7 @@
 .chat-dock.raised { bottom:92px; }
 .chat-dock.raised.tall { bottom:128px; }
 .chat-dock.away { display:none; }
+.chat-dock.offline { display:none; }   /* hidden until the server says Nonna is working */
 .chat-fab { position:relative; width:64px; height:64px; border-radius:50%; border:3px solid #FBF3E6; padding:0; background:linear-gradient(135deg,#C9341F,#E8A33D); color:#fff; display:flex; align-items:center; justify-content:center; animation:cfGlow 2.2s ease-in-out infinite; transition:transform .15s; }
 .chat-fab:hover { transform:scale(1.08); }
 .chat-fab .cf-ico { font-size:28px; line-height:1; display:block; animation:cfWiggle 4.4s ease-in-out infinite; }
