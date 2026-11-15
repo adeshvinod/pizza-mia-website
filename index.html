@@ -15,7 +15,6 @@
 </head>
 <body>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="./assets/chat-widget.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pacifico&display=swap" rel="stylesheet">
 <style>
   body { margin: 0; background: #FBF3E6; }
@@ -37,7 +36,6 @@
   .wa-fab { position:fixed; bottom:22px; left:22px; z-index:1000; width:60px; height:60px; border-radius:50%; background:#25D366; box-shadow:0 4px 14px rgba(0,0,0,0.28); display:flex; align-items:center; justify-content:center; transition:transform .15s ease, box-shadow .15s ease; }
   .wa-fab:hover { transform:scale(1.07); box-shadow:0 6px 20px rgba(0,0,0,0.33); }
   .wa-fab svg { width:34px; height:34px; display:block; }
-  .pm-chat-open .wa-fab { display:none; }
   @media (max-width:600px) { .wa-fab { width:54px; height:54px; bottom:18px; left:18px; } .wa-fab svg { width:30px; height:30px; } }
 
   /* Online-ordering promo (top of page) */
@@ -550,10 +548,6 @@
   <section id="about" style="max-width:1240px;margin:0 auto;padding:84px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:center;">
     <div style="position:relative;">
       <img src="./images/bar.webp" alt="Inside Pizza Mia" loading="lazy" decoding="async" style="width:100%;height:480px;object-fit:cover;border-radius:20px;display:block;"/>
-      <div style="position:absolute;bottom:20px;left:20px;background:#FBF3E6;border-radius:14px;padding:14px 18px;">
-        <div style="font-family:'Pacifico',cursive;font-size:17px;color:#C9341F;line-height:1;">Happy hours</div>
-        <div style="font-size:13px;color:#4E5347;margin-top:6px;letter-spacing:0.02em;">Cocktails 1+1 · 7–9 PM</div>
-      </div>
     </div>
     <div>
       <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#C9341F;font-weight:700;margin-bottom:12px;">Our Place</div>
@@ -571,7 +565,7 @@
           <span style="width:42px;height:42px;border-radius:12px;background:#C6DBBB;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;">🍸</span>
           <div>
             <div style="font-weight:700;font-size:16px;margin-bottom:4px;">A proper little bar</div>
-            <div style="font-size:15px;color:#7A7767;line-height:1.55;">Cocktails, cold beer and wine, with happy hours to start the evening right.</div>
+            <div style="font-size:15px;color:#7A7767;line-height:1.55;">Cocktails, cold beer and wine to start the evening right.</div>
           </div>
         </div>
         <div style="display:flex;gap:16px;align-items:flex-start;">
@@ -650,7 +644,6 @@
       <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EFE4D0;font-size:14.5px;"><span style="font-weight:700;">Monday</span><span style="color:#7A7767;">12–3 PM · 6–11:45 PM</span></div>
       <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #EFE4D0;font-size:14.5px;"><span style="font-weight:700;">Tuesday</span><span style="color:#7A7767;">3–11:45 PM</span></div>
       <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;font-size:14.5px;"><span style="font-weight:700;">Wed – Sunday</span><span style="color:#7A7767;">12–11:45 PM</span></div>
-      <div style="margin-top:16px;padding-top:15px;border-top:1px dashed #DCCFBA;font-size:14px;line-height:1.5;color:#4E5347;">Happy hours every evening, 7–9 PM. Cocktails 1+1.</div>
       <div style="margin-top:12px;display:flex;gap:10px;align-items:flex-start;background:#F6EFE0;border-radius:12px;padding:12px 14px;">
         <span style="font-size:14px;line-height:1.4;">🌙</span>
         <div style="font-size:14px;line-height:1.5;color:#22271F;"><strong style="font-weight:700;">Late night, Wed–Sunday:</strong> open 12 AM–3 AM for takeaway, Swiggy and Zomato.</div>
@@ -713,7 +706,7 @@
 
 <script>
 (function () {
-  var blurbs = {"fairytale":"Costumes encouraged. The room gets dressed up and so does everyone in it.","street":"Kids shape and paint their own dough ornaments at the tables out front, then take one home to hang up.","valentines":"The mic goes round and everyone gets a turn. Happy hours run right through it.","rakhi":"Brothers, sisters, cousins and a lot of pizza. A Rakhi afternoon for the whole family.","karaoke":"Celebrating the 'I' in Valentine. Long conversations, hearty laughter and a table you're in no hurry to leave.","pizza-making":"Aprons on, dough in hand. Kids stretch their own bases, top them however they like, and we bake them right there."};
+  var blurbs = {"fairytale":"Costumes encouraged. The room gets dressed up and so does everyone in it.","street":"Kids shape and paint their own dough ornaments at the tables out front, then take one home to hang up.","valentines":"The mic goes round and everyone gets a turn.","rakhi":"Brothers, sisters, cousins and a lot of pizza. A Rakhi afternoon for the whole family.","karaoke":"Celebrating the 'I' in Valentine. Long conversations, hearty laughter and a table you're in no hurry to leave.","pizza-making":"Aprons on, dough in hand. Kids stretch their own bases, top them however they like, and we bake them right there."};
   function scrollRail(el, dir) { if (el) el.scrollBy({ left: dir * Math.max(300, el.clientWidth * 0.8), behavior: "smooth" }); }
   window.scrollPizza = function (dir) { scrollRail(document.getElementById("pizza-rail"), dir); };
   window.scrollActiveEventRail = function (dir) { scrollRail(document.querySelector(".ev-rail.active"), dir); };
@@ -726,6 +719,5 @@
 })();
 </script>
 <script src="./assets/menu.js"></script>
-<script src="./assets/chat-widget.js"></script>
 </body>
 </html>

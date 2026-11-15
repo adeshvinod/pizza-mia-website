@@ -13,7 +13,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Order Online · Pizza Mia, Miramar</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="./assets/chat-widget.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pacifico&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -447,7 +446,6 @@
 <div class="toast" id="toast"></div>
 
 <script src="./assets/menu.js"></script>
-<script src="./assets/chat-widget.js"></script>
 
 <script>
 (function () {
@@ -922,18 +920,13 @@
     toast("Added "+(b ? "Half & Half pizza" : mItem.name));
   };
 
-  function showModal(on){ el("modal").classList.toggle("show",on); el("overlay").classList.toggle("show", on || drawerOpen); if(!on && !drawerOpen) hideOverlay(); syncChat(); }
-  // keep the chat button out of the way while a popup (cart, item, games) is open
-  function syncChat(){
-    if (!window.PMChat || !window.PMChat.hide) return;
-    window.PMChat.hide(drawerOpen || el("modal").classList.contains("show") || el("gameWrap").classList.contains("show"));
-  }
+  function showModal(on){ el("modal").classList.toggle("show",on); el("overlay").classList.toggle("show", on || drawerOpen); if(!on && !drawerOpen) hideOverlay(); }
 
   /* ---------- DRAWER (cart + checkout) ---------- */
   var drawerOpen=false, checkoutMode=false;
 
-  function openDrawer(){ drawerOpen=true; el("drawer").classList.add("show"); el("overlay").classList.add("show"); renderDrawer(); syncChat(); }
-  function closeDrawer(){ drawerOpen=false; checkoutMode=false; el("drawer").classList.remove("show"); if(!el("modal").classList.contains("show")) hideOverlay(); updateDrawerHead(); syncChat(); refreshCartUI(); }
+  function openDrawer(){ drawerOpen=true; el("drawer").classList.add("show"); el("overlay").classList.add("show"); renderDrawer(); }
+  function closeDrawer(){ drawerOpen=false; checkoutMode=false; el("drawer").classList.remove("show"); if(!el("modal").classList.contains("show")) hideOverlay(); updateDrawerHead(); refreshCartUI(); }
   function hideOverlay(){ el("overlay").classList.remove("show"); }
   function showCart(){ checkoutMode=false; renderDrawer(); }
   function updateDrawerHead(){
@@ -1259,7 +1252,6 @@
     }
     el("cartbarNudge").innerHTML = t;
     el("cartbarNudge").style.display = t ? "" : "none";
-    if (window.PMChat) window.PMChat.raise(barShown, !!t);
   }
 
   /* ---------- TOAST ---------- */
@@ -1322,12 +1314,12 @@
     gamesReturn = ctx || "page";
     el("gOverlay").classList.add("show");
     el("gameWrap").classList.add("show");
-    syncChat();
+   
     if (!OFFERS){ gSetHead("Play & Win 🎮", false); el("gameBody").innerHTML = '<div class="ghint">Loading the games…</div>'; loadOffers().then(function(){ renderGameMenu(); launchGame(game); }); return; }
     renderGameMenu();
     launchGame(game);
   }
-  function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); syncChat(); }
+  function closeGames(){ stopCatch(); el("gameWrap").classList.remove("show"); el("gOverlay").classList.remove("show"); }
   function gSetHead(title, back){ el("gTitle").textContent = title; el("gBack").style.display = back ? "block" : "none"; }
 
   function renderGameMenu(){
@@ -1992,8 +1984,7 @@
   window.addEventListener("scroll", onScroll, {passive:true});
 
   // Deep links from the homepage promo: order.html#half / order.html#play
-  // and order.html#add=ID from the chat on other pages
-  window.PMChatAdd = openItem;
+  // and order.html#add=ID to open one item
   var addHash = /^#add=([a-z0-9_]+)$/i.exec(location.hash);
   if (location.hash==="#half" && el("halfStart")) el("halfStart").click();
   else if (location.hash==="#play") openGames("page");

@@ -1,5 +1,4 @@
-/* Pizza Mia menu data (Pizza Mia Menu 2026) — shared by order.html, the chat widget and the offers function.
-   After changing it, regenerate the AI host menu in netlify/functions/chat.js. */
+/* Pizza Mia menu data (Pizza Mia Menu 2026) — shared by order.html and the offers function. */
 (function () {
   "use strict";
   // Half & Half: allowed on these pizza size indexes (Large, Godfather, Jumbo).
