@@ -1774,16 +1774,9 @@
       delivered ? " and delivered the pizza! 🍕" : "!", delivered ? "" : "You crashed into the snow! ", startRun);
   }
 
-  // Night sky, moon, snowy hills and the village are drawn once; only the scroll offset changes.
+  // Night sky, moon, snowy hills and the village (no background trees, so only the tree obstacles are trees) are drawn once; only the scroll offset changes.
   function runBackdrop(dpr){
     function layer(w, h, paint){ var c = document.createElement("canvas"); c.width = w*dpr; c.height = h*dpr; var x = c.getContext("2d"); x.scale(dpr,dpr); paint(x); return c; }
-    function pine(x, bx, by, s){
-      x.fillStyle = "#5E8C86";   // muted, so background trees don't look like the tree obstacles
-      for (var k=0;k<3;k++){ var ty = by-10*s-k*11*s, hw = (14-k*3.5)*s; x.beginPath(); x.moveTo(bx-hw,ty+12*s); x.lineTo(bx,ty-6*s); x.lineTo(bx+hw,ty+12*s); x.fill(); }
-      x.fillStyle = "#F4F8FC";
-      for (var j=0;j<3;j++){ var sy = by-10*s-j*11*s; x.beginPath(); x.moveTo(bx-4*s,sy-1*s); x.lineTo(bx,sy-6*s); x.lineTo(bx+4*s,sy-1*s); x.fill(); }
-      x.fillStyle = "#5A3A22"; x.fillRect(bx-2*s, by-10*s+12*s, 4*s, 6*s);
-    }
     var sky = layer(RUN_W, RUN_H, function(x){
       var g = x.createLinearGradient(0,0,0,RUN_H); g.addColorStop(0,"#0B1A33"); g.addColorStop(0.6,"#1C3A5E"); g.addColorStop(1,"#3A5F82");
       x.fillStyle = g; x.fillRect(0,0,RUN_W,RUN_H);
@@ -1799,7 +1792,6 @@
       x.beginPath(); x.moveTo(0,120); x.lineTo(0,70);
       for (var i=0;i<=800;i+=40) x.quadraticCurveTo(i+20, 40+((i*7)%30), i+40, 66+((i*3)%14));
       x.lineTo(800,120); x.fill();
-      [[90,72,0.8],[130,76,0.6],[300,66,0.7],[660,70,0.8],[700,74,0.6]].forEach(function(t){ pine(x, t[0], t[1], t[2]); });
       // little church with a lit window on the hill
       x.fillStyle = "#7A4A3A"; x.fillRect(520,40,40,32); x.fillRect(548,22,12,20);
       x.fillStyle = "#F4F8FC"; x.beginPath(); x.moveTo(514,42); x.lineTo(540,24); x.lineTo(566,42); x.fill();
@@ -1818,7 +1810,6 @@
         var cols = ["#FF5A4E","#FFD23F","#5BD16E","#5AA9FF"];
         for (var b=0;b<7;b++){ x.fillStyle = cols[b%4]; x.beginPath(); x.arc(hx-2+b*(hw+4)/6, 93-hh+(b%2)*2, 2.2, 0, 7); x.fill(); }
       });
-      [[120,1],[160,0.8],[330,1.1],[370,0.85],[540,1]].forEach(function(t){ pine(x, t[0], 90, t[1]); });
       // snow drift along the bottom
       x.fillStyle = "#E8F0F8"; x.beginPath(); x.moveTo(0,90);
       for (var d=0; d<=600; d+=30) x.quadraticCurveTo(d+15, 82+((d*7)%6), d+30, 88);
