@@ -41,6 +41,17 @@ function sizeIndexOf(item, line) {
   return -1;
 }
 
+// Petpooja "Half N Half" price of one half (assets/menu.js HALF_PRICES), and container charge per unit.
+function halfPrice(menu, it, si) {
+  var h = (menu.HALF_PRICES || {})[it.id], p = h && h[si - 1];
+  if (typeof p !== "number") fail("bad_cart", "Half & Half not available for " + it.name);
+  return p;
+}
+function containerOf(menu, it, si, isHalf) {
+  if (it.type === "pizza") return isHalf ? (menu.HALF_BOX[si] || 0) * 2 : (menu.PIZZA_BOX[si] || 0);
+  return it.box || 0;
+}
+
 function isExcludedName(config, name) {
   var ex = (config.excluded_from_eligible || []).map(norm);
   return ex.indexOf(norm(name)) >= 0;
@@ -63,7 +74,8 @@ function priceCart(menu, config, rawLines) {
         var b = M.items[bId];
         if (!b || b.type !== "pizza" || b.id === it.id) fail("bad_cart", "Bad Half & Half");
         if (M.halfSizes.indexOf(si) < 0) fail("bad_cart", "Half & Half is Large and up only");
-        unit = Math.ceil(it.sizes[si] / 2) + Math.ceil(b.sizes[si] / 2);
+        // Petpooja bills each half at its own "Half N Half" price (not half the full price).
+        unit = halfPrice(menu, it, si) + halfPrice(menu, b, si);
         name = "Half & Half: " + it.name + " + " + b.name;
         half = { a: it.name, b: b.name, bId: b.id };
       } else unit = it.sizes[si];
@@ -78,18 +90,19 @@ function priceCart(menu, config, rawLines) {
     });
     tops.forEach(function (t) { unit += t.price; });
     var excluded = isExcludedName(config, it.name) || !!it.alcohol;
+    var box = containerOf(menu, it, si, !!half);          // container charge per unit (no GST)
     var sizeLabel = it.type === "pizza" ? SIZE_NAMES[si] : (it.type === "multi" ? it.sizes[si].label : "");
     return {
       idx: idx, itemId: it.id, name: name, sizeIdx: si, sizeLabel: sizeLabel, qty: qty,
-      unit: unit, total: unit * qty, toppings: tops, half: half,
+      unit: unit, total: unit * qty, container: box * qty, toppings: tops, half: half,
       choice: raw.choice && it.choice && it.choice.opts.indexOf(raw.choice) >= 0 ? raw.choice : (it.choice ? it.choice.opts[0] : null),
       isPizza: it.type === "pizza" && !excluded && norm(it.name) !== "99 pizza",
       excluded: excluded
     };
   });
-  var itemTotal = 0, eligible = 0;
-  lines.forEach(function (l) { itemTotal += l.total; if (!l.excluded) eligible += l.total; });
-  return { lines: lines, itemTotal: itemTotal, eligible: eligible, hasPizza: lines.some(function (l) { return l.isPizza; }) };
+  var itemTotal = 0, eligible = 0, container = 0;
+  lines.forEach(function (l) { itemTotal += l.total; container += l.container; if (!l.excluded) eligible += l.total; });
+  return { lines: lines, itemTotal: itemTotal, eligible: eligible, container: container, hasPizza: lines.some(function (l) { return l.isPizza; }) };
 }
 
 /* ---------- reward definitions ---------- */
@@ -243,12 +256,16 @@ function evaluateReward(config, priced, reward, sel, opts) {
 }
 function cap1(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+// Same as a Petpooja bill: item total − discount, + container charge (no GST on it),
+// + 5% GST on the items only, then rounded to the nearest ₹1.
 // Discount comes off before GST, so GST is charged on the reduced amount.
 function totals(priced, discount) {
   var subtotal = Math.max(0, priced.itemTotal - (discount || 0));
+  var container = priced.container || 0;
   var gst = round2(subtotal * GST_RATE);
   return { itemTotal: priced.itemTotal, eligible: priced.eligible, discount: discount || 0,
-           subtotal: subtotal, gstRate: GST_RATE, gst: gst, total: round2(subtotal + gst) };
+           subtotal: subtotal, container: container, gstRate: GST_RATE, gst: gst,
+           total: Math.round(subtotal + container + gst) };
 }
 
 /* ---------- ordering hours ---------- */

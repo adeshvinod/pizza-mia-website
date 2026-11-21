@@ -100,7 +100,7 @@ function Api(deps) {
   function kitchenOrder(r) {
     return { orderId: r.orderId, at: r.at, channel: r.channel, customer: r.customer || null, items: r.items || [],
       freeItems: r.freeItems || [], itemTotal: r.itemTotal, prize: r.reward ? r.reward.code + " · " + r.reward.versionLabel : "",
-      discount: r.discount || 0, gst: r.gst, total: r.total, newCustomer: !!r.newPhone, seenAt: r.seenAt || null };
+      discount: r.discount || 0, container: r.container || 0, gst: r.gst, total: r.total, newCustomer: !!r.newPhone, seenAt: r.seenAt || null };
   }
 
   var actions = {
@@ -224,7 +224,7 @@ function Api(deps) {
           return { name: l.name, size: l.sizeLabel, choice: l.choice || "", qty: l.qty, toppings: l.toppings.map(function (x) { return x.name; }), total: l.total };
         }),
         freeItems: applied ? ev.freeLines.map(function (f) { return f.text; }) : [],
-        itemTotal: q.totals.itemTotal, eligible: q.totals.eligible, gst: q.totals.gst, total: q.totals.total,
+        itemTotal: q.totals.itemTotal, eligible: q.totals.eligible, container: q.totals.container, gst: q.totals.gst, total: q.totals.total,
         reward: applied ? { code: ev.reward.code, id: ev.reward.id, rewardId: ev.reward.rewardId, source: ev.reward.source,
           option: ev.optionIndex, version: ev.versionIndex, versionLabel: ev.version.label } : null,
         discount: applied ? ev.discount : 0, estCost: applied ? ev.estCost : 0
@@ -333,6 +333,7 @@ function summaryHtml(rows, nDays, key) {
       (r.freeItems || []).map(function (f) { return "<tr><td>🎁 " + esc(f) + "</td><td>₹0</td></tr>"; }).join("") +
       "<tr><td>Item total</td><td>" + inr(r.itemTotal) + "</td></tr>" +
       (r.reward ? "<tr><td>Prize: " + esc(prizeText(r)) + "</td><td>-" + inr(r.discount || 0) + "</td></tr>" : "") +
+      (r.container ? "<tr><td>Container charge</td><td>" + inr(r.container) + "</td></tr>" : "") +
       (r.gst != null ? "<tr><td>GST</td><td>" + inr(r.gst) + "</td></tr>" : "") +
       "<tr><td><b>Total</b></td><td>" + inr(r.total) + "</td></tr>" +
       "<tr><td class=m>Seen by staff on the counter laptop</td><td class=m>" + (r.seenAt ? esc(ist(r.seenAt).slice(11)) : "Not yet") + "</td></tr>" +
@@ -343,11 +344,11 @@ function summaryHtml(rows, nDays, key) {
 }
 function csvCell(v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
 function ordersCsv(rows) {
-  var head = ["Date (IST)", "Order ID", "Name", "Phone", "Address", "Landmark", "Notes", "Items", "Free items", "Item total", "Prize", "Discount", "GST", "Total", "Est. prize cost", "New customer", "Seen by staff (IST)"];
+  var head = ["Date (IST)", "Order ID", "Name", "Phone", "Address", "Landmark", "Notes", "Items", "Free items", "Item total", "Prize", "Discount", "Container", "GST", "Total", "Est. prize cost", "New customer", "Seen by staff (IST)"];
   var lines = rows.map(function (r) {
     var c = cust(r);
     return [ist(r.at), r.orderId, c.name, c.phone, c.address, c.landmark, c.notes,
-      (r.items || []).map(itemText).join("; "), (r.freeItems || []).join("; "), r.itemTotal, prizeText(r), r.discount || 0,
+      (r.items || []).map(itemText).join("; "), (r.freeItems || []).join("; "), r.itemTotal, prizeText(r), r.discount || 0, r.container || 0,
       r.gst != null ? r.gst : "", r.total, r.estCost || 0, r.newPhone ? "Yes" : "No", r.seenAt ? ist(r.seenAt) : ""].map(csvCell).join(",");
   });
   return "﻿" + [head.map(csvCell).join(",")].concat(lines).join("\r\n");

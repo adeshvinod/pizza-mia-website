@@ -473,7 +473,7 @@
     b.classList.toggle("show", !ordersOpen());
   }
   var GST_RATE = 0.05;               // menu is "not inclusive of taxes"
-  var CART_KEY = "pizzamia_cart_2026";   // new key so carts saved with old prices are dropped
+  var CART_KEY = "pizzamia_cart_2026b";  // new key so carts saved with old prices are dropped (Nov 2026: Petpooja half & half prices)
   var CUST_KEY = "pizzamia_customer";
   var REWARD_KEY = "pizzamia_reward";
   var PIZZA_SIZES = [
@@ -501,7 +501,8 @@
   function placeholder(it){ return '<div class="ph">'+(it.ph || (it.veg?'🥗':'🍖'))+'</div>'; }
   function mustTag(it){ return it.must ? ' <span class="must">★ Must try</span>' : ''; }
   function allPizzas(){ var a=[]; PIZZAS.forEach(function(g){ a=a.concat(g.items); }); return a; }
-  function half(p,si){ return Math.ceil(p.sizes[si] / 2); }
+  // One half of a Half & Half, at Petpooja's own half price (assets/menu.js HALF_PRICES)
+  function half(p,si){ return M.halfPriceOf(p.id, si); }
   function halfPrice(a,b,si){ return half(a,si) + half(b,si); }
 
   /* ---------- CART STATE ---------- */
@@ -516,6 +517,22 @@
     return t;
   }
   function itemTotal(){ var t=0; cart.forEach(function(l){ t += lineUnit(l)*l.qty; }); return t; }
+  // Container (packing) charge, as Petpooja adds it on delivery: per item, no GST on it.
+  function lineSizeIdx(l, it){
+    if (it.type==="pizza") return PIZZA_SIZES.map(function(z){ return z.label; }).indexOf(String(l.sizeLabel||"").split(" ")[0]);
+    if (it.type==="multi"){ for (var i=0;i<it.sizes.length;i++) if (it.sizes[i].label===l.sizeLabel) return i; }
+    return -1;
+  }
+  function containerTotal(){
+    var t=0;
+    cart.forEach(function(l){ var it = ITEMS[l.itemId]; if (it) t += M.containerOf(it, lineSizeIdx(l, it), !!l.half) * l.qty; });
+    return t;
+  }
+  // Bill worked out on this page (only used if the server can't be reached) — same maths as Petpooja.
+  function localBill(){
+    var it = itemTotal(), box = containerTotal(), gst = Math.round(it*GST_RATE*100)/100;
+    return { it:it, discount:0, container:box, gst:gst, total:Math.round(it + box + gst), reward:null, server:false };
+  }
   function cartCount(){ var n=0; cart.forEach(function(l){ n += l.qty; }); return n; }
   function sig(line){
     var tn = (line.toppings||[]).map(function(t){return t.name;}).sort().join(",");
@@ -624,8 +641,8 @@
   // Bill: the server's numbers when we have them; otherwise the plain menu total (no prize).
   function computeBill(){
     var q = freshQuote(), it = itemTotal();
-    if (q) return { it:q.totals.itemTotal, discount:q.totals.discount, gst:q.totals.gst, total:q.totals.total, reward:q.reward, server:true };
-    return { it:it, discount:0, gst:it*GST_RATE, total:it*(1+GST_RATE), reward:null, server:false };
+    if (q) return { it:q.totals.itemTotal, discount:q.totals.discount, container:q.totals.container || 0, gst:q.totals.gst, total:q.totals.total, reward:q.reward, server:true };
+    return localBill();
   }
 
   /* ---------- MENU RENDER ---------- */
@@ -668,7 +685,7 @@
       if (s.id==="pizzas"){
         html += '<div class="halfbanner"><div class="hb-ico"><span style="background-image:url(\'./images/menu/pepperoni.jpg\')"></span><span style="background-image:url(\'./images/menu/margherita.jpg\')"></span></div>'+
           '<div class="hb-txt"><b>Can\'t decide? Go Half &amp; Half</b>'+
-          '<span>Two favourites on one pizza — pick a different flavour for each half. You pay half the price of each. Large, Godfather &amp; Jumbo.</span></div>'+
+          '<span>Two favourites on one pizza — pick a different flavour for each half. Each half is priced on its own. Large, Godfather &amp; Jumbo.</span></div>'+
           '<button class="addbtn" id="halfStart">Build yours</button></div>';
       }
       if (s.id==="dinein"){
@@ -759,7 +776,7 @@
       return '<button type="button" class="hp-slot'+(act===k?' on':'')+'" data-slot="'+k+'">'+
         '<span class="hp-side">'+side+' half'+(act===k?'<i class="hp-ch"> · choosing</i>':'')+'</span>'+
         '<span class="hp-name">'+vegDot(p.veg)+' '+p.name+'</span>'+
-        '<span class="hp-pr">'+money(half(p,mSizeIdx))+' <small>('+money(p.sizes[mSizeIdx])+' ÷ 2)</small></span></button>';
+        '<span class="hp-pr">'+money(half(p,mSizeIdx))+' <small>for this half</small></span></button>';
     }
     var h = '<div class="hp">'+
       '<div class="hp-stage">'+
@@ -783,7 +800,7 @@
           '<span class="hp-thumb" style="'+pzBg(p)+'"></span>'+
           vegDot(p.veg)+'<span class="hp-tn">'+p.name+'</span>'+
           (isOther ? '<span class="hp-tp">'+(act==="a"?"Right":"Left")+' half</span>'
-                   : '<span class="hp-tp">'+money(half(p,mSizeIdx))+'</span><span class="hp-tf">('+money(p.sizes[mSizeIdx])+' ÷ 2)</span>')+
+                   : '<span class="hp-tp">'+money(half(p,mSizeIdx))+'</span><span class="hp-tf">per half</span>')+
           (isCur ? '<span class="hp-check">✓</span>' : '')+
         '</button>';
       });
@@ -944,6 +961,7 @@
         h += '<div class="row"><span>🎁 '+f.name+(f.size?' ('+f.size+')':'')+' ×'+f.qty+'</span><span class="disc">FREE</span></div>';
       });
     }
+    if (b.container) h += '<div class="row"><span>Container charge</span><span>'+money(b.container)+'</span></div>';
     h += '<div class="row"><span>GST ('+(GST_RATE*100)+'%)</span><span>'+money(b.gst)+'</span></div>'+
       '<div class="row"><span>Delivery</span><span class="free">FREE</span></div>'+
       '<div class="row total"><span>To pay</span><span>'+money(b.total)+'</span></div>'+
@@ -1189,8 +1207,8 @@
   }
 
   function sendOrder(srv, cust){
-    var b = srv ? { it:srv.totals.itemTotal, discount:srv.totals.discount, gst:srv.totals.gst, total:srv.totals.total, reward:srv.reward }
-                : { it:itemTotal(), discount:0, gst:itemTotal()*GST_RATE, total:itemTotal()*(1+GST_RATE), reward:null };
+    var b = srv ? { it:srv.totals.itemTotal, discount:srv.totals.discount, container:srv.totals.container || 0, gst:srv.totals.gst, total:srv.totals.total, reward:srv.reward }
+                : localBill();
     var rw = b.reward && b.reward.status==="applied" ? b.reward : null;
     var L = [];
     L.push("*New Order — Pizza Mia* 🍕");
@@ -1210,6 +1228,7 @@
     L.push("*Bill:*");
     L.push("Item total: "+money(b.it));
     if (rw && b.discount>0) L.push(rw.discountLabel+" ("+rw.reward.code+"): -"+money(b.discount));
+    if (b.container) L.push("Container charge: "+money(b.container));
     L.push("GST ("+(GST_RATE*100)+"%): "+money(b.gst));
     L.push("Delivery: FREE");
     L.push("*Total: "+money(b.total)+"*");
@@ -1242,7 +1261,7 @@
     var barShown = n>0 && !drawerOpen;
     el("cartbar").classList.toggle("show", barShown);
     var b = computeBill();
-    el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(b.it - b.discount)+" + taxes</small>";
+    el("cartbarCnt").innerHTML = n+" item"+(n===1?"":"s")+"<small>"+money(b.it - b.discount)+" + GST &amp; packing</small>";
     // one-line prize nudge above the cart bar
     var t = "", rw = prizeResult();
     if (prizesOn() && n>0){
@@ -1887,13 +1906,26 @@
     }
     else if (o.kind==="tree"){
       var cx = x+w/2;
-      ctx.fillStyle = "#5A3A22"; ctx.fillRect(cx-3, G-8, 6, 8);
-      ctx.fillStyle = "#1E6B3A";
-      for (var k=0;k<3;k++){ var by = G-6-k*11, hw = 15-k*3.5; ctx.beginPath(); ctx.moveTo(cx-hw,by); ctx.lineTo(cx,by-16); ctx.lineTo(cx+hw,by); ctx.fill(); }
-      ["#FF5A4E","#FFD23F","#5AA9FF","#FF5A4E"].forEach(function(cl, b){ ctx.fillStyle = cl; ctx.beginPath(); ctx.arc(cx+[-7,6,-3,4][b], G-[10,15,22,29][b], 2, 0, 7); ctx.fill(); });
-      ctx.fillStyle = "#FFD23F"; ctx.beginPath();
-      for (var p=0;p<10;p++){ var a = -Math.PI/2 + p*Math.PI/5, r = p%2 ? 2.5 : 6; ctx.lineTo(cx+Math.cos(a)*r, G-h+4+Math.sin(a)*r); }
-      ctx.fill();
+      // Bright, outlined and glowing so it stands out clearly against the dark night sky
+      ctx.save();
+      ctx.fillStyle = "#7A4A26"; ctx.fillRect(cx-3.5, G-9, 7, 9);
+      ctx.shadowColor = "rgba(140,255,170,.75)"; ctx.shadowBlur = 12;
+      ctx.lineJoin = "round"; ctx.lineWidth = 2.5; ctx.strokeStyle = "#FFFFFF";
+      for (var k=0;k<3;k++){
+        var by = G-6-k*11, hw = 16-k*3.8;
+        ctx.beginPath(); ctx.moveTo(cx-hw,by); ctx.lineTo(cx,by-17); ctx.lineTo(cx+hw,by); ctx.closePath();
+        ctx.fillStyle = k===1 ? "#3DBE5E" : "#34B356"; ctx.fill(); ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#FFFFFF";   // snow along each layer of branches
+      for (var j=0;j<3;j++){ var sy = G-6-j*11, sw = 16-j*3.8; ctx.beginPath(); ctx.ellipse(cx, sy-1, sw*0.8, 2.2, 0, 0, 7); ctx.fill(); }
+      ctx.shadowColor = "rgba(255,240,180,.9)"; ctx.shadowBlur = 6;
+      ["#FF3B30","#FFD23F","#4FC3FF","#FF3B30","#FF7AE0"].forEach(function(cl, b){ ctx.fillStyle = cl; ctx.beginPath(); ctx.arc(cx+[-8,7,-4,5,0][b], G-[11,13,22,24,31][b], 2.8, 0, 7); ctx.fill(); });
+      ctx.shadowColor = "rgba(255,220,80,1)"; ctx.shadowBlur = 14;
+      ctx.fillStyle = "#FFE14D"; ctx.beginPath();
+      for (var p=0;p<10;p++){ var a = -Math.PI/2 + p*Math.PI/5, r = p%2 ? 3 : 7.5; ctx.lineTo(cx+Math.cos(a)*r, G-h+4+Math.sin(a)*r); }
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
     }
     else if (o.kind==="snowman"){
       var cx = x+w/2;

@@ -2,8 +2,30 @@
 (function () {
   "use strict";
   // Half & Half: allowed on these pizza size indexes (Large, Godfather, Jumbo).
-  // Price = half of each pizza's price at that size (each half rounded up), added together.
+  // Each half is billed at Petpooja's own "Half N Half" price for that pizza and size
+  // (HALF_PRICES below). Never work it out from the full-pizza price.
   var HALF_SIZES = [1,2,3];
+  // Petpooja "Half N Half" price of ONE half, [Large, Godfather, Jumbo], before tax.
+  // Source: Pizza_Mia_Petpooja_Pricing.xlsx (read from Petpooja 19 Nov 2026). Change here and in Petpooja the same day.
+  var HALF_PRICES = {
+    marg:[365,490,650], garden:[390,515,675], medi:[575,750,950], mozz:[500,700,950],
+    spinfeta:[550,675,925], bragveg:[525,725,950], paneer:[475,650,875],
+    chbbq:[550,725,950], chkeema:[550,750,875], smokpap:[640,825,1095], chtikka:[625,775,1050],
+    chsaus:[525,675,950], bragch:[725,1000,1325],
+    pep:[675,875,1125], chorizo:[650,850,1075], bacon:[750,950,1300], hawaii:[575,775,1000],
+    smoksal:[700,975,1325], flamsal:[623,850,1075],
+    tuna:[600,800,1000]
+  };
+  // Container (packing) charge per item on delivery / pick up, as Petpooja bills it. No GST on it.
+  // Pizzas by size [Medium, Large, Godfather, Jumbo]; each half of a Half & Half carries its own.
+  var PIZZA_BOX = [15,20,25,40];
+  var HALF_BOX = [0,10,13,20];
+  function halfPriceOf(id, si){ var h = HALF_PRICES[id]; return h ? h[si-1] : undefined; }
+  // Container charge for one unit of an item (toppings and drinks: ₹0).
+  function containerOf(it, si, isHalf){
+    if (it.type === "pizza") return isHalf ? HALF_BOX[si] * 2 : PIZZA_BOX[si];
+    return it.box || 0;
+  }
   // Optional extras on any item, e.g. {must:true} for the "Must Try" badge,
   // {choice:{label,opts}} for a required pick (Penne/Spaghetti), {toppings:true}.
   function ext(o,x){ if (x) for (var k in x) o[k]=x[k]; return o; }
@@ -11,7 +33,8 @@
   function mu(id,name,desc,veg,img,s,x){ return ext({id:id,name:name,desc:desc,veg:veg,img:img,type:"multi",sizes:s},x); }
   function sg(id,name,desc,veg,img,p,x){ return ext({id:id,name:name,desc:desc,veg:veg,img:img,type:"single",price:p},x); }
   var MUST = {must:true};
-  var PASTA_X = {choice:{label:"Choose pasta", opts:["Penne","Spaghetti"]}, toppings:true};
+  var PASTA_X = {choice:{label:"Choose pasta", opts:["Penne","Spaghetti"]}, toppings:true, box:10};
+  var BOX10 = {box:10}, BOX15 = {box:15};   // container charge: knots & pasta ₹10, desserts ₹15
 
   var PIZZAS = [
     { group:"Vegetarian", items:[
@@ -47,16 +70,16 @@
   var STARTERS = [
     sg("garlicveg","Garlic Butter Vegetables","Vegetables tossed in garlic butter",true,"garlic-butter-vegetables.jpg",300),
     sg("wedges","Potato Wedges","Crispy seasoned potato wedges",true,"potato-wedges.jpg",250),
-    mu("garlicknots","Garlic Knots","Freshly baked, brushed with garlic butter",true,"garlic-knots.jpg",[{label:"2 pcs",price:180},{label:"4 pcs",price:300}]),
-    mu("cheeseknots","Cheese Garlic Knots","Garlic knots loaded with melted cheese",true,"cheese-garlic-knots.jpg",[{label:"2 pcs",price:250},{label:"4 pcs",price:400}],MUST)
+    mu("garlicknots","Garlic Knots","Freshly baked, brushed with garlic butter",true,"garlic-knots.jpg",[{label:"2 pcs",price:180},{label:"4 pcs",price:300}],BOX10),
+    mu("cheeseknots","Cheese Garlic Knots","Garlic knots loaded with melted cheese",true,"cheese-garlic-knots.jpg",[{label:"2 pcs",price:250},{label:"4 pcs",price:400}],{must:true,box:10})
   ];
 
   var CHEESE_KNOTS = [
-    sg("chilliknots","Chilli Cheese Knots","2 pcs · cheese knots with a chilli kick",true,"chilli-cheese-knots.jpg",250),
-    sg("mushknots","Mushroom Cheese Knots","2 pcs · cheese knots with mushroom",true,"mushroom-cheese-knots.jpg",275),
-    sg("keemaknots","Chicken Keema Cheese Knots","2 pcs · cheese knots with chicken keema",false,"chicken-keema-cheese-knots.jpg",300),
-    sg("chorizoknots","Chorizo Cheese Knots","2 pcs · cheese knots with Goan chorizo",false,"chorizo-cheese-knots.jpg",350),
-    sg("baconknots","Bacon Cheese Knots","2 pcs · cheese knots with bacon",false,"bacon-cheese-knots.jpg",350)
+    sg("chilliknots","Chilli Cheese Knots","2 pcs · cheese knots with a chilli kick",true,"chilli-cheese-knots.jpg",250,BOX10),
+    sg("mushknots","Mushroom Cheese Knots","2 pcs · cheese knots with mushroom",true,"mushroom-cheese-knots.jpg",275,BOX10),
+    sg("keemaknots","Chicken Keema Cheese Knots","2 pcs · cheese knots with chicken keema",false,"chicken-keema-cheese-knots.jpg",300,BOX10),
+    sg("chorizoknots","Chorizo Cheese Knots","2 pcs · cheese knots with Goan chorizo",false,"chorizo-cheese-knots.jpg",350,BOX10),
+    sg("baconknots","Bacon Cheese Knots","2 pcs · cheese knots with bacon",false,"bacon-cheese-knots.jpg",350,BOX10)
   ];
 
   var PASTA = [
@@ -68,7 +91,7 @@
   ];
 
   var DESSERTS = [
-    sg("brownie","Chocolate Brownie","Warm, fudgy chocolate brownie",true,"brownie.jpg",250)
+    sg("brownie","Chocolate Brownie","Warm, fudgy chocolate brownie",true,"brownie.jpg",250,BOX15)
   ];
 
   // Dine-in only: shown to tempt people to visit, not orderable online
@@ -118,7 +141,7 @@
     { id:"dinein", label:"Dine-in", items:DINEIN }
   ];
 
-  var PM_MENU = { HALF_SIZES:HALF_SIZES, PIZZAS:PIZZAS, TOPPINGS:TOPPINGS, NO_MEAT_ADDONS:NO_MEAT_ADDONS, SECTIONS:SECTIONS };
+  var PM_MENU = { HALF_SIZES:HALF_SIZES, HALF_PRICES:HALF_PRICES, PIZZA_BOX:PIZZA_BOX, HALF_BOX:HALF_BOX, halfPriceOf:halfPriceOf, containerOf:containerOf, PIZZAS:PIZZAS, TOPPINGS:TOPPINGS, NO_MEAT_ADDONS:NO_MEAT_ADDONS, SECTIONS:SECTIONS };
   // Browser: window.PM_MENU. Server (offers function): require() so prices are checked against the same data.
   if (typeof module !== "undefined" && module.exports) module.exports = PM_MENU;
   else window.PM_MENU = PM_MENU;

@@ -558,6 +558,8 @@ class App:
         parts = ["Items " + rs(o.get("itemTotal"))]
         if o.get("discount"):
             parts.append("Prize discount -" + rs(o["discount"]))
+        if o.get("container"):
+            parts.append("Container " + rs(o["container"]))
         if o.get("gst") is not None:
             parts.append("GST " + rs(o["gst"]))
         tk.Label(money, text="\n".join(parts), font=self.f(15), fg=GREY, bg=CREAM, justify="right").pack(side="right")
@@ -614,7 +616,7 @@ class App:
                                         "toppings": ["Jalapeños"]},
                                        {"name": "Cheese Garlic Knots", "size": "4 pcs", "qty": 1, "toppings": []}],
                              "freeItems": ["Coke ×1 ₹0 (Game reward HX7K2Q)"], "prize": "HX7K2Q · 10% off (max ₹100)",
-                             "itemTotal": 3014, "discount": 100, "gst": 145.7, "total": 3059.7},
+                             "itemTotal": 3014, "discount": 100, "container": 51, "gst": 145.7, "total": 3111},
             "PM-1030-FN22": {"orderId": "PM-1030-FN22", "at": iso(50), "seenAt": iso(49), "customer": {"name": "Priya Fernandes"},
                              "items": [], "total": 1380.75, "prize": ""},
         }

@@ -149,14 +149,23 @@ test("11. WhatsApp 5% + Review 5% also claimed → never combined", async functi
 test("12. Half & Half Large Margherita/Pepperoni + W_PCT10 → H&H counted at full price", async function () {
   var s = setup(), id = await give(s, "W_PCT10");
   var r = await price(s, [L("marg", "Large", 1, { half: { b: { id: "pep" } } })], id);
-  // Site price today = ½ of ₹679 + ½ of ₹1,299 = ₹340 + ₹650 = ₹990 (the brief's ₹1,040 includes a
-  // ₹25-per-half charge the website doesn't add yet — flagged to Adesh, prices not changed here).
+  // Petpooja half prices: Margherita Large half ₹365 + Pepperoni Large half ₹675 = ₹1,040 (as in the brief)
   assert.equal(r.totals.eligible, r.lines[0].total);
-  assert.equal(r.totals.eligible, 990);
-  assert.equal(r.totals.discount, 99);
-  // with the brief's ₹1,040 price the same rule gives the ₹100 cap
-  var priced = { lines: [{ idx: 0, isPizza: true }], itemTotal: 1040, eligible: 1040, hasPizza: true };
-  assert.equal(E.evaluateReward(CONFIG, priced, { rewardId: "W_PCT10" }).discount, 100);
+  assert.equal(r.totals.eligible, 1040);
+  assert.equal(r.totals.discount, 100);
+});
+
+test("Bill matches Petpooja to the rupee: order PM-1118 = ₹3,216", async function () {
+  var s = setup();
+  var r = await price(s, [L("chorizo", "Godfather"), L("marg", "Godfather", 1, { half: { b: { id: "pep" } } })]);
+  assert.equal(r.lines[1].total, 1365);       // ₹490 + ₹875 Petpooja half prices
+  assert.equal(r.totals.itemTotal, 3014);
+  assert.equal(r.totals.container, 51);       // ₹25 Godfather + ₹13 + ₹13 for the two halves
+  assert.equal(r.totals.gst, 150.7);          // 5% on items only, not on the container charge
+  assert.equal(r.totals.total, 3216);
+  // knots & pasta ₹10, brownie ₹15, starters ₹0, Jumbo ₹40 container
+  var r2 = await price(s, [L("garlicknots", "2 pcs", 2), L("brownie"), L("wedges"), L("ptomato", "Regular"), L("tuna", "Jumbo")]);
+  assert.equal(r2.totals.container, 20 + 15 + 0 + 10 + 40);
 });
 
 test("13. Fake reward id or client-sent discount → rejected/ignored", async function () {
