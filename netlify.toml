@@ -15,3 +15,10 @@
   from = "/report"
   to = "/.netlify/functions/offers?action=summary"
   status = 302
+
+# Old QR code points here: send people to the home page.
+[[redirects]]
+  from = "/play"
+  to = "/"
+  status = 302
+  force = true
